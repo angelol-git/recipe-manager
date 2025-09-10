@@ -5,8 +5,9 @@ function Add() {
   const [reply, setReply] = useState("");
 
   async function sendMessage() {
+    if (message.length <= 0) return;
     try {
-      const result = await fetch("http://localhost:8080/api/message", {
+      const result = await fetch("http://localhost:8080/api/ai/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
@@ -14,7 +15,7 @@ function Add() {
 
       const data = await result.json();
       setReply(data.reply);
-      setMessage(""); // clear input after sending
+      setMessage("");
     } catch (error) {
       console.log(`Error: ${error}`);
     }
@@ -37,7 +38,7 @@ function Add() {
           className="flex-1 border rounded p-2 text-white resize-none h-24"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="Enter a recipe and any changes you will like to make..."
         />
         <button
           className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"

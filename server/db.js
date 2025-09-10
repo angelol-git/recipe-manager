@@ -37,6 +37,8 @@ db.prepare(`CREATE TABLE IF NOT EXISTS recipes (
     title TEXT NOT NULL,
     description TEXT,
     instructions TEXT NOT NULL,
+    source_prompt TEXT,
+    ai_model TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
     )
@@ -48,6 +50,21 @@ db.prepare(`CREATE TABLE IF NOT EXISTS ingredients(
     name TEXT NOT NULL,
     amount TEXT,
     FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+    )
+`).run();
+
+db.prepare(`CREATE TABLE IF NOT EXISTS tags (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL
+    )
+`).run();
+
+db.prepare(`CREATE TABLE IF NOT EXISTS recipe_tags(
+    recipe_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    PRIMARY KEY(recipe_id, tag_id),
+    FOREIGN KEY(recipe_id) REFERENCES recipes(id),
+    FOREIGN KEY(tag_id) REFERENCES tags(id)
     )
 `).run();
 

@@ -1,6 +1,7 @@
 import express from "express";
 import { OAuth2Client } from "google-auth-library";
 import { v4 as uuidv4 } from "uuid";
+import authMiddleware from "../middleware.js";
 import db from "../db.js";
 
 const router = express.Router();
@@ -32,7 +33,6 @@ router.post("/google", async (req, res) => {
         return res.status(401).json({ error: "Invalid Google token" });
     }
 });
-
 
 router.post("/logout", (req, res) => {
     const sid = req.cookies.sid;
@@ -71,30 +71,5 @@ function createSession(userId, res) {
     return sid;
 }
 
-function authMiddleware(req, res, next) {
-    const sid = req.cookies.sid;
-    if (!sid) {
-        return res.status(401).json({ error: "Not authenticated" });
-    }
 
-    try {
-        const user = db.prepare(
-            `SELECT s.*, u.email FROM sessions s
-            JOIN users u ON u.id = s.user_id 
-            WHERE sid = ? AND expires > ?`)
-            .get(sid, Date.now());
-
-        if (!user) {
-            return res.status(401).json({ error: "Session expired" });
-        }
-
-        req.user = { id: user.user_id, email: user.email };
-        next();
-    }
-    catch (error) {
-        console.error("DB error:", error);
-        return res.status(500).json({ error: "DB error" });
-    }
-
-}
 export default router;
