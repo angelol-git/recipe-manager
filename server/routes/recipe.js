@@ -23,6 +23,25 @@ router.get("/", authMiddleware, async (req, res) => {
     }
 })
 
+router.get("/:id", authMiddleware, async (req, res) => {
+    const userId = req.user.id;
+    const { id } = req.params;
+    try {
+        const recipe = db.prepare(`
+            SELECT r.*, GROUP_CONCAT(t.name) AS tags
+            FROM recipes r
+            LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id
+            LEFT JOIN tags t ON rt.tag_id = t.id
+            WHERE r.id = ?
+            GROUP BY r.id`).get(id);
+        console.log(recipe);
+        return res.json(recipe);
+    }
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
 router.post("/save", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const { recipe } = req.body;

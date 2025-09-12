@@ -93,7 +93,9 @@ function Home() {
         <div className="grid grid-cols-2 gap-4 md:flex">
           {recipes?.map((item) => {
             return (
-              <div
+              <Link
+                to={`/add/${item.id}`}
+                state={{ recipe: item }}
                 key={item.id}
                 className="border-black/40 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 max-w-[250px] cursor-pointer"
               >
@@ -104,7 +106,7 @@ function Home() {
                 <p className="text-text-secondary/60">
                   {formatDate(item.created_at)}
                 </p>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -115,13 +117,13 @@ function Home() {
 
 export default Home;
 
-function Tags({ title, count }) {
-  return (
-    <button className="cursor-pointer flex gap-2 rounded-lg px-2 py-1 bg-gray-500">
-      <div>Baking</div>
-      <div className="bg-gray-400 rounded-full h-6 w-6 flex items-center justify-center">
-        4
-      </div>
-    </button>
-  );
-}
+// function Tags({ title, count }) {
+//   return (
+//     <button className="cursor-pointer flex gap-2 rounded-lg px-2 py-1 bg-gray-500">
+//       <div>Baking</div>
+//       <div className="bg-gray-400 rounded-full h-6 w-6 flex items-center justify-center">
+//         4
+//       </div>
+//     </button>
+//   );
+// }

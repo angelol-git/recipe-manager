@@ -13,6 +13,8 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/home" element={<Home />} />
         <Route path="/add" element={<Add />} />
+
+        <Route path="/add/:id" element={<Add />} />
       </Route>
     </Routes>
   );
