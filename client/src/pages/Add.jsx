@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 function Add() {
-  const [message, setMessage] = useState(
-    "I want a simple chocolate chip cookie recipe. Make it chewy in the middle and slightly crispy on the edges. It should serve about 12 cookies. Add a baking tag and a dessert tag."
-  );
-  const [reply, setReply] = useState({
-    title: "Chocolate Chip Cookies",
+  const [message, setMessage] = useState("");
+  // const [message, setMessage] = useState(
+  //   "I want a simple chocolate chip cookie recipe. Make it chewy in the middle and slightly crispy on the edges. It should serve about 12 cookies. Add a baking tag and a dessert tag."
+  // );
+  const [recipe, setRecipe] = useState({
+    title: "Chocolate Chip Cookies - Crunchy",
     description:
       "A simple recipe for classic chocolate chip cookies that are perfectly chewy in the middle and delightfully crispy on the edges, making them an ideal dessert. This baking recipe yields approximately 12 cookies, perfect for a small batch.",
     ingredients:
@@ -27,9 +28,26 @@ function Add() {
       });
 
       const data = await result.json();
-      console.log(data.reply);
-      setReply(data.reply);
+      console.log(data.recipe);
+      setRecipe(data.recipe);
       setMessage("");
+    } catch (error) {
+      console.log(`Error: ${error}`);
+    }
+  }
+
+  async function saveRecipe() {
+    if (Object.keys(recipe).length === 0) return;
+    try {
+      const result = await fetch("http://localhost:8080/api/recipes/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ recipe: recipe }),
+      });
+
+      const data = await result.json();
+      console.log(data.recipe);
     } catch (error) {
       console.log(`Error: ${error}`);
     }
@@ -37,25 +55,30 @@ function Add() {
 
   return (
     <div className="bg-base flex flex-col h-screen text-text-primary p-5">
-      <h1 className="text-2xl font-bold font-lora">
-        {reply ? reply?.title : "Add"}
-      </h1>
-      <div className="relative flex-1 overflow-y-auto">
-        <div className="flex sticky top-0 z-10 rounded justify-end gap-4">
-          <button className="px-3 py-1 text-text-secondary bg-crust rounded-md">
+      <div className="flex justify-between py-2 border-b-1 border-black/40 items-start">
+        <h1 className="text-xl font-bold font-lora">
+          {recipe ? recipe?.title : "Add"}
+        </h1>
+        <div className="flex sticky top-0 z-10 rounded justify-end gap-2">
+          <button
+            onClick={saveRecipe}
+            className="px-2 py-1 text-text-secondary bg-crust rounded-md"
+          >
             Save
           </button>
-          <button className="px-3 py-1 text-text-secondary bg-crust rounded-md">
-            Fork
+          <button className="font-bold px-2 py-1 color-black rounded-md">
+            ...
           </button>
         </div>
-        {reply ? (
+      </div>
+      <div className="relative flex-1 py-3 overflow-y-auto">
+        {recipe ? (
           <div className="flex flex-col gap-3">
-            <div>{reply?.description}</div>
+            <div>{recipe?.description}</div>
             <div>
               <h3 className="font-bold">Ingredients</h3>
               <ul className="list-disc pl-4">
-                {reply.ingredients.split("\n").map((item, index) => (
+                {recipe.ingredients.split("\n").map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
@@ -63,12 +86,15 @@ function Add() {
             <div>
               <h3 className="font-bold">Instructions</h3>
               <ul className="list-disc">
-                {reply.instructions.split("\n").map((item, index) => (
+                {recipe.instructions.split("\n").map((item, index) => (
                   <li key={index} className="list-none">
                     {item}
                   </li>
                 ))}
               </ul>
+            </div>
+            <div className="flex text-black/60 text-sm underline ">
+              <button>View prompt</button>
             </div>
           </div>
         ) : (
