@@ -41,12 +41,7 @@ router.post("/message", async (req, res) => {
         } catch (err) {
             return res.status(500).json({ error: `Invalid JSON from AI: ${error}` });
         }
-        // db.prepare(`
-        //     INSERT INTO recipes (user_id, title, description, instructions, source_prompt, ai_model)
-        //     VALUES (?, ?, ?, ?, ?, ?)
-        // `).run(userId, "Pasta", "Creamy pasta dish", "Boil pasta...", "Make pasta recipe", "gpt-4");
-
-        res.json({ reply: recipe });
+        res.json({ recipe });
     }
     catch (err) {
         console.error(err);
