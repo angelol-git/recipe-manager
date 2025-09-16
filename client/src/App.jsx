@@ -13,7 +13,6 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/home" element={<Home />} />
         <Route path="/chat" element={<Chat />} />
-
         <Route path="/chat/:id" element={<Chat />} />
       </Route>
     </Routes>

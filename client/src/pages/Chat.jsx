@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import DotsSvg from "../components/icons/DotsSvg.jsx";
 import SaveSvg from "../components/icons/SaveSvg.jsx";
 import DeleteSvg from "../components/icons/DeleteSvg.jsx";
 import ShareSvg from "../components/icons/ShareSvg.jsx";
+import EditSvg from "../components/icons/EditSvg.jsx";
 
 function Chat() {
+  const navigate = useNavigate();
   const { state } = useLocation();
   const { id } = useParams();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   useEffect(() => {
     if (state?.recipe) {
       const stateData = state.recipe;
@@ -87,6 +89,31 @@ function Chat() {
     });
   }
 
+  async function handleDelete() {
+    if (!id) return;
+    // setFormData(prev=>({
+    //   ...prev,
+    //   title:""
+    // }));
+    try {
+      console.log("HERE");
+      const result = await fetch(
+        `http://localhost:8080/api/recipes/delete/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!result.ok) {
+        throw new Error(`Server returned ${result.status}`);
+      }
+
+      navigate("/home");
+    } catch (error) {
+      console.log(`Error: ${error}`);
+    }
+  }
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -103,27 +130,41 @@ function Chat() {
             <SaveSvg />
             Save
           </button>
-          <button className="font-bold px-2 py-1 color-black rounded-md relative">
+          <button
+            onClick={() => {
+              setIsOptionsOpen(!isOptionsOpen);
+            }}
+            className="cursor-pointer font-bold px-2 py-1 color-black rounded-md relative"
+          >
             <DotsSvg />
-            <div className="absolute right-0 z-10 bg-crust translate-y-3 p-2 rounded-lg  font-medium">
-              <ul className="p-1 flex flex-col">
+          </button>
+          {isOptionsOpen ? (
+            <div className="absolute  right-0 z-10 bg-crust translate-y-10 p-2 rounded-lg  font-medium">
+              <ul className="p-1 flex gap-2 flex-col">
                 <li className="border-b-1 border-black/40 py-2">
-                  <button className="flex items-center">
-                    <button className="flex w-[125px] justify-between items-center">
-                      <ShareSvg />
-                      <div>Share</div>
-                    </button>
+                  <button className="flex w-[125px] justify-between items-center">
+                    <ShareSvg />
+                    <div>Share</div>
+                  </button>
+                </li>
+                <li className="border-b-1 border-black/40 py-2">
+                  <button className="flex w-[125px] justify-between items-center">
+                    <EditSvg />
+                    <div>Rename</div>
                   </button>
                 </li>
                 <li className="text-rose py-2">
-                  <button className="flex w-[125px] justify-between items-center ">
+                  <button
+                    onClick={handleDelete}
+                    className="flex w-[125px] justify-between items-center"
+                  >
                     <DeleteSvg />
                     <div>Delete</div>
                   </button>
                 </li>
               </ul>
             </div>
-          </button>
+          ) : null}
         </div>
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">

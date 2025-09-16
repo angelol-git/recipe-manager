@@ -1,6 +1,7 @@
 import express from "express";
 import db from "../db.js";
 import authMiddleware from "../middleware.js";
+import { auth } from "google-auth-library";
 
 const router = express.Router();
 
@@ -24,7 +25,6 @@ router.get("/", authMiddleware, async (req, res) => {
 })
 
 router.get("/:id", authMiddleware, async (req, res) => {
-    const userId = req.user.id;
     const { id } = req.params;
     try {
         const recipe = db.prepare(`
@@ -59,4 +59,20 @@ router.post("/save", authMiddleware, async (req, res) => {
     }
 })
 
+router.delete("/delete/:id", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = db.prepare(`DELETE FROM recipes WHERE id = ?`).run(id);
+
+        if (result.changes === 0) {
+            return res.status(404).json(({ message: "Recipe not found" }));
+        }
+        res.status(204).send();
+    }
+
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
 export default router;
