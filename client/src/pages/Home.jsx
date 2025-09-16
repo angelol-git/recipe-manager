@@ -84,7 +84,7 @@ function Home() {
         <div className="flex items-center gap-4">
           <div>Items({recipes?.length ?? "..."})</div>
           <Link
-            to="/add"
+            to="/chat"
             className="cursor-pointer rounded-lg border-black border-1 px-2 py-1"
           >
             + Add

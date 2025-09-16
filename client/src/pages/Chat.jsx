@@ -5,7 +5,7 @@ import SaveSvg from "../components/icons/SaveSvg.jsx";
 import DeleteSvg from "../components/icons/DeleteSvg.jsx";
 import ShareSvg from "../components/icons/ShareSvg.jsx";
 
-function Add() {
+function Chat() {
   const { state } = useLocation();
   const { id } = useParams();
   const [formData, setFormData] = useState({});
@@ -93,7 +93,7 @@ function Add() {
     <div className="bg-base flex flex-col h-screen text-text-primary p-5">
       <div className="gap-2 flex justify-between py-2 border-b-1 border-black/40 items-start">
         <h1 className="text-xl font-bold font-lora">
-          {formData ? formData?.title : "Add"}
+          {formData ? formData?.title : "Chat"}
         </h1>
         <div className="flex sticky top-0 z-10 rounded justify-end gap-2">
           <button
@@ -175,4 +175,4 @@ function Add() {
   );
 }
 
-export default Add;
+export default Chat;

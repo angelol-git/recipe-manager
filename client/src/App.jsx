@@ -2,7 +2,7 @@ import "./App.css";
 import { Routes, Route } from "react-router";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
-import Add from "./pages/Add";
+import Chat from "./pages/Chat";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -12,9 +12,9 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/home" element={<Home />} />
-        <Route path="/add" element={<Add />} />
+        <Route path="/chat" element={<Chat />} />
 
-        <Route path="/add/:id" element={<Add />} />
+        <Route path="/chat/:id" element={<Chat />} />
       </Route>
     </Routes>
   );
