@@ -3,10 +3,12 @@ import { useNavigate, useParams, useLocation } from "react-router";
 import ChatTitle from "../components/chat/ChatTitle.jsx";
 import ChatInput from "../components/chat/ChatInput.jsx";
 import DotsSvg from "../components/icons/DotsSvg.jsx";
+import MenuSvg from "../components/icons/MenuSvg.jsx";
 import SaveSvg from "../components/icons/SaveSvg.jsx";
 import DeleteSvg from "../components/icons/DeleteSvg.jsx";
 import ShareSvg from "../components/icons/ShareSvg.jsx";
 import EditSvg from "../components/icons/EditSvg.jsx";
+import ChatSideBar from "../components/chat/ChatSideBar.jsx";
 
 function Chat() {
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   function saveFormData(object) {
     setFormData({
       title: object.title,
@@ -134,15 +136,25 @@ function Chat() {
 
   if (loading) return <p>Loading...</p>;
   return (
-    <div className="bg-base flex flex-col h-screen text-text-primary p-5">
-      <div className="gap-2 flex justify-between py-2 border-b-1 border-black/40 items-start">
-        <ChatTitle
-          title={formData.title}
-          setFormData={setFormData}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
-          handleRename={handleRename}
-        />
+    <div className="relative bg-base flex flex-col h-screen text-text-primary p-5 w-full">
+      <ChatSideBar
+        isSideBarOpen={isSideBarOpen}
+        setIsSideBarOpen={setIsSideBarOpen}
+      />
+      <div className="gap-2 flex w-full justify-between py-2 border-b-1 border-black/40 items-start">
+        <div className="flex gap-3 items-center">
+          <button onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
+            <MenuSvg />
+          </button>
+
+          <ChatTitle
+            title={formData.title}
+            setFormData={setFormData}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            handleRename={handleRename}
+          />
+        </div>
         <div className="flex sticky top-0 z-10 rounded justify-end gap-2">
           <button
             onClick={saveRecipe}

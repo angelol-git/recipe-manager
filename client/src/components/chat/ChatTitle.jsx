@@ -27,9 +27,10 @@ function ChatTitle({
   }
 
   return (
-    <div>
+    <div className="w-full">
       {isEditing ? (
         <input
+          name="title"
           ref={inputRef}
           value={draftTitle}
           onChange={(e) => setDraftTitle(e.target.value)}
@@ -37,11 +38,11 @@ function ChatTitle({
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSave();
           }}
-          className="text-2xl font-bold font-lora border-b border-black"
+          className="text-2xl font-bold font-lora border-b border-black w-full"
         />
       ) : (
         <h1
-          className="text-2xl font-bold font-lora"
+          className="text-2xl font-bold font-lora w-full"
           onClick={() => setIsEditing(true)}
         >
           {title}
