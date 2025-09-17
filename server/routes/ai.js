@@ -10,23 +10,37 @@ router.post("/message", async (req, res) => {
     try {
         const { message } = req.body;
         const prompt = `
-            You are a recipe extraction assistant. 
+        You are a recipe extraction assistant. 
 
-            The user will send you a recipe request or modification. 
-            You must extract the recipe information and respond ONLY in raw valid JSON with this format (no markdown, no backticks, no extra text):
-            Do not include any text outside the JSON.
+        The user will send you a recipe request or modification. 
+        You must extract the recipe information and respond ONLY in raw valid JSON with this format (no markdown, no backticks, no extra text):
+        Do not include any text outside the JSON.
 
-            {
-            "title": "...",
-            "description": "...",
-            "ingredients": "...",
-            "instructions": "...",
-            "source_prompt": "...",
-            "ai_model": "gemini-2.5-flash"
-            }
+        If the user's message is NOT about a recipe, respond with this exact JSON (leaving fields empty except source_prompt and ai_model):
 
-            Here is the user message: "${message}"
+        {
+        "title": "",
+        "description": "",
+        "ingredients": "",
+        "instructions": "",
+        "source_prompt": "<copy the user message here>",
+        "ai_model": "gemini-2.5-flash"
+        }
+
+        Otherwise, return a properly extracted recipe in this JSON format:
+
+        {
+        "title": "...",
+        "description": "...",
+        "ingredients": "...",
+        "instructions": "...",
+        "source_prompt": "<copy the user message here>",
+        "ai_model": "gemini-2.5-flash"
+        }
+
+        Here is the user message: "${message}"
         `;
+
 
         const response = await genAI.models.generateContent({
             model: "gemini-2.5-flash",
@@ -37,7 +51,7 @@ router.post("/message", async (req, res) => {
 
         try {
             recipe = JSON.parse(response.candidates[0].content.parts[0].text)
-            //console.log(recipe);
+            console.log(recipe);
         } catch (err) {
             return res.status(500).json({ error: `Invalid JSON from AI: ${error}` });
         }

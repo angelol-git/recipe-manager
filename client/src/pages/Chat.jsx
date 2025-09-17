@@ -4,38 +4,20 @@ import ChatTitle from "../components/chat/ChatTitle.jsx";
 import ChatSideBar from "../components/chat/ChatSideBar.jsx";
 import ChatOptions from "../components/chat/ChatOptions.jsx";
 import ChatInput from "../components/chat/ChatInput.jsx";
-import DotsSvg from "../components/icons/DotsSvg.jsx";
+
 import MenuSvg from "../components/icons/MenuSvg.jsx";
-import SaveSvg from "../components/icons/SaveSvg.jsx";
 
 function Chat() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { id } = useParams();
-  const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [currentRecipe, setCurrentRecipe] = useState({});
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [isValidResponse, setIsValidResponse] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
-  function saveFormData(object) {
-    setFormData({
-      title: object.title,
-      description: object.description,
-      instructions: object.instructions,
-      ingredients: object.ingredients,
-      source_prompt: object.source_prompt,
-      ai_model: object.ai_model,
-    });
-  }
-
-  // useEffect(() => {
-  //   if (state?.recipe) {
-  //     const stateData = state.recipe;
-  //     saveFormData(stateData);
-  //     setLoading(false);
-  //   }
-  // }, [state]);
 
   useEffect(() => {
     async function fetchRecipe() {
@@ -44,7 +26,7 @@ function Chat() {
           credentials: "include",
         });
         const data = await result.json();
-        saveFormData(data);
+        saveCurrentRecipe(data);
       } catch (error) {
         console.log("Error fetching recipe:", error);
       } finally {
@@ -53,7 +35,7 @@ function Chat() {
     }
 
     if (state?.recipe) {
-      saveFormData(state.recipe);
+      saveCurrentRecipe(state.recipe);
       setLoading(false);
     }
 
@@ -72,25 +54,41 @@ function Chat() {
       });
 
       const data = await result.json();
-      saveFormData(data);
+      console.log(data);
+
+      saveCurrentRecipe(data.recipe);
       setMessage("");
+      if (
+        !data.recipe.title &&
+        !data.recipe.ingredients &&
+        !data.recipe.instructions
+      ) {
+        setIsValidResponse(false);
+        setIsError("I couldn’t extract a recipe from that message.");
+        return;
+      }
+
+      setIsError(null);
     } catch (error) {
       console.log(`Error: ${error}`);
+      setIsError(
+        "Something went wrong while sending your message. Please try again."
+      );
     }
   }
 
   async function saveRecipe() {
-    if (Object.keys(formData).length === 0) return;
+    if (Object.keys(currentRecipe).length === 0) return;
     try {
       const result = await fetch("http://localhost:8080/api/recipes/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ recipe: formData }),
+        body: JSON.stringify({ recipe: currentRecipe }),
       });
 
       const data = await result.json();
-      console.log(data.recipe);
+      console.log(data);
     } catch (error) {
       console.log(`Error: ${error}`);
     }
@@ -135,6 +133,22 @@ function Chat() {
     }
   }
 
+  // function checkValidResponse() {
+  //   if (!currentRecipe.title && !currentRecipe.ingredients && !currentRecipe.instructions) {
+  //     return false;
+  //   }
+  // }
+  function saveCurrentRecipe(object) {
+    setCurrentRecipe({
+      title: object.title,
+      description: object.description,
+      instructions: object.instructions,
+      ingredients: object.ingredients,
+      source_prompt: object.source_prompt,
+      ai_model: object.ai_model,
+    });
+  }
+
   if (loading) return <p>Loading...</p>;
   return (
     <div className="relative bg-base flex flex-col h-screen text-text-primary p-5 w-full">
@@ -153,68 +167,63 @@ function Chat() {
           <button onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
             <MenuSvg />
           </button>
-
           <ChatTitle
-            title={formData.title}
-            setFormData={setFormData}
+            title={currentRecipe.title}
+            setCurrentRecipe={setCurrentRecipe}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
             handleRename={handleRename}
           />
         </div>
-        <div className="flex sticky z-10 top-0 rounded justify-end gap-2">
-          <button
-            onClick={saveRecipe}
-            className="px-2 py-1 bg-yellow flex font-semibold gap-2 rounded-md items-center"
-          >
-            <SaveSvg />
-          </button>
-          <button
-            onClick={() => {
-              setIsOptionsOpen(!isOptionsOpen);
-            }}
-            className="cursor-pointer font-bold px-2 py-1 color-black rounded-md relative"
-          >
-            <DotsSvg />
-          </button>
-          {isOptionsOpen ? (
-            <ChatOptions
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              handleDelete={handleDelete}
-            />
-          ) : null}
-        </div>
+        <ChatOptions
+          saveRecipe={saveRecipe}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          handleDelete={handleDelete}
+        />
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">
-        {formData ? (
-          <div className="flex flex-col gap-3">
-            <div>{formData?.description}</div>
-            <div>
-              <h3 className="font-bold">Ingredients</h3>
-              <ul className="list-disc pl-4">
-                {formData.ingredients.split("\n").map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
+        <div className="relative flex-1 py-3 overflow-y-auto">
+          {isError && (
+            <div className="flex flex-col gap-3">
+              <div className="p-3 rounded bg-gray-200 max-w-[80%] self-end">
+                {currentRecipe.source_prompt}
+              </div>
+              <div className="p-3  rounded bg-rose-100 text-rose-700">
+                {isError}
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold">Instructions</h3>
-              <ul className="list-disc">
-                {formData.instructions.split("\n").map((item, index) => (
-                  <li key={index} className="list-none">
-                    {item}
-                  </li>
-                ))}
-              </ul>
+          )}
+
+          {currentRecipe && isValidResponse ? (
+            <div className="flex flex-col gap-3">
+              <div>{currentRecipe?.description}</div>
+              <div>
+                <h3 className="font-bold">Ingredients</h3>
+                <ul className="list-disc pl-4">
+                  {currentRecipe.ingredients.split("\n").map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold">Instructions</h3>
+                <ul className="list-disc">
+                  {currentRecipe.instructions.split("\n").map((item, index) => (
+                    <li key={index} className="list-none">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex text-black/60 text-sm underline ">
+                <button>View prompt</button>
+              </div>
             </div>
-            <div className="flex text-black/60 text-sm underline ">
-              <button>View prompt</button>
-            </div>
-          </div>
-        ) : (
-          <div className="text-gray-400">No messages yet</div>
-        )}
+          ) : (
+            !isError && <div className="text-gray-400">No messages yet</div>
+          )}
+        </div>
       </div>
       <ChatInput
         message={message}

@@ -50,6 +50,7 @@ router.post("/save", authMiddleware, async (req, res) => {
 
         return res.json({ success: true });
     }
+
     catch (error) {
         console.error("DB error:", error);
         return res.status(500).json({ error: `DB error: ${error}` });

@@ -17,11 +17,11 @@ function ChatInput({ message, setMessage, sendMessage }) {
     <div className="flex  max-h-40 items-end gap-2 p-1 border rounded-2xl border-gray-300">
       <textarea
         ref={ref}
-        className="flex-1 px-3 py-2 h-10 outline-none"
+        className="flex-1 px-3 py-2 h-2 outline-none"
         style={{ maxHeight: `${maxHeight}px`, overflowY: "auto" }}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Enter a recipe and any changes you will like to make..."
+        placeholder="Enter a recipe or any changes"
       />
 
       {message.length > 0 && (
