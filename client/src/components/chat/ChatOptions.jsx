@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DeleteSvg from "../icons/DeleteSvg.jsx";
 import ShareSvg from "../icons/ShareSvg.jsx";
 import EditSvg from "../icons/EditSvg.jsx";
@@ -7,6 +7,22 @@ import DotsSvg from "../icons/DotsSvg.jsx";
 
 function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsOptionsOpen(false);
+      }
+    }
+    if (isOptionsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOptionsOpen]);
+
   return (
     <div className="flex sticky z-10 top-0 rounded justify-end gap-2">
       <button
@@ -24,10 +40,18 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
         <DotsSvg />
       </button>
       {isOptionsOpen ? (
-        <div className="absolute right-0 z-100 bg-crust translate-y-12 p-2 rounded-lg shadow-lg">
+        <div
+          ref={menuRef}
+          className="absolute right-0 z-100 bg-crust translate-y-12 p-2 rounded-lg shadow-lg"
+        >
           <ul className="p-1 flex gap-2 flex-col w-[150px]">
             <li className="border-b-1 border-black/40 py-2">
-              <button className="flex z-100 w-full justify-between items-center">
+              <button
+                onClick={() => {
+                  setIsOptionsOpen(!isOptionsOpen);
+                }}
+                className="flex z-100 w-full justify-between items-center"
+              >
                 <ShareSvg />
                 <div>Share</div>
               </button>
@@ -35,6 +59,7 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
             <li className="border-b-1 border-black/40 py-2">
               <button
                 onClick={() => {
+                  setIsOptionsOpen(!isOptionsOpen);
                   setIsEditing(!isEditing);
                 }}
                 className="flex w-full justify-between items-center"
@@ -45,7 +70,10 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
             </li>
             <li className="text-rose py-2">
               <button
-                onClick={handleDelete}
+                onClick={() => {
+                  setIsOptionsOpen(!isOptionsOpen);
+                  handleDelete();
+                }}
                 className="flex w-full justify-between items-center"
               >
                 <DeleteSvg />

@@ -9,9 +9,9 @@ import MenuSvg from "../components/icons/MenuSvg.jsx";
 
 function Chat() {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const { id } = useParams();
-  const [loading, setLoading] = useState(true);
+  const { state: initialState } = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
   const [currentRecipe, setCurrentRecipe] = useState({});
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -30,19 +30,19 @@ function Chat() {
       } catch (error) {
         console.log("Error fetching recipe:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     }
 
-    if (state?.recipe) {
-      saveCurrentRecipe(state.recipe);
-      setLoading(false);
+    if (initialState?.recipe) {
+      saveCurrentRecipe(initialState.recipe);
+      setIsLoading(false);
     }
 
     if (id) {
       fetchRecipe();
     }
-  }, [id, state]);
+  }, [id, initialState]);
 
   async function sendMessage() {
     if (message.length <= 0) return;
@@ -149,7 +149,7 @@ function Chat() {
     });
   }
 
-  if (loading) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;
   return (
     <div className="relative bg-base flex flex-col h-screen text-text-primary p-5 w-full">
       <ChatSideBar
