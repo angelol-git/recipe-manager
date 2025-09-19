@@ -1,7 +1,21 @@
+import { useEffect } from "react";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useNavigate } from "react-router";
 function Landing() {
   const navigate = useNavigate();
+  useEffect(() => {
+    async function redirect() {
+      const result = await fetch("http://localhost:8080/api/auth/check", {
+        credentials: "include",
+      });
+
+      if (result.ok) {
+        navigate("/home");
+      }
+    }
+    redirect();
+  }, []);
+
   async function handleSuccess(response) {
     try {
       const result = await fetch("http://localhost:8080/api/auth/google", {

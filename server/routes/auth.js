@@ -58,7 +58,7 @@ router.get("/me", authMiddleware, (req, res) => {
 
 function createSession(userId, res) {
     const sid = uuidv4();
-    const expires = Date.now() + 1000 * 60 * 60 * 24; //1 day
+    const expires = Date.now() + 1000 * 60 * 60 * 24 * 30; //30 days
 
     db.prepare("INSERT INTO sessions (sid,user_id,expires) VALUES (?,?,?)").run(sid, userId, expires);
 

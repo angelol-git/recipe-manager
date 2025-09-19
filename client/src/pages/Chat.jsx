@@ -65,7 +65,6 @@ function Chat() {
       });
 
       const data = await result.json();
-      console.log(data);
       saveCurrentRecipe(data.recipe);
       setMessage("");
       const isValid = checkValidResponse(data.recipe);
@@ -235,7 +234,7 @@ function Chat() {
                   </ul>
                 </div>
               )}
-              {currentRecipe.source_prompt && (
+              {currentRecipe.source_prompt && !isReplyLoading && (
                 <div className="flex text-black/60 text-sm underline ">
                   <button>View prompt</button>
                 </div>
