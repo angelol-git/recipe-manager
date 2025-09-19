@@ -11,17 +11,21 @@ function Chat() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { state: initialState } = useLocation();
+
   const [isLoading, setIsLoading] = useState(true);
   const [currentRecipe, setCurrentRecipe] = useState({});
   const [message, setMessage] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isValidResponse, setIsValidResponse] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isReplyLoading, setIsReplyLoading] = useState(false);
+
   useEffect(() => {
     async function fetchRecipe() {
       try {
+        setErrorMessage(null);
+        setIsValidResponse(true);
         const result = await fetch(`http://localhost:8080/api/recipes/${id}`, {
           credentials: "include",
         });
@@ -37,41 +41,41 @@ function Chat() {
     if (initialState?.recipe) {
       saveCurrentRecipe(initialState.recipe);
       setIsLoading(false);
-    }
-
-    if (id) {
+    } else if (id) {
       fetchRecipe();
+    } else {
+      setIsLoading(false);
     }
   }, [id, initialState]);
 
   async function sendMessage() {
     if (message.length <= 0) return;
     try {
+      setErrorMessage(null);
+      setIsValidResponse(true);
       setIsReplyLoading(true);
+      console.log(currentRecipe);
       const result = await fetch("http://localhost:8080/api/ai/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({
+          message: message,
+          previousRecipe: currentRecipe,
+        }),
       });
 
       const data = await result.json();
-
+      console.log(data);
       saveCurrentRecipe(data.recipe);
       setMessage("");
-      if (
-        !data.recipe.title &&
-        !data.recipe.ingredients &&
-        !data.recipe.instructions
-      ) {
-        setIsValidResponse(false);
-        setIsError("I couldn’t extract a recipe from that message.");
-        return;
+      const isValid = checkValidResponse(data.recipe);
+      setIsValidResponse(isValid);
+      if (!isValid) {
+        setErrorMessage("I couldn’t extract a recipe from that message.");
       }
-
-      setIsError(null);
     } catch (error) {
       console.log(`Error: ${error}`);
-      setIsError(
+      setErrorMessage(
         "Something went wrong while sending your message. Please try again."
       );
     } finally {
@@ -135,11 +139,14 @@ function Chat() {
     }
   }
 
-  // function checkValidResponse() {
-  //   if (!currentRecipe.title && !currentRecipe.ingredients && !currentRecipe.instructions) {
-  //     return false;
-  //   }
-  // }
+  function checkValidResponse(recipe) {
+    return !!(
+      recipe.title?.trim() ||
+      recipe.ingredients?.trim() ||
+      recipe.instructions?.trim()
+    );
+  }
+
   function saveCurrentRecipe(object) {
     setCurrentRecipe({
       title: object.title,
@@ -185,47 +192,60 @@ function Chat() {
         />
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">
-        <div className="relative flex-1 py-3 overflow-y-auto">
-          {isError && (
-            <div className="flex flex-col gap-3">
-              <div className="p-3 rounded bg-gray-200 max-w-[80%] self-end wrap-break-word">
-                {currentRecipe.source_prompt}
-              </div>
-              <div className="p-3  rounded bg-rose-100 text-rose-700">
-                {isError}
-              </div>
+        {errorMessage && (
+          <div className="flex flex-col gap-3">
+            <div className="p-3 rounded bg-gray-200 max-w-[80%] self-end wrap-break-word">
+              {currentRecipe.source_prompt}
             </div>
-          )}
+            <div className="p-3  rounded bg-rose-100 text-rose-700">
+              {errorMessage}
+            </div>
+          </div>
+        )}
 
-          {currentRecipe && isValidResponse ? (
+        {!errorMessage &&
+          isValidResponse &&
+          Object.keys(currentRecipe).length > 0 && (
             <div className="flex flex-col gap-3">
               <div>{currentRecipe?.description}</div>
-              <div>
-                <h3 className="font-bold">Ingredients</h3>
-                <ul className="list-disc pl-4">
-                  {currentRecipe.ingredients.split("\n").map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-bold">Instructions</h3>
-                <ul className="list-disc">
-                  {currentRecipe.instructions.split("\n").map((item, index) => (
-                    <li key={index} className="list-none">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex text-black/60 text-sm underline ">
-                <button>View prompt</button>
-              </div>
+
+              {currentRecipe.ingredients && (
+                <div>
+                  <h3 className="font-bold">Ingredients</h3>
+                  <ul className="list-disc pl-4">
+                    {currentRecipe?.ingredients
+                      .split("\n")
+                      .map((item, index) => (
+                        <li key={index}>{item}</li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+              {currentRecipe.instructions && (
+                <div>
+                  <h3 className="font-bold">Instructions</h3>
+                  <ul className="list-disc">
+                    {currentRecipe?.instructions
+                      .split("\n")
+                      .map((item, index) => (
+                        <li key={index} className="list-none">
+                          {item}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+              {currentRecipe.source_prompt && (
+                <div className="flex text-black/60 text-sm underline ">
+                  <button>View prompt</button>
+                </div>
+              )}
             </div>
-          ) : (
-            !isError && <div className="text-gray-400">No messages yet</div>
           )}
-        </div>
+        {!errorMessage &&
+          (!isValidResponse || Object.keys(currentRecipe).length === 0) && (
+            <div className="text-gray-400">No messages yet</div>
+          )}
       </div>
       <ChatInput
         message={message}

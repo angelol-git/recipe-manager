@@ -35,7 +35,9 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
         onClick={() => {
           setIsOptionsOpen(!isOptionsOpen);
         }}
-        className="cursor-pointer font-bold px-2 py-1 color-black rounded-md relative"
+        className={`cursor-pointer font-bold px-2 py-1 color-black rounded-md relative ${
+          isOptionsOpen ? "bg-gray-300/30" : null
+        }`}
       >
         <DotsSvg />
       </button>

@@ -8,9 +8,13 @@ const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
 router.post("/message", async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, previousRecipe } = req.body;
         const prompt = `
 You are a recipe extraction assistant.
+
+The user previously received this recipe from you:
+${previousRecipe ? JSON.stringify(previousRecipe) : "{}"}
+
 
 The user will send you a recipe request, modification, or a URL pointing to a recipe.
 
@@ -18,7 +22,12 @@ The user will send you a recipe request, modification, or a URL pointing to a re
 2. If the user's message is plain text about a recipe, extract the recipe information from it.
 3. If the user's message is NOT about a recipe and not a URL, respond with an "empty" JSON.
 
-You must respond ONLY in raw valid JSON (no markdown, no backticks, no extra text):
+You must respond ONLY with raw valid JSON. 
+Do not include markdown. 
+Do not include backticks. 
+Do not include any explanation. 
+Do not include markdown fences like \`\`\`json or \`\`\`.
+The ENTIRE response must be valid JSON only.
 
 If the user's message is NOT about a recipe, return:
 {
@@ -43,22 +52,27 @@ Otherwise, return a properly extracted recipe in this format:
 Here is the user message: "${message}"
 `;
 
-
-
         const response = await genAI.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: prompt,
+            contents: [{ type: "text", text: prompt }],
 
         });
-        let recipe;
+
+        let rawResponse = response.candidates[0].content.parts[0].text.trim();
+
+        if (rawResponse.startsWith("```")) {
+            rawText = rawText.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "").trim();
+        }
 
         try {
-            recipe = JSON.parse(response.candidates[0].content.parts[0].text)
+            let recipe = JSON.parse(rawResponse)
             console.log(recipe);
+            return res.json({ recipe });
+
         } catch (err) {
-            return res.status(500).json({ error: `Invalid JSON from AI: ${error}` });
+            return res.status(500).json({ error: `Invalid JSON from AI: ${err}` });
         }
-        res.json({ recipe });
+
     }
     catch (err) {
         console.error(err);

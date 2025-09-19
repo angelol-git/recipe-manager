@@ -90,14 +90,14 @@ function Home() {
             + Add
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:flex">
+        <div className="grid grid-cols-1 gap-4 md:flex">
           {recipes?.map((item) => {
             return (
               <Link
                 to={`/chat/${item.id}`}
                 state={{ recipe: item }}
                 key={item.id}
-                className="border-black/40 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 max-w-[250px] cursor-pointer"
+                className="border-black/40 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 md:max-w-[250px] cursor-pointer"
               >
                 <h3 className="font-bold font-lora text-xl">{item.title}</h3>
                 <p className="text-text-secondary">

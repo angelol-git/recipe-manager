@@ -50,6 +50,9 @@ function ChatSideBar({ isSideBarOpen, setIsSideBarOpen }) {
                   to={`/chat/${item.id}`}
                   state={{ recipe: item }}
                   key={item.id}
+                  onClick={() => {
+                    setIsSideBarOpen(!isSideBarOpen);
+                  }}
                 >
                   <p className="cursor-pointer">{item.title}</p>
                 </Link>
