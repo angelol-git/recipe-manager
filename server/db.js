@@ -12,19 +12,9 @@ db.prepare(`
     )
 `).run();
 
-db.prepare(`CREATE TABLE IF NOT EXISTS todos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT NOT NULL,
-    description TEXT,
-    complete INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-`).run();
-
 db.prepare(`CREATE TABLE IF NOT EXISTS sessions (
     sid TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expires INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -33,17 +23,26 @@ db.prepare(`CREATE TABLE IF NOT EXISTS sessions (
 
 db.prepare(`CREATE TABLE IF NOT EXISTS recipes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
     parent_id INTEGER,
     title TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (parent_id) REFERENCES recipes(id)
+    )
+`).run();
+
+db.prepare(`CREATE TABLE IF NOT EXISTS recipe_versions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipe_id INTEGER NOT NULL,
     description TEXT,
     instructions TEXT NOT NULL,
     ingredients TEXT NOT NULL,
     source_prompt TEXT,
     ai_model TEXT,
+    relation TEXT CHECK (relation IN ('reply','fork')) DEFAULT reply,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-    FOREIGN KEY (parent_id) REFERENCES recipes(id)
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
     )
 `).run();
 
@@ -59,7 +58,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS ingredients(
 db.prepare(`CREATE TABLE IF NOT EXISTS tags (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE NOT NULL
-    )
+)
 `).run();
 
 db.prepare(`CREATE TABLE IF NOT EXISTS recipe_tags(

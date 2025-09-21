@@ -6,14 +6,15 @@ import ChatOptions from "../components/chat/ChatOptions.jsx";
 import ChatInput from "../components/chat/ChatInput.jsx";
 
 import MenuSvg from "../components/icons/MenuSvg.jsx";
+import ChatReply from "../components/chat/ChatReply.jsx";
 
 function Chat() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { state: initialState } = useLocation();
 
+  const [recipe, setRecipe] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [currentRecipe, setCurrentRecipe] = useState({});
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [isValidResponse, setIsValidResponse] = useState(true);
@@ -24,13 +25,18 @@ function Chat() {
   useEffect(() => {
     async function fetchRecipe() {
       try {
-        setErrorMessage(null);
-        setIsValidResponse(true);
         const result = await fetch(`http://localhost:8080/api/recipes/${id}`, {
           credentials: "include",
         });
         const data = await result.json();
-        saveCurrentRecipe(data);
+        setRecipe({
+          id: data.id || null,
+          title: data.title,
+          relation: data.relation || "reply",
+          versions: data.versions,
+        });
+        setErrorMessage(null);
+        setIsValidResponse(true);
       } catch (error) {
         console.log("Error fetching recipe:", error);
       } finally {
@@ -39,7 +45,12 @@ function Chat() {
     }
 
     if (initialState?.recipe) {
-      saveCurrentRecipe(initialState.recipe);
+      console.log(initialState.recipe);
+      setRecipe({
+        id: initialState.recipe.id || null,
+        title: initialState.recipe.title,
+        versions: initialState.recipe.versions,
+      });
       setIsLoading(false);
     } else if (id) {
       fetchRecipe();
@@ -51,21 +62,31 @@ function Chat() {
   async function sendMessage() {
     if (message.length <= 0) return;
     try {
-      setErrorMessage(null);
-      setIsValidResponse(true);
       setIsReplyLoading(true);
-      console.log(currentRecipe);
       const result = await fetch("http://localhost:8080/api/ai/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: message,
-          previousRecipe: currentRecipe,
+          message: message.trim(),
+          previousRecipe: recipe,
         }),
       });
+      setErrorMessage(null);
 
       const data = await result.json();
-      saveCurrentRecipe(data.recipe);
+      const newVersion = {
+        // id: data.recipe.id,
+        ai_model: data.recipe.ai_model,
+        description: data.recipe.description,
+        ingredients: data.recipe.ingredients,
+        instructions: data.recipe.instructions,
+        source_prompt: data.recipe.source_prompt,
+      };
+
+      setRecipe((prev) => ({
+        ...prev,
+        versions: [newVersion, ...prev.versions],
+      }));
       setMessage("");
       const isValid = checkValidResponse(data.recipe);
       setIsValidResponse(isValid);
@@ -83,17 +104,20 @@ function Chat() {
   }
 
   async function saveRecipe() {
-    if (Object.keys(currentRecipe).length === 0) return;
+    if (Object.keys(recipe).length === 0) return;
     try {
       const result = await fetch("http://localhost:8080/api/recipes/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ recipe: currentRecipe }),
+        body: JSON.stringify({
+          recipeId: recipe.id,
+          recipe: recipe.versions[0],
+        }),
       });
 
       const data = await result.json();
-      console.log(data);
+      console.log("Saved: ", data);
     } catch (error) {
       console.log(`Error: ${error}`);
     }
@@ -146,24 +170,23 @@ function Chat() {
     );
   }
 
-  function saveCurrentRecipe(object) {
-    setCurrentRecipe({
+  function saveRootRecipe(object) {
+    // console.log(object);
+    setRecipe({
+      id: object.id || null,
       title: object.title,
-      description: object.description,
-      instructions: object.instructions,
-      ingredients: object.ingredients,
-      source_prompt: object.source_prompt,
-      ai_model: object.ai_model,
+      relation: object.relation || "reply",
+      versions: object.versions,
     });
   }
 
   if (isLoading) return <p>Loading...</p>;
   return (
     <div className="relative bg-base flex flex-col h-screen text-text-primary p-5 w-full">
-      <ChatSideBar
+      {/* <ChatSideBar
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
-      />
+      /> */}
       {isSideBarOpen && (
         <div
           className="fixed inset-0 bg-black/10 z-20"
@@ -176,8 +199,8 @@ function Chat() {
             <MenuSvg />
           </button>
           <ChatTitle
-            title={currentRecipe.title}
-            setCurrentRecipe={setCurrentRecipe}
+            title={recipe.title}
+            setCurrentRecipe={recipe}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
             handleRename={handleRename}
@@ -194,7 +217,7 @@ function Chat() {
         {errorMessage && (
           <div className="flex flex-col gap-3">
             <div className="p-3 rounded bg-gray-200 max-w-[80%] self-end wrap-break-word">
-              {currentRecipe.source_prompt}
+              {recipe.source_prompt}
             </div>
             <div className="p-3  rounded bg-rose-100 text-rose-700">
               {errorMessage}
@@ -202,47 +225,14 @@ function Chat() {
           </div>
         )}
 
+        {!errorMessage && isValidResponse && Object.keys(recipe).length > 0 && (
+          <ChatReply
+            versions={recipe.versions}
+            isReplyLoading={isReplyLoading}
+          />
+        )}
         {!errorMessage &&
-          isValidResponse &&
-          Object.keys(currentRecipe).length > 0 && (
-            <div className="flex flex-col gap-3">
-              <div>{currentRecipe?.description}</div>
-
-              {currentRecipe.ingredients && (
-                <div>
-                  <h3 className="font-bold">Ingredients</h3>
-                  <ul className="list-disc pl-4">
-                    {currentRecipe?.ingredients
-                      .split("\n")
-                      .map((item, index) => (
-                        <li key={index}>{item}</li>
-                      ))}
-                  </ul>
-                </div>
-              )}
-              {currentRecipe.instructions && (
-                <div>
-                  <h3 className="font-bold">Instructions</h3>
-                  <ul className="list-disc">
-                    {currentRecipe?.instructions
-                      .split("\n")
-                      .map((item, index) => (
-                        <li key={index} className="list-none">
-                          {item}
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )}
-              {currentRecipe.source_prompt && !isReplyLoading && (
-                <div className="flex text-black/60 text-sm underline ">
-                  <button>View prompt</button>
-                </div>
-              )}
-            </div>
-          )}
-        {!errorMessage &&
-          (!isValidResponse || Object.keys(currentRecipe).length === 0) && (
+          (!isValidResponse || Object.keys(recipe).length === 0) && (
             <div className="text-gray-400">No messages yet</div>
           )}
       </div>

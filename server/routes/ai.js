@@ -66,7 +66,6 @@ Here is the user message: "${message}"
 
         try {
             let recipe = JSON.parse(rawResponse)
-            console.log(recipe);
             return res.json({ recipe });
 
         } catch (err) {

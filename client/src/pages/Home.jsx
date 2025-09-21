@@ -6,12 +6,14 @@ function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [recipes, setRecipes] = useState([]);
+
   useEffect(() => {
     async function getData() {
       try {
         const result = await fetch("http://localhost:8080/api/auth/me", {
           credentials: "include",
         });
+
         const data = await result.json();
         setUser(data.user);
 
@@ -45,13 +47,13 @@ function Home() {
     }
   }
 
-  function formatDescription(description) {
-    if (description.length > 125) {
-      let truncatedString = description.slice(0, 125).concat("...");
-      return truncatedString;
-    }
-    return description;
-  }
+  // function formatDescription(description) {
+  //   if (description.length > 125) {
+  //     let truncatedString = description.slice(0, 125).concat("...");
+  //     return truncatedString;
+  //   }
+  //   return description;
+  // }
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -95,14 +97,14 @@ function Home() {
             return (
               <Link
                 to={`/chat/${item.id}`}
-                state={{ recipe: item }}
+                state={item}
                 key={item.id}
                 className="border-black/40 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 md:max-w-[250px] cursor-pointer"
               >
                 <h3 className="font-bold font-lora text-xl">{item.title}</h3>
-                <p className="text-text-secondary">
+                {/* <p className="text-text-secondary">
                   {formatDescription(item.description)}
-                </p>
+                </p> */}
                 <p className="text-text-secondary/60">
                   {formatDate(item.created_at)}
                 </p>
