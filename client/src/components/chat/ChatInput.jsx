@@ -42,11 +42,19 @@ function ChatInput({
     <div className="flex items-center max-h-40 gap-2 px-2 py-1 border rounded-2xl border-gray-300">
       {!focused && (
         <div className="flex gap-2">
-          <button onClick={handlePrevVersion}>
-            <LeftArrowSvg />
+          <button
+            onClick={handlePrevVersion}
+            className={`cursor-pointer ${
+              currentVersion === 0 ? "gray-300" : "black"
+            }`}
+          >
+            <LeftArrowSvg currentVersion={currentVersion} />
           </button>
-          <button onClick={handleNextVersion}>
-            <RightArrowSvg />
+          <button onClick={handleNextVersion} className="cursor-pointer">
+            <RightArrowSvg
+              currentVersion={currentVersion}
+              max={recipeVersions.length - 1}
+            />
           </button>
         </div>
       )}
