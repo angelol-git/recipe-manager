@@ -27,7 +27,7 @@ function ChatInput({
   }, [message, maxHeight]);
 
   function handleNextVersion() {
-    if (recipeVersions.length > currentVersion + 1) {
+    if (recipeVersions?.length > currentVersion + 1) {
       setCurrentVersion((prev) => prev + 1);
     }
   }
@@ -40,7 +40,7 @@ function ChatInput({
 
   return (
     <div className="flex items-center max-h-40 gap-2 px-2 py-1 border rounded-2xl border-gray-300">
-      {!focused && (
+      {!focused && recipeVersions?.length > 0 && (
         <div className="flex gap-2">
           <button
             onClick={handlePrevVersion}

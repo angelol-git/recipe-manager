@@ -2,10 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import DeleteSvg from "../icons/DeleteSvg.jsx";
 import ShareSvg from "../icons/ShareSvg.jsx";
 import EditSvg from "../icons/EditSvg.jsx";
-import SaveSvg from "../icons/SaveSvg.jsx";
+import ForkSvg from "../icons/ForkSvg.jsx";
 import DotsSvg from "../icons/DotsSvg.jsx";
+import WarningSvg from "../icons/WarningSvg.jsx";
 
-function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
+function ChatOptions({
+  handleFork,
+  isEditing,
+  setIsEditing,
+  handleDelete,
+  handleDeleteAll,
+}) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -26,10 +33,10 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
   return (
     <div className="flex sticky z-10 top-0 rounded justify-end gap-2">
       <button
-        onClick={saveRecipe}
+        onClick={handleFork}
         className="px-2 py-1 bg-yellow flex font-semibold gap-2 rounded-md items-center"
       >
-        <SaveSvg />
+        <ForkSvg />
       </button>
       <button
         onClick={() => {
@@ -70,7 +77,7 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
                 <div>Rename</div>
               </button>
             </li>
-            <li className="text-rose py-2">
+            <li className="text-rose py-2 border-black/40 border-b-1">
               <button
                 onClick={() => {
                   setIsOptionsOpen(!isOptionsOpen);
@@ -80,6 +87,18 @@ function ChatOptions({ saveRecipe, isEditing, setIsEditing, handleDelete }) {
               >
                 <DeleteSvg />
                 <div>Delete</div>
+              </button>
+            </li>
+            <li className="text-rose py-2 font-bold">
+              <button
+                onClick={() => {
+                  setIsOptionsOpen(!isOptionsOpen);
+                  handleDeleteAll();
+                }}
+                className="flex w-full justify-between items-center"
+              >
+                <WarningSvg />
+                <div>Delete All</div>
               </button>
             </li>
           </ul>

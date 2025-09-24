@@ -22,6 +22,7 @@ function Home() {
         });
         const recipesData = await recipesRes.json();
         setRecipes(recipesData);
+        console.log(recipesData);
       } catch (error) {
         console.log(error);
       }
@@ -47,13 +48,13 @@ function Home() {
     }
   }
 
-  // function formatDescription(description) {
-  //   if (description.length > 125) {
-  //     let truncatedString = description.slice(0, 125).concat("...");
-  //     return truncatedString;
-  //   }
-  //   return description;
-  // }
+  function formatDescription(description) {
+    if (description.length > 125) {
+      let truncatedString = description.slice(0, 125).concat("...");
+      return truncatedString;
+    }
+    return description;
+  }
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -102,9 +103,9 @@ function Home() {
                 className="border-black/40 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 md:max-w-[250px] cursor-pointer"
               >
                 <h3 className="font-bold font-lora text-xl">{item.title}</h3>
-                {/* <p className="text-text-secondary">
-                  {formatDescription(item.description)}
-                </p> */}
+                <p className="text-text-secondary">
+                  {formatDescription(item.versions[0].description)}
+                </p>
                 <p className="text-text-secondary/60">
                   {formatDate(item.created_at)}
                 </p>

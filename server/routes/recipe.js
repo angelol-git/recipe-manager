@@ -19,10 +19,11 @@ router.get("/", authMiddleware, async (req, res) => {
             FROM recipes r
             LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id
             WHERE r.user_id = ?
-            ORDER BY r.created_at DESC
+            ORDER BY r.created_at,rv.created_at DESC
         `).all(userId);
 
         const recipes = {};
+
         for (const row of rows) {
             if (!recipes[row.recipe_id]) {
                 recipes[row.recipe_id] = {
@@ -53,13 +54,27 @@ router.get("/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
         const recipe = db.prepare(`
-        SELECT id, title, created_at
+        SELECT 
+            id, 
+            title, 
+            created_at
         FROM recipes
         WHERE id = ?
         `).get(id);
 
+        if (!recipe) {
+            return res.status(404).json({ error: "Recipe not found" });
+        }
+
         const versions = db.prepare(`
-        SELECT id, description, ingredients, instructions, source_prompt, ai_model, created_at
+        SELECT 
+            id, 
+            description, 
+            ingredients, 
+            instructions, 
+            source_prompt, 
+            ai_model, 
+            created_at
         FROM recipe_versions
         WHERE recipe_id = ?
         ORDER BY created_at DESC
@@ -71,7 +86,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
             title: recipe.title,
             created_at: recipe.created_at,
             versions: versions.map(v => ({
-                // id: v.id,
+                id: v.id,
                 description: v.description,
                 ingredients: v.ingredients,
                 instructions: v.instructions,
@@ -120,6 +135,24 @@ router.post("/save", authMiddleware, async (req, res) => {
     }
 })
 
+router.delete("/versions/:id", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    console.log(id);
+    try {
+        const result = db.prepare(`DELETE FROM recipe_versions WHERE id = ?`).run(id);
+
+        if (result.changes === 0) {
+            return res.status(404).json(({ message: "Recipe not found" }));
+        }
+        res.status(204).send();
+    }
+
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
+
 router.delete("/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
@@ -136,6 +169,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
         return res.status(500).json({ error: `DB error: ${error}` });
     }
 })
+
 
 router.post("/editTitle/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;

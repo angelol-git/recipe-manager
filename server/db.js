@@ -21,6 +21,19 @@ db.prepare(`CREATE TABLE IF NOT EXISTS sessions (
     )
 `).run();
 
+db.prepare(`CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    recipe_id INTEGER,
+    role TEXT CHECK(role IN ('user','assistant')) NOT NULL,
+    content TEXT NOT NULL,
+    status TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+    )
+`).run();
+
 db.prepare(`CREATE TABLE IF NOT EXISTS recipes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -42,18 +55,10 @@ db.prepare(`CREATE TABLE IF NOT EXISTS recipe_versions (
     ai_model TEXT,
     relation TEXT CHECK (relation IN ('reply','fork')) DEFAULT reply,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
     )
 `).run();
 
-db.prepare(`CREATE TABLE IF NOT EXISTS ingredients(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    recipe_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    amount TEXT,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-    )
-`).run();
 
 db.prepare(`CREATE TABLE IF NOT EXISTS tags (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,8 +70,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS recipe_tags(
     recipe_id INTEGER NOT NULL,
     tag_id INTEGER NOT NULL,
     PRIMARY KEY(recipe_id, tag_id),
-    FOREIGN KEY(recipe_id) REFERENCES recipes(id),
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id),
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
     FOREIGN KEY(tag_id) REFERENCES tags(id)
     )
 `).run();
