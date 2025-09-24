@@ -15,7 +15,8 @@ router.get("/", authMiddleware, async (req, res) => {
                 rv.id AS version_id,
                 rv.description,
                 rv.instructions,
-                rv.ingredients
+                rv.ingredients,
+                rv.source_prompt
             FROM recipes r
             LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id
             WHERE r.user_id = ?
@@ -39,6 +40,7 @@ router.get("/", authMiddleware, async (req, res) => {
                 description: row.description,
                 instructions: row.instructions,
                 ingredients: row.ingredients,
+                source_prompt: row.source_prompt,
             })
         }
 

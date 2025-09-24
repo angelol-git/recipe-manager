@@ -30,8 +30,11 @@ function ChatReply({ currentVersion, versions, isReplyLoading }) {
         </div>
       )}
       {versions[currentVersion].source_prompt && !isReplyLoading && (
-        <div className="flex text-black/60 text-sm underline ">
-          <button>View prompt</button>
+        <div className="flex justify-between text-text-secondary/80 text-sm">
+          <button className="underline">View prompt</button>
+          <p className="text-text-secondary/80">
+            {currentVersion + 1} of {versions.length}
+          </p>
         </div>
       )}
     </div>
