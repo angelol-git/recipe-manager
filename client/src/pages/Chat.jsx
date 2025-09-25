@@ -252,10 +252,11 @@ function Chat() {
       <div className="relative flex-1 py-3 overflow-y-auto">
         {isValidResponse && Object.keys(recipe).length > 0 && (
           <ChatReply
-            currentVersion={currentVersion}
-            versions={recipe.versions}
+            version={recipe.versions[currentVersion]}
             isReplyLoading={isReplyLoading}
             setIsModalOpen={setIsModalOpen}
+            currentVersion={currentVersion}
+            totalVersion={recipe.versions.length}
           />
         )}
         {(!isValidResponse || Object.keys(recipe).length === 0) && (

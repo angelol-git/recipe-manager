@@ -80,9 +80,9 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
             const newRecipeId = recipeResult.lastInsertRowid;
 
             const versionResult = db.prepare(`
-                INSERT INTO recipe_versions (recipe_id, description, instructions, ingredients, source_prompt, ai_model, relation)
+                INSERT INTO recipe_versions (recipe_id,servings,total_time,calories, description, instructions, ingredients, source_prompt, ai_model, relation)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                `).run(newRecipeId, reply.description, reply.instructions, reply.ingredients, reply.source_prompt, reply.ai_model, reply.relation);
+                `).run(newRecipeId, reply.servings, reply.total_time, reply.calories, reply.description, reply.instructions, reply.ingredients, reply.source_prompt, reply.ai_model, reply.relation);
 
             reply.id = newRecipeId;
             reply.versionId = versionResult.lastInsertRowid;
@@ -91,7 +91,7 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
             const versionResult = db.prepare(`
                 INSERT INTO recipe_versions (recipe_id, description, instructions, ingredients, source_prompt, ai_model, relation)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                `).run(recipeId, reply.description, reply.instructions, reply.ingredients, reply.source_prompt, reply.ai_model, reply.relation);
+                `).run(recipeId, reply.servings, reply.total_time, reply.calories, reply.description, reply.instructions, reply.ingredients, reply.source_prompt, reply.ai_model, reply.relation);
 
             reply.id = recipeId;
             reply.versionId = versionResult.lastInsertRowid;
