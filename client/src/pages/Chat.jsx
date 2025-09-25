@@ -90,6 +90,9 @@ function Chat() {
       const newVersion = {
         id: data.reply.versionId,
         ai_model: data.reply.ai_model,
+        calories: data.reply.calories,
+        total_time: data.reply.total_time,
+        servings: data.reply.servings,
         description: data.reply.description,
         ingredients: data.reply.ingredients,
         instructions: data.reply.instructions,
@@ -262,7 +265,7 @@ function Chat() {
       <ChatModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        source_prompt={recipe.versions[currentVersion].source_prompt}
+        source_prompt={recipe.versions?.[currentVersion].source_prompt}
       />
       <ChatInput
         message={message}

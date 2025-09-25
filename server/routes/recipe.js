@@ -13,6 +13,9 @@ router.get("/", authMiddleware, async (req, res) => {
                 r.title,
                 r.created_at,
                 rv.id AS version_id,
+                rv.calories,
+                rv.total_time,
+                rv.servings,
                 rv.description,
                 rv.instructions,
                 rv.ingredients,
@@ -71,6 +74,9 @@ router.get("/:id", authMiddleware, async (req, res) => {
         const versions = db.prepare(`
         SELECT 
             id, 
+            calories,
+            total_time,
+            servings,
             description, 
             ingredients, 
             instructions, 

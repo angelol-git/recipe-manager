@@ -49,6 +49,9 @@ db.prepare(`CREATE TABLE IF NOT EXISTS messages (
 db.prepare(`CREATE TABLE IF NOT EXISTS recipe_versions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     recipe_id INTEGER NOT NULL,
+    servings INTEGER,
+    total_time INTEGER,
+    calories INTEGER,
     description TEXT,
     instructions TEXT NOT NULL,
     ingredients TEXT NOT NULL,

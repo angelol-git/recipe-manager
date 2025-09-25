@@ -4,10 +4,10 @@ function ChatReply({
   isReplyLoading,
   setIsModalOpen,
 }) {
+  console.log(versions);
   return (
     <div className="flex flex-col gap-3">
       <div>{versions?.[currentVersion]?.description}</div>
-
       {versions[currentVersion].ingredients && (
         <div>
           <h3 className="font-bold">Ingredients</h3>

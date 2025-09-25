@@ -124,12 +124,20 @@ function genAIPrompt(currentVersion, message) {
     Do not include markdown fences like \`\`\`json or \`\`\`.
     The ENTIRE reply must be valid JSON only.
 
+    For these fields, return numbers only (integers):
+    - "servings": number of servings (e.g. 12, not "12 servings")
+    - "calories": total calories per serving (e.g. 250, not "250 kcal")
+    - "total_time": minutes only as an integer (e.g. 45, not "45 minutes")
+ 
     If the user's message is NOT about a recipe, return:
     {
     "title": "",
     "description": "",
     "ingredients": "",
     "instructions": "",
+    "servings": 0,
+    "calories": 0,
+    "total_time: 0,
     "source_prompt": "<copy the user message here>",
     "ai_model": "gemini-2.5-flash"
     }
@@ -140,9 +148,17 @@ function genAIPrompt(currentVersion, message) {
     "description": "...",
     "ingredients": "...",
     "instructions": "...",
+    "servings": <integer>,
+    "calories": <integer>,
+    "total_time: <integer>,
     "source_prompt": "<copy the user message here>",
     "ai_model": "gemini-2.5-flash"
     }
+
+    Rules:
+    - If no servings, calories, or total_time are available from the source, give an approximate numeric estimate.
+    - The instructions field must always be a numbered list (1., 2., 3. ...).
+    - The ingredients field must always be a plain list of strings, one ingredient per item, without dashes or bullets.
 
     Here is the user message: "${message}"
     `)
