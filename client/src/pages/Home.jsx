@@ -22,7 +22,6 @@ function Home() {
         });
         const recipesData = await recipesRes.json();
         setRecipes(recipesData);
-        console.log(recipesData);
       } catch (error) {
         console.log(error);
       }

@@ -29,7 +29,6 @@ function ChatTitle({
     setIsEditing(false);
   }
 
-  // console.log(title);
   return (
     <div className="w-full">
       {isEditing ? (

@@ -139,7 +139,6 @@ router.post("/save", authMiddleware, async (req, res) => {
 
 router.delete("/versions/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
-    console.log(id);
     try {
         const result = db.prepare(`DELETE FROM recipe_versions WHERE id = ?`).run(id);
 

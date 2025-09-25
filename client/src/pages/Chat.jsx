@@ -25,6 +25,7 @@ function Chat() {
   // const [errorMessage, setErrorMessage] = useState(null);
   const [isValidResponse, setIsValidResponse] = useState(true);
   async function fetchRecipe() {
+    console.log("Fetching recipe");
     try {
       const result = await fetch(`http://localhost:8080/api/recipes/${id}`, {
         credentials: "include",
@@ -41,19 +42,16 @@ function Chat() {
   }
 
   useEffect(() => {
-    if (initialState) {
-      console.log("here1");
-      setRecipe(initialState);
-      setIsLoading(false);
-    } else if (id) {
-      console.log("here2");
+    if (id) {
+      if (initialState) {
+        setRecipe(initialState);
+        setIsLoading(false);
+      }
       fetchRecipe();
     } else {
-      console.log("here3");
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [id]);
 
   async function sendMessage() {
     if (message.length <= 0) return;
@@ -72,7 +70,22 @@ function Chat() {
         }),
       });
       // setErrorMessage(null);
+      if (!result.ok) {
+        const error = await result.json();
+        throw new Error(`Server returned ${result.status}: ${error}`);
+      }
+
       const data = await result.json();
+      let newRecipe = {};
+      if (!recipe.id) {
+        newRecipe = {
+          id: data.reply.id,
+          title: data.reply.title,
+        };
+
+        window.history.pushState({}, "", `/chat/${newRecipe.id}`);
+      }
+
       const newVersion = {
         id: data.reply.versionId,
         ai_model: data.reply.ai_model,
@@ -84,12 +97,13 @@ function Chat() {
 
       setRecipe((prev) => ({
         ...prev,
-        id: prev.id || data.reply.id,
+        id: prev.id || newRecipe.id,
+        title: prev.title || newRecipe.title,
         versions: prev.versions ? [newVersion, ...prev.versions] : [newVersion],
       }));
 
       setMessage("");
-      const isValid = checkValidResponse(data.recipe);
+      const isValid = checkValidResponse(data.reply);
       setIsValidResponse(isValid);
       // if (!isValid) {
       //   setErrorMessage("I couldn’t extract a recipe from that message.");
@@ -109,12 +123,10 @@ function Chat() {
   }
 
   async function handleDelete() {
-    if (!id) return;
+    if (!recipe.id) return;
 
-    const v_id = recipe.versions[currentVersion].id;
-    console.log(recipe.versions);
-    console.log(v_id);
     const prevRecipe = recipe;
+    const v_id = recipe.versions[currentVersion].id;
     const updatedVersions = recipe.versions.filter((item) => {
       return item.id !== v_id;
     });
@@ -135,31 +147,35 @@ function Chat() {
         throw new Error(`Server returned ${result.status}: ${errorText}`);
       }
     } catch (error) {
-      console.log(`Error: ${error}`);
+      console.log(error);
       setRecipe(prevRecipe);
     }
   }
 
   async function handleDeleteAll() {
-    if (!id) return;
+    if (!recipe.id) return;
     try {
-      const result = await fetch(`http://localhost:8080/api/recipes/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const result = await fetch(
+        `http://localhost:8080/api/recipes/${recipe.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
       if (!result.ok) {
-        throw new Error(`Server returned ${result.status}`);
+        const errorText = await result.text();
+        throw new Error(`Server returned ${result.status}: ${errorText}`);
       }
       navigate("/home");
     } catch (error) {
-      console.log(`Error: ${error}`);
+      console.log(error);
     }
   }
 
   async function handleRename(draftTitle) {
     try {
       const result = await fetch(
-        `http://localhost:8080/api/recipes/editTitle/${id}`,
+        `http://localhost:8080/api/recipes/editTitle/${recipe.id}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -211,6 +227,7 @@ function Chat() {
           />
         </div>
         <ChatOptions
+          recipe={recipe}
           handleFork={handleFork}
           isEditing={isEditing}
           setIsEditing={setIsEditing}

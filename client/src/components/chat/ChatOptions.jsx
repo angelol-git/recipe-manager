@@ -7,6 +7,7 @@ import DotsSvg from "../icons/DotsSvg.jsx";
 import WarningSvg from "../icons/WarningSvg.jsx";
 
 function ChatOptions({
+  recipe,
   handleFork,
   isEditing,
   setIsEditing,
@@ -15,7 +16,6 @@ function ChatOptions({
 }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const menuRef = useRef(null);
-
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -81,7 +81,11 @@ function ChatOptions({
               <button
                 onClick={() => {
                   setIsOptionsOpen(!isOptionsOpen);
-                  handleDelete();
+                  if (recipe.versions.length === 1) {
+                    handleDeleteAll();
+                  } else {
+                    handleDelete();
+                  }
                 }}
                 className="flex w-full justify-between items-center"
               >
