@@ -48,6 +48,7 @@ function Home() {
   }
 
   function formatDescription(description) {
+    if (!description) return null;
     if (description.length > 125) {
       let truncatedString = description.slice(0, 125).concat("...");
       return truncatedString;
@@ -58,6 +59,8 @@ function Home() {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
+
+  console.log(recipes);
 
   return (
     <div className="text-text-primary bg-base p-5 lg:p-15 flex flex-col h-screen gap-5">

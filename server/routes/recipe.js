@@ -95,6 +95,9 @@ router.get("/:id", authMiddleware, async (req, res) => {
             created_at: recipe.created_at,
             versions: versions.map(v => ({
                 id: v.id,
+                servings: v.servings,
+                total_time: v.total_time,
+                calories: v.calories,
                 description: v.description,
                 ingredients: v.ingredients,
                 instructions: v.instructions,
@@ -103,40 +106,6 @@ router.get("/:id", authMiddleware, async (req, res) => {
             }))
         });
     }
-    catch (error) {
-        console.error("DB error:", error);
-        return res.status(500).json({ error: `DB error: ${error}` });
-    }
-})
-router.post("/save", authMiddleware, async (req, res) => {
-    const userId = req.user.id;
-    const { recipeId, recipe } = req.body;
-    try {
-        //if first save/new insert into recipes parent
-        if (!recipeId) {
-            const recipeResult = db.prepare(`
-                INSERT INTO recipes (user_id, title)
-                VALUES (?, ?)
-                `).run(userId, recipe.title);
-
-            const newRecipeId = recipeResult.lastInsertRowid;
-            db.prepare(
-                `INSERT INTO recipe_versions (recipe_id,description,instructions,ingredients,source_prompt,ai_model,relation)
-                VALUES (?,?,?,?,?,?,?)
-                `).run(newRecipeId, recipe.description, recipe.instructions, recipe.ingredients, recipe.source_prompt, recipe.ai_model, recipe.relation)
-            return res.json({ success: true });
-        }
-        else {
-            // if (recipe.relation === "reply") {
-            db.prepare(
-                `INSERT INTO recipe_versions (recipe_id,description,instructions,ingredients,source_prompt,ai_model,relation)
-                VALUES (?,?,?,?,?,?,?)
-                `).run(recipeId, recipe.description, recipe.instructions, recipe.ingredients, recipe.source_prompt, recipe.ai_model, recipe.relation)
-            // }
-            return res.json({ success: true });
-        }
-    }
-
     catch (error) {
         console.error("DB error:", error);
         return res.status(500).json({ error: `DB error: ${error}` });
@@ -196,3 +165,38 @@ router.post("/editTitle/:id", authMiddleware, async (req, res) => {
     }
 })
 export default router;
+
+// router.post("/save", authMiddleware, async (req, res) => {
+//     const userId = req.user.id;
+//     const { recipeId, recipe } = req.body;
+//     try {
+//         //if first save/new insert into recipes parent
+//         if (!recipeId) {
+//             const recipeResult = db.prepare(`
+//                 INSERT INTO recipes (user_id, title)
+//                 VALUES (?, ?)
+//                 `).run(userId, recipe.title);
+
+//             const newRecipeId = recipeResult.lastInsertRowid;
+//             db.prepare(
+//                 `INSERT INTO recipe_versions (recipe_id,description,instructions,ingredients,source_prompt,ai_model,relation)
+//                 VALUES (?,?,?,?,?,?,?)
+//                 `).run(newRecipeId, recipe.description, recipe.instructions, recipe.ingredients, recipe.source_prompt, recipe.ai_model, recipe.relation)
+//             return res.json({ success: true });
+//         }
+//         else {
+//             // if (recipe.relation === "reply") {
+//             db.prepare(
+//                 `INSERT INTO recipe_versions (recipe_id,description,instructions,ingredients,source_prompt,ai_model,relation)
+//                 VALUES (?,?,?,?,?,?,?)
+//                 `).run(recipeId, recipe.description, recipe.instructions, recipe.ingredients, recipe.source_prompt, recipe.ai_model, recipe.relation)
+//             // }
+//             return res.json({ success: true });
+//         }
+//     }
+
+//     catch (error) {
+//         console.error("DB error:", error);
+//         return res.status(500).json({ error: `DB error: ${error}` });
+//     }
+// })

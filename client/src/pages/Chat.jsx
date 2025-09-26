@@ -32,6 +32,7 @@ function Chat() {
         credentials: "include",
       });
       const data = await result.json();
+      console.log(data);
       setRecipe(data);
       // setErrorMessage(null);
       setIsValidResponse(true);
