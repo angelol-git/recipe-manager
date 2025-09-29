@@ -3,48 +3,58 @@ import FireSvg from "../icons/FireSvg";
 import ClockSvg from "../icons/ClockSvg";
 
 function ChatReply({
-  version,
+  versions,
   isReplyLoading,
   setIsModalOpen,
   currentVersion,
   totalVersion,
 }) {
-  if (!version) return null;
+  const {
+    calories,
+    total_time,
+    servings,
+    description,
+    ingredients,
+    instructions,
+    source_prompt,
+  } = versions[currentVersion];
+
+  if (!versions) return null;
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-4">
         <div className="flex gap-1 items-center">
           <FireSvg />
-          <div>{version.calories}</div>
+          <div>{calories}</div>
           kcal
         </div>
         <div className="flex gap-1 items-center">
           <ClockSvg />
-          <div>{version.total_time}</div>
+          <div>{total_time}</div>
           mins
         </div>
         <div className="flex gap-1 items-center">
           <UtensilsSvg />
-          <div>{version.servings}</div>
+          <div>{servings}</div>
           servings
         </div>
       </div>
-      <div>{version.description}</div>
-      {version.ingredients && (
+      <div>{description}</div>
+      {ingredients && (
         <div>
           <h3 className="font-bold">Ingredients</h3>
           <ul className="list-disc pl-4">
-            {version.ingredients.split("\n").map((item, index) => (
+            {ingredients.split("\n").map((item, index) => (
               <li key={index}>{item}</li>
             ))}
           </ul>
         </div>
       )}
-      {version.instructions && (
+      {instructions && (
         <div>
           <h3 className="font-bold">Instructions</h3>
           <ul className="list-disc">
-            {version.instructions.split("\n").map((item, index) => (
+            {instructions.split("\n").map((item, index) => (
               <li key={index} className="list-none">
                 {item}
               </li>
@@ -52,7 +62,7 @@ function ChatReply({
           </ul>
         </div>
       )}
-      {version.source_prompt && !isReplyLoading && (
+      {source_prompt && !isReplyLoading && (
         <div className="flex justify-between text-text-secondary/80 text-sm">
           <button onClick={() => setIsModalOpen(true)} className="underline">
             View prompt

@@ -1,34 +1,10 @@
-import { useEffect, useState } from "react";
+import { useRecipes } from "../contexts/RecipesContext";
 import { useNavigate } from "react-router";
 import { Link } from "react-router";
 
 function Home() {
   const navigate = useNavigate();
-  const [user, setUser] = useState({});
-  const [recipes, setRecipes] = useState([]);
-
-  useEffect(() => {
-    async function getData() {
-      try {
-        const result = await fetch("http://localhost:8080/api/auth/me", {
-          credentials: "include",
-        });
-
-        const data = await result.json();
-        setUser(data.user);
-
-        const recipesRes = await fetch("http://localhost:8080/api/recipes/", {
-          credentials: "include",
-        });
-        const recipesData = await recipesRes.json();
-        setRecipes(recipesData);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    getData();
-  }, []);
+  const { user, recipes } = useRecipes();
 
   async function handleLogout() {
     try {
@@ -98,7 +74,6 @@ function Home() {
             return (
               <Link
                 to={`/chat/${item.id}`}
-                state={item}
                 key={item.id}
                 className="border-black/40 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 md:max-w-[250px] cursor-pointer"
               >
@@ -119,14 +94,3 @@ function Home() {
 }
 
 export default Home;
-
-// function Tags({ title, count }) {
-//   return (
-//     <button className="cursor-pointer flex gap-2 rounded-lg px-2 py-1 bg-gray-500">
-//       <div>Baking</div>
-//       <div className="bg-gray-400 rounded-full h-6 w-6 flex items-center justify-center">
-//         4
-//       </div>
-//     </button>
-//   );
-// }

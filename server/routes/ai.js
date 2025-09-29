@@ -57,7 +57,6 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
     }
 
     try {
-        console.log(reply);
         if (!reply.title?.trim() ||
             !reply.ingredients?.trim() ||
             !reply.instructions?.trim()) {

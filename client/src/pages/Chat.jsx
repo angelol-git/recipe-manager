@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { useRecipes } from "../contexts/RecipesContext.jsx";
 import ChatTitle from "../components/chat/ChatTitle.jsx";
 import ChatSideBar from "../components/chat/ChatSideBar.jsx";
 import ChatOptions from "../components/chat/ChatOptions.jsx";
@@ -12,48 +13,19 @@ import ForkSvg from "../components/icons/ForkSvg.jsx";
 function Chat() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { state: initialState } = useLocation();
-  const [recipe, setRecipe] = useState({});
-  const [currentVersion, setCurrentVersion] = useState(0);
+  const { recipes, addRecipe, updateRecipe, deleteRecipe, deleteRecipeAll } =
+    useRecipes();
+  const recipe = recipes.find((r) => r.id === parseInt(id)) || null;
 
-  const [isReplyLoading, setIsReplyLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [currentVersion, setCurrentVersion] = useState(0);
+  const [isReplyLoading, setIsReplyLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // const [errorMessage, setErrorMessage] = useState(null);
-  const [isValidResponse, setIsValidResponse] = useState(true);
-  async function fetchRecipe() {
-    console.log("Fetching recipe");
-    try {
-      const result = await fetch(`http://localhost:8080/api/recipes/${id}`, {
-        credentials: "include",
-      });
-      const data = await result.json();
-      console.log(data);
-      setRecipe(data);
-      // setErrorMessage(null);
-      setIsValidResponse(true);
-    } catch (error) {
-      console.log("Error fetching recipe:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if (id) {
-      if (initialState) {
-        setRecipe(initialState);
-        setIsLoading(false);
-      }
-      fetchRecipe();
-    } else {
-      setIsLoading(false);
-    }
-  }, [id]);
+  // const [isValidResponse, setIsValidResponse] = useState(true);
 
   async function sendMessage() {
     if (message.length <= 0) return;
@@ -67,8 +39,8 @@ function Chat() {
         body: JSON.stringify({
           message: message.trim(),
           recipe: recipe,
-          currentVersion: recipe.versions?.[currentVersion] || null,
-          recipeId: recipe.id || null,
+          currentVersion: recipe?.versions?.[currentVersion] || null,
+          recipeId: recipe?.id || null,
         }),
       });
       // setErrorMessage(null);
@@ -79,13 +51,14 @@ function Chat() {
 
       const data = await result.json();
       let newRecipe = {};
-      if (!recipe.id) {
+      if (!recipe?.id) {
         newRecipe = {
           id: data.reply.id,
           title: data.reply.title,
+          // created_at: data.reply.created_at,
         };
 
-        window.history.pushState({}, "", `/chat/${newRecipe.id}`);
+        navigate(`/chat/${newRecipe.id}`);
       }
 
       const newVersion = {
@@ -100,16 +73,15 @@ function Chat() {
         source_prompt: data.reply.source_prompt,
       };
 
-      setRecipe((prev) => ({
-        ...prev,
-        id: prev.id || newRecipe.id,
-        title: prev.title || newRecipe.title,
-        versions: prev.versions ? [newVersion, ...prev.versions] : [newVersion],
-      }));
+      if (!recipe?.id) {
+        addRecipe(newRecipe, newVersion);
+      } else {
+        addRecipe(recipe, newVersion);
+      }
 
       setMessage("");
-      const isValid = checkValidResponse(data.reply);
-      setIsValidResponse(isValid);
+      // const isValid = checkValidResponse(data.reply);
+      // setIsValidResponse(isValid);
       // if (!isValid) {
       //   setErrorMessage("I couldn’t extract a recipe from that message.");
       // }
@@ -130,88 +102,40 @@ function Chat() {
   async function handleDelete() {
     if (!recipe.id) return;
 
-    const prevRecipe = recipe;
-    const v_id = recipe.versions[currentVersion].id;
-    const updatedVersions = recipe.versions.filter((item) => {
-      return item.id !== v_id;
-    });
+    deleteRecipe(recipe.id, recipe[currentVersion]);
 
     if (currentVersion === recipe.versions.length - 1) {
       setCurrentVersion((prev) => prev - 1);
-    }
-    setRecipe((prev) => {
-      return { ...prev, versions: updatedVersions };
-    });
-    try {
-      const result = await fetch(
-        `http://localhost:8080/api/recipes/versions/${v_id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-      if (!result.ok) {
-        const errorText = await result.text();
-        throw new Error(`Server returned ${result.status}: ${errorText}`);
-      }
-    } catch (error) {
-      console.log(error);
-      setRecipe(prevRecipe);
     }
   }
 
   async function handleDeleteAll() {
     if (!recipe.id) return;
-    try {
-      const result = await fetch(
-        `http://localhost:8080/api/recipes/${recipe.id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-      if (!result.ok) {
-        const errorText = await result.text();
-        throw new Error(`Server returned ${result.status}: ${errorText}`);
-      }
+
+    const result = deleteRecipeAll(recipe.id);
+    console.log(result);
+    if (result.ok) {
       navigate("/home");
-    } catch (error) {
-      console.log(error);
     }
   }
 
-  async function handleRename(draftTitle) {
-    try {
-      const result = await fetch(
-        `http://localhost:8080/api/recipes/editTitle/${recipe.id}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ newTitle: draftTitle }),
-        }
-      );
-
-      if (!result.ok) {
-        throw new Error(`Server returned ${result.status}`);
-      }
-    } catch (error) {
-      console.log(`Error: ${error}`);
-    }
+  async function handleRename(newTitle) {
+    const updatedRecipe = { ...recipe, title: newTitle };
+    updateRecipe(updatedRecipe);
   }
 
-  function checkValidResponse(recipe) {
-    return !!(
-      recipe.title?.trim() ||
-      recipe.ingredients?.trim() ||
-      recipe.instructions?.trim()
-    );
-  }
+  // function checkValidResponse(recipe) {
+  //   return !!(
+  //     recipe.title?.trim() ||
+  //     recipe.ingredients?.trim() ||
+  //     recipe.instructions?.trim()
+  //   );
+  // }
 
-  if (isLoading) return <p>Loading...</p>;
   return (
     <div className="relative bg-base flex flex-col h-screen text-text-primary p-5 w-full">
       <ChatSideBar
+        recipes={recipes}
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
       />
@@ -227,8 +151,7 @@ function Chat() {
             <MenuSvg />
           </button>
           <ChatTitle
-            title={recipe.title}
-            setRecipe={setRecipe}
+            title={recipe?.title}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
             handleRename={handleRename}
@@ -251,30 +174,29 @@ function Chat() {
         </div>
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">
-        {isValidResponse && Object.keys(recipe).length > 0 && (
+        {recipe?.id ? (
           <ChatReply
-            version={recipe.versions[currentVersion]}
+            versions={recipe.versions}
             isReplyLoading={isReplyLoading}
             setIsModalOpen={setIsModalOpen}
             currentVersion={currentVersion}
             totalVersion={recipe.versions.length}
           />
-        )}
-        {(!isValidResponse || Object.keys(recipe).length === 0) && (
+        ) : (
           <div className="text-gray-400">No messages yet</div>
         )}
       </div>
       <ChatModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        source_prompt={recipe.versions?.[currentVersion].source_prompt}
+        source_prompt={recipe?.versions?.[currentVersion].source_prompt}
       />
       <ChatInput
         message={message}
         setMessage={setMessage}
         sendMessage={sendMessage}
         isReplyLoading={isReplyLoading}
-        recipeVersions={recipe.versions}
+        recipeVersions={recipe?.versions}
         currentVersion={currentVersion}
         setCurrentVersion={setCurrentVersion}
       />

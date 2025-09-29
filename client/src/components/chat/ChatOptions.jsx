@@ -45,7 +45,7 @@ function ChatOptions({
       </button>
       {isOptionsOpen ? (
         <div
-          className="absolute right-0 z-50 bg-crust translate-y-12 p-2 rounded-lg shadow-lg"
+          className="absolute right-5 z-50 bg-crust  p-2 rounded-lg shadow-lg"
           role="menu"
         >
           <ul className="p-1 flex gap-2 flex-col w-[150px]">

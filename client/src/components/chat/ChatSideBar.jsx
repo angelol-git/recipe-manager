@@ -1,25 +1,7 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import CloseSvg from "../icons/CloseSvg";
-function ChatSideBar({ isSideBarOpen, setIsSideBarOpen }) {
-  const [recipes, setRecipes] = useState([]);
-
-  useEffect(() => {
-    async function getData() {
-      try {
-        const recipesRes = await fetch("http://localhost:8080/api/recipes/", {
-          credentials: "include",
-        });
-        const recipesData = await recipesRes.json();
-        setRecipes(recipesData);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getData();
-  }, []);
-
+function ChatSideBar({ recipes, isSideBarOpen, setIsSideBarOpen }) {
   return (
     <nav
       className={`z-100 p-7 fixed top-0 left-0 h-full w-72 bg-base transition-transform duration-300 ease-in-out ${

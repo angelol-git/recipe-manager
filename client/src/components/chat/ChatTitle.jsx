@@ -1,17 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 
-function ChatTitle({
-  title,
-  setRecipe,
-  isEditing,
-  setIsEditing,
-  handleRename,
-}) {
+function ChatTitle({ title, isEditing, setIsEditing, handleRename }) {
   const [draftTitle, setDraftTitle] = useState(title);
   const inputRef = useRef(null);
-  useEffect(() => {
-    setDraftTitle(title);
-  }, [title]);
+  // useEffect(() => {
+  //   setDraftTitle(title);
+  // }, [title]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -21,10 +15,6 @@ function ChatTitle({
   }, [isEditing]);
 
   function handleSave() {
-    setRecipe((prev) => ({
-      ...prev,
-      title: draftTitle,
-    }));
     handleRename(draftTitle);
     setIsEditing(false);
   }

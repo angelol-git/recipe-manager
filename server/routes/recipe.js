@@ -49,7 +49,6 @@ router.get("/", authMiddleware, async (req, res) => {
                 total_time: row.total_time
             })
         }
-        console.log(recipes.versions);
         return res.json(Object.values(recipes));
     }
     catch (error) {
