@@ -44,9 +44,12 @@ router.get("/", authMiddleware, async (req, res) => {
                 instructions: row.instructions,
                 ingredients: row.ingredients,
                 source_prompt: row.source_prompt,
+                calories: row.calories,
+                servings: row.servings,
+                total_time: row.total_time
             })
         }
-
+        console.log(recipes.versions);
         return res.json(Object.values(recipes));
     }
     catch (error) {
@@ -112,7 +115,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
     }
 })
 
-router.delete("/versions/:id", authMiddleware, async (req, res) => {
+router.delete("/version/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
 
     try {
