@@ -147,23 +147,29 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     }
 })
 
-
-router.post("/editTitle/:id", authMiddleware, async (req, res) => {
+//Currently only supports title
+router.put("/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
-    const { newTitle } = req.body;
-    try {
-        const result = db.prepare("UPDATE recipes SET title = ? WHERE id = ?").run(newTitle, id);
-        if (result.changes === 0) {
-            return res.status(404).json(({ message: "Recipe not found" }));
-        }
-        res.status(204).send();
-    }
+    const recipe = req.body;
 
-    catch (error) {
-        console.error("DB error:", error);
-        return res.status(500).json({ error: `DB error: ${error}` });
+    try {
+        const result = db.prepare(
+            `UPDATE recipes
+             SET title = ?
+             WHERE id = ?`
+        ).run(recipe.title, id);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Recipe not found" });
+        }
+
+        res.json({ success: true, updatedId: id });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: `Failed to update recipe: ${error}` });
     }
-})
+});
+
 export default router;
 
 // router.post("/save", authMiddleware, async (req, res) => {
