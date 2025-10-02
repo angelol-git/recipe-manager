@@ -21,7 +21,7 @@ router.get("/", authMiddleware, async (req, res) => {
                 rv.ingredients,
                 rv.source_prompt
             FROM recipes r
-            LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id
+            LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id 
             WHERE r.user_id = ?
             ORDER BY r.created_at,rv.created_at DESC
         `).all(userId);
@@ -114,6 +114,25 @@ router.get("/:id", authMiddleware, async (req, res) => {
     }
 })
 
+router.get("/errors/:id", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    try {
+        console.log("here");
+        const response = db.prepare(`
+            SELECT *
+            FROM messages
+            WHERE recipe_id = ?
+                AND status = 'error'
+            ORDER BY created_At DESC;
+            `).all(id);
+
+        return res.json({ errors: response });
+    }
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
 router.delete("/version/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
 

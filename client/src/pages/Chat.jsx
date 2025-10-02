@@ -9,6 +9,7 @@ import ChatReply from "../components/chat/ChatReply.jsx";
 import ChatModal from "../components/chat/ChatModal.jsx";
 import MenuSvg from "../components/icons/MenuSvg.jsx";
 import ForkSvg from "../components/icons/ForkSvg.jsx";
+import { useEffect } from "react";
 
 function Chat() {
   const navigate = useNavigate();
@@ -23,9 +24,32 @@ function Chat() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [errors, setErrors] = useState([]);
   // const [errorMessage, setErrorMessage] = useState(null);
   // const [isValidResponse, setIsValidResponse] = useState(true);
+
+  useEffect(() => {
+    if (!recipe?.id) return;
+    async function fetchErrors() {
+      try {
+        const result = await fetch(
+          `http://localhost:8080/api/recipes/errors/${recipe.id}`,
+          {
+            credentials: "include",
+          }
+        );
+        const data = await result.json();
+        if (!result.ok) {
+          console.error(data.error.message);
+          return null;
+        }
+        setErrors(data.errors);
+      } catch (error) {
+        console.log("Network error", error);
+      }
+    }
+    fetchErrors();
+  }, [recipe?.id]);
 
   async function sendMessage() {
     if (message.length <= 0) return;
@@ -44,12 +68,13 @@ function Chat() {
         }),
       });
       // setErrorMessage(null);
+      const data = await result.json();
+
       if (!result.ok) {
-        const error = await result.json();
-        throw new Error(`Server returned ${result.status}: ${error}`);
+        console.error(data.error.message);
+        return null;
       }
 
-      const data = await result.json();
       let newRecipe = {};
       if (!recipe?.id) {
         newRecipe = {
@@ -86,7 +111,8 @@ function Chat() {
       //   setErrorMessage("I couldn’t extract a recipe from that message.");
       // }
     } catch (error) {
-      console.log(`Error: ${error}`);
+      console.error("Network error:", error);
+      return null;
       // setErrorMessage(
       //   "Something went wrong while sending your message. Please try again."
       // );
@@ -164,6 +190,7 @@ function Chat() {
           </button>
           <ChatOptions
             recipe={recipe}
+            errors={errors}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
             handleDelete={handleDelete}

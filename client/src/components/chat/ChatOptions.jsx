@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import DeleteSvg from "../icons/DeleteSvg.jsx";
 import ShareSvg from "../icons/ShareSvg.jsx";
 import EditSvg from "../icons/EditSvg.jsx";
-
 import DotsSvg from "../icons/DotsSvg.jsx";
+import ErrorSvg from "../icons/ErrorSvg.jsx";
 import WarningSvg from "../icons/WarningSvg.jsx";
 
 function ChatOptions({
   recipe,
+  errors,
   isEditing,
   setIsEditing,
   handleDelete,
@@ -72,6 +73,19 @@ function ChatOptions({
                 <div>Rename</div>
               </button>
             </li>
+            <li className="text-text-primary py-2 border-black/40 border-b-1">
+              <button
+                onClick={() => {
+                  setIsOptionsOpen((prev) => !prev);
+                }}
+                className="flex w-full justify-between items-center"
+              >
+                <ErrorSvg />
+                <div>
+                  Errors {errors?.length > 0 ? `(${errors.length})` : null}
+                </div>
+              </button>
+            </li>
             <li className="text-rose py-2 border-black/40 border-b-1">
               <button
                 onClick={() => {
@@ -88,6 +102,7 @@ function ChatOptions({
                 <div>Delete</div>
               </button>
             </li>
+
             <li className="text-rose py-2 font-bold">
               <button
                 onClick={() => {

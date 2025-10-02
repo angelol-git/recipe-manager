@@ -64,7 +64,7 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
                 INSERT INTO messages (user_id, recipe_id, role, content,status)
                 VALUES (?, ?, 'assistant', ?,'error')
             `).run(req.user.id, recipeId || null, JSON.stringify(reply));
-            return res.json({ reply });
+            return res.status(400).json({ error: { code: "INVALID_RECIPE", message: "The recipe data is incomplete or invalid", details: reply } });
         }
         db.prepare(`
                 INSERT INTO messages (user_id, recipe_id, role, content,status)

@@ -24,7 +24,7 @@ export function RecipesProvider({ children }) {
         });
         const recipesData = await recipesRes.json();
         setRecipes(recipesData);
-        //console.log(recipesData);
+        // console.log(recipesData);
       } catch (error) {
         console.error(error);
       } finally {
