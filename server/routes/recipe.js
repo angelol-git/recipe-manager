@@ -117,15 +117,17 @@ router.get("/:id", authMiddleware, async (req, res) => {
 router.get("/errors/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
-        console.log("here");
         const response = db.prepare(`
-            SELECT *
+            SELECT status,content,created_at
             FROM messages
             WHERE recipe_id = ?
                 AND status = 'error'
             ORDER BY created_At DESC;
             `).all(id);
 
+        console.log(response);
+        // const content = await response.json();
+        // cons
         return res.json({ errors: response });
     }
     catch (error) {

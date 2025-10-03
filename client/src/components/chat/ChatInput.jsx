@@ -16,7 +16,8 @@ function ChatInput({
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandedRef = useRef();
-  const textAreaRef = useRef();
+  const textAreaRef = useRef(null);
+  const minHeight = 24;
   const maxHeight = 160;
 
   useEffect(() => {
@@ -37,13 +38,14 @@ function ChatInput({
 
   useEffect(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.style = "auto";
+      textAreaRef.current.style.height = "auto";
       textAreaRef.current.style.height = `${Math.min(
-        textAreaRef.current.scrollHeight,
+        Math.max(textAreaRef.current.scrollHeight, minHeight),
         maxHeight
       )}px`;
+      console.log(textAreaRef);
     }
-  }, [message, maxHeight]);
+  }, [message]);
 
   function handleNextVersion(event) {
     event.stopPropagation();
@@ -61,55 +63,27 @@ function ChatInput({
 
   return (
     <div
-      ref={isExpandedRef}
       onClick={() => {
         setIsExpanded(true);
       }}
-      className="flex-col px-3 py-1 border rounded-2xl border-gray-300"
+      className="flex-col p-2 border rounded-2xl border-gray-300"
     >
-      <div
-        className={`flex gap-3 items-center w-full max-h-40 ${
-          message.length > 0 ? "items-start" : "items-center"
-        }`}
-      >
-        {!isExpanded && recipeVersions?.length > 0 && message.length === 0 && (
-          <div className="flex gap-3">
-            <button
-              onClick={handlePrevVersion}
-              className={`cursor-pointer ${
-                currentVersion === 0 ? "gray-300" : "black"
-              }`}
-            >
-              <LeftArrowSvg currentVersion={currentVersion} />
-            </button>
-            <button onClick={handleNextVersion} className="cursor-pointer">
-              <RightArrowSvg
-                currentVersion={currentVersion}
-                max={recipeVersions.length - 1}
-              />
-            </button>
-          </div>
-        )}
-
-        <textarea
-          ref={textAreaRef}
-          className={`flex-1 h-4 outline-none `}
-          style={{ maxHeight: `${maxHeight}px`, overflowY: "auto" }}
-          value={message}
-          // onFocus={() => setIsExpanded(true)}
-          // onBlur={() => setIsExpanded(false)}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Enter any recipe"
-        />
-
-        <button
-          className="cursor-pointer flex items-center justify-center w-10 h-10 p-0 text-white bg-accent hover:bg-accent-dark rounded-full shrink-0"
-          onClick={sendMessage}
-        >
-          {isReplyLoading ? <SpinnerSvg /> : <UpArrowSvg />}
-        </button>
-      </div>
-      {(message.length > 0 || isExpanded) && (
+      <textarea
+        rows={1}
+        ref={textAreaRef}
+        className="w-full px-2 rounded-xl 
+                 outline-none resize-none leading-6
+                 placeholder:text-gray-400"
+        style={{
+          minHeight: `${minHeight}px`,
+          maxHeight: `${maxHeight}px`,
+          overflowY: "auto",
+        }}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Enter any recipe or changes..."
+      />
+      <div className={`flex bg-gap-3 items-center justify-between`}>
         <div className="flex gap-2">
           <div className="flex gap-3">
             <button
@@ -132,7 +106,13 @@ function ChatInput({
             <DownArrowSvg />
           </div>
         </div>
-      )}
+        <button
+          className="cursor-pointer flex items-center justify-center w-9 h-9 p-0 text-white bg-accent hover:bg-accent-dark rounded-full shrink-0"
+          onClick={sendMessage}
+        >
+          {isReplyLoading ? <SpinnerSvg /> : <UpArrowSvg />}
+        </button>
+      </div>
     </div>
   );
 }

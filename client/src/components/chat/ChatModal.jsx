@@ -19,10 +19,10 @@ function ChatModal({ isModalOpen, setIsModalOpen, source_prompt }) {
 
   if (!isModalOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50 p-4 w-full">
+    <div className="fixed inset-0 bg-black/30 flex justify-center  z-50 p-4 w-full">
       <div
         ref={modalRef}
-        className="p-4  flex  flex-col bg-crust rounded shadow-lg w-full"
+        className="p-4 flex h-min mt-24 flex-col bg-crust rounded shadow-lg w-full"
       >
         <div className="flex justify-end">
           <button onClick={() => setIsModalOpen(false)}>

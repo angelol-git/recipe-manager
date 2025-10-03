@@ -8,7 +8,6 @@ import WarningSvg from "../icons/WarningSvg.jsx";
 
 function ChatOptions({
   recipe,
-  errors,
   isEditing,
   setIsEditing,
   handleDelete,
@@ -71,19 +70,6 @@ function ChatOptions({
               >
                 <EditSvg />
                 <div>Rename</div>
-              </button>
-            </li>
-            <li className="text-text-primary py-2 border-black/40 border-b-1">
-              <button
-                onClick={() => {
-                  setIsOptionsOpen((prev) => !prev);
-                }}
-                className="flex w-full justify-between items-center"
-              >
-                <ErrorSvg />
-                <div>
-                  Errors {errors?.length > 0 ? `(${errors.length})` : null}
-                </div>
               </button>
             </li>
             <li className="text-rose py-2 border-black/40 border-b-1">

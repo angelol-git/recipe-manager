@@ -64,9 +64,20 @@ function ChatReply({
       )}
       {source_prompt && !isReplyLoading && (
         <div className="flex justify-between text-text-secondary/80 text-sm">
-          <button onClick={() => setIsModalOpen(true)} className="underline">
-            View prompt
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="underline cursor-pointer"
+            >
+              View prompt
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="underline text-rose"
+            >
+              Errors(2)
+            </button>
+          </div>
           <p className="text-text-secondary/80">
             {currentVersion + 1} of {totalVersion}
           </p>

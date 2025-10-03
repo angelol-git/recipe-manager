@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext.jsx";
+import Toast from "../components/Toast.jsx";
 import ChatTitle from "../components/chat/ChatTitle.jsx";
 import ChatSideBar from "../components/chat/ChatSideBar.jsx";
 import ChatOptions from "../components/chat/ChatOptions.jsx";
@@ -25,8 +26,17 @@ function Chat() {
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [toast, setToast] = useState(null);
+
   // const [errorMessage, setErrorMessage] = useState(null);
   // const [isValidResponse, setIsValidResponse] = useState(true);
+  function showToast(message, type = "error") {
+    setToast({ message, type });
+
+    setTimeout(() => {
+      setToast(null);
+    }, 5000);
+  }
 
   useEffect(() => {
     if (!recipe?.id) return;
@@ -68,10 +78,11 @@ function Chat() {
         }),
       });
       // setErrorMessage(null);
-      const data = await result.json();
 
+      setMessage("");
+      const data = await result.json();
       if (!result.ok) {
-        console.error(data.error.message);
+        showToast("Recipe could not be generated from this input");
         return null;
       }
 
@@ -104,13 +115,13 @@ function Chat() {
         addRecipe(recipe, newVersion);
       }
 
-      setMessage("");
       // const isValid = checkValidResponse(data.reply);
       // setIsValidResponse(isValid);
       // if (!isValid) {
       //   setErrorMessage("I couldn’t extract a recipe from that message.");
       // }
     } catch (error) {
+      showToast("Network error. Please try again.");
       console.error("Network error:", error);
       return null;
       // setErrorMessage(
@@ -157,7 +168,7 @@ function Chat() {
   // }
 
   return (
-    <div className="relative bg-base flex flex-col h-screen text-text-primary p-5 w-full">
+    <div className="relative bg-base flex flex-col h-screen text-text-primary py-5 px-4 w-full">
       <ChatSideBar
         recipes={recipes}
         isSideBarOpen={isSideBarOpen}
@@ -190,7 +201,6 @@ function Chat() {
           </button>
           <ChatOptions
             recipe={recipe}
-            errors={errors}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
             handleDelete={handleDelete}
@@ -216,6 +226,14 @@ function Chat() {
         setIsModalOpen={setIsModalOpen}
         source_prompt={recipe?.versions?.[currentVersion].source_prompt}
       />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <ChatInput
         message={message}
         setMessage={setMessage}
