@@ -3,7 +3,12 @@ import { createPortal } from "react-dom";
 import CloseSvg from "../icons/CloseSvg";
 import ErrorSvg from "../icons/ErrorSvg";
 import WarningSvg from "../icons/WarningSvg";
-function ChatErrorModal({ isErrorModalOpen, setIsErrorModalOpen, errors }) {
+function ChatErrorModal({
+  isErrorModalOpen,
+  setIsErrorModalOpen,
+  errors,
+  deleteError,
+}) {
   const modalRef = useRef(null);
   useEffect(() => {
     function handleClickOutside(e) {
@@ -24,6 +29,37 @@ function ChatErrorModal({ isErrorModalOpen, setIsErrorModalOpen, errors }) {
   //     console.log(JSON.parse(errors?.[0].content).source_prompt);
   //   }
   //   console.log(JSON.parse(errors));
+
+  function convertTime(created_at) {
+    const now = new Date();
+    const created = new Date(created_at + "Z");
+    const diffMs = now - created;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min${diffMins === 1 ? "" : "s"} ago`;
+
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) {
+      return `${diffHours} hr${diffHours === 1 ? "" : "s"} ago`;
+    }
+
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) {
+      return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+    }
+
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks < 4)
+      return `${diffWeeks} week${diffWeeks === 1 ? "" : "s"} ago`;
+
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12)
+      return `${diffMonths} month${diffMonths === 1 ? "" : "s"} ago`;
+
+    const diffYears = Math.floor(diffDays / 365);
+    return `${diffYears} year${diffYears === 1 ? "" : "s"} ago`;
+  }
+
   if (!isErrorModalOpen) return null;
 
   return createPortal(
@@ -38,26 +74,35 @@ function ChatErrorModal({ isErrorModalOpen, setIsErrorModalOpen, errors }) {
           </button>
         </div>
         <h2 className="font-bold pb-2">Errors</h2>
-        <ul className="">
+        <ul className="flex flex-col gap-3">
           {errors?.length > 0
             ? errors.map((element) => {
                 const content = JSON.parse(element.content);
-                console.log(content);
-
                 return (
                   <li
-                    className="bg-rose-100 p-2 flex gap-2 rounded-lg"
+                    className="bg-rose-100 px-2 py-3 flex gap-2 rounded-lg"
                     key={element.id}
                   >
                     <WarningSvg />
                     <div className="flex flex-col">
-                      <h3 className="font-bold text-rose-900 text-large">
-                        {content.error}
-                      </h3>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-bold text-rose-900 text-large">
+                          {content.error}
+                        </h3>
+                        <button
+                          onClick={() => deleteError(element.id)}
+                          className="text-rose-600 hover:text-rose-900 text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
                       <p className="text-rose-900">{content.errorMessage}</p>
-                      <p className="text-gray-400 text-sm italic">
+                      <p className="text-gray-500 text-sm italic">
                         Input: {content.source_prompt}
                       </p>
+                      <div className="text-rose-800 self-end text-sm">
+                        {convertTime(element.created_at)}
+                      </div>
                     </div>
                   </li>
                 );
@@ -66,7 +111,7 @@ function ChatErrorModal({ isErrorModalOpen, setIsErrorModalOpen, errors }) {
         </ul>
       </div>
     </div>,
-    document.body // Render outside the main app DOM
+    document.body
   );
 }
 

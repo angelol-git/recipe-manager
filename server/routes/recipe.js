@@ -125,9 +125,6 @@ router.get("/errors/:id", authMiddleware, async (req, res) => {
             ORDER BY created_At DESC;
             `).all(id);
 
-        console.log(response);
-        // const content = await response.json();
-        // cons
         return res.json({ errors: response });
     }
     catch (error) {
@@ -135,6 +132,22 @@ router.get("/errors/:id", authMiddleware, async (req, res) => {
         return res.status(500).json({ error: `DB error: ${error}` });
     }
 })
+
+router.delete("/error/:id", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = db.prepare(`DELETE FROM messages WHERE id = ?`).run(id);
+        if (result.changes === 0) {
+            return res.status(404).json(({ message: "Error message not found" }));
+        }
+        return res.status(204).send();
+    }
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
+
 router.delete("/version/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
 
@@ -144,7 +157,7 @@ router.delete("/version/:id", authMiddleware, async (req, res) => {
         if (result.changes === 0) {
             return res.status(404).json(({ message: "Recipe not found" }));
         }
-        res.status(204).send();
+        return res.status(204).send();
     }
 
     catch (error) {
@@ -161,7 +174,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
         if (result.changes === 0) {
             return res.status(404).json(({ message: "Recipe not found" }));
         }
-        res.status(204).send();
+        return res.status(204).send();
     }
 
     catch (error) {
@@ -186,7 +199,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
             return res.status(404).json({ error: "Recipe not found" });
         }
 
-        res.json({ success: true, updatedId: id });
+        return res.json({ success: true, updatedId: id });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: `Failed to update recipe: ${error}` });

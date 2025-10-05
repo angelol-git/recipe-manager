@@ -73,12 +73,14 @@ function ChatReply({
             >
               View prompt
             </button>
-            <button
-              onClick={() => setIsErrorModalOpen(true)}
-              className="underline text-rose cursor-pointer"
-            >
-              Errors {errors?.length > 0 ? `(${errors.length})` : null}
-            </button>
+            {errors?.length > 0 ? (
+              <button
+                onClick={() => setIsErrorModalOpen(true)}
+                className="underline text-rose cursor-pointer"
+              >
+                Errors {`(${errors.length})`}
+              </button>
+            ) : null}
           </div>
           <p className="text-text-secondary/80">
             {currentVersion + 1} of {totalVersion}

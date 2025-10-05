@@ -30,8 +30,6 @@ function Chat() {
   const [errors, setErrors] = useState([]);
   const [toast, setToast] = useState(null);
 
-  // const [errorMessage, setErrorMessage] = useState(null);
-  // const [isValidResponse, setIsValidResponse] = useState(true);
   function showToast(message, type = "error") {
     setToast({ message, type });
 
@@ -42,29 +40,12 @@ function Chat() {
 
   useEffect(() => {
     if (!recipe?.id) return;
-    async function fetchErrors() {
-      try {
-        const result = await fetch(
-          `http://localhost:8080/api/recipes/errors/${recipe.id}`,
-          {
-            credentials: "include",
-          }
-        );
-        const data = await result.json();
-        if (!result.ok) {
-          console.error(data.error.message);
-          return null;
-        }
-        setErrors(data.errors);
-      } catch (error) {
-        console.log("Network error", error);
-      }
-    }
-    fetchErrors();
+    fetchErrors(recipe.id);
   }, [recipe?.id]);
 
   async function sendMessage() {
-    if (message.length <= 0) return;
+    if (message.trim().length === 0) return;
+
     try {
       setIsReplyLoading(true);
 
@@ -79,13 +60,14 @@ function Chat() {
           recipeId: recipe?.id || null,
         }),
       });
-      // setErrorMessage(null);
 
-      setMessage("");
       const data = await result.json();
-      if (!result.ok) {
+      setMessage("");
+
+      if (!result.ok || !data.reply) {
         showToast("Recipe could not be generated from this input");
-        return null;
+        fetchErrors(recipe?.id);
+        return;
       }
 
       let newRecipe = {};
@@ -116,21 +98,59 @@ function Chat() {
       } else {
         addRecipe(recipe, newVersion);
       }
-
-      // const isValid = checkValidResponse(data.reply);
-      // setIsValidResponse(isValid);
-      // if (!isValid) {
-      //   setErrorMessage("I couldn’t extract a recipe from that message.");
-      // }
     } catch (error) {
       showToast("Network error. Please try again.");
       console.error("Network error:", error);
-      return null;
-      // setErrorMessage(
-      //   "Something went wrong while sending your message. Please try again."
-      // );
+      if (recipe?.id) {
+        fetchErrors(recipe.id);
+      }
     } finally {
       setIsReplyLoading(false);
+    }
+  }
+
+  async function fetchErrors(recipeId) {
+    try {
+      const result = await fetch(
+        `http://localhost:8080/api/recipes/errors/${recipeId}`,
+        {
+          credentials: "include",
+        }
+      );
+      const data = await result.json();
+      if (!result.ok) {
+        console.error(data.error.message);
+        return null;
+      }
+      setErrors(data.errors);
+    } catch (error) {
+      console.log("Network error", error);
+    }
+  }
+
+  async function deleteError(messageId) {
+    const prevErrors = [...errors];
+    setErrors((prev) => {
+      return prev.filter((item) => {
+        return item.id !== messageId;
+      });
+    });
+
+    try {
+      const result = await fetch(
+        `http://localhost:8080/api/recipes/error/${messageId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!result.ok && result.status !== 204) {
+        const data = await result.json();
+        console.error(data.error?.message || "Unknown error");
+      }
+    } catch (error) {
+      console.log("Network error", error);
+      setErrors(prevErrors);
     }
   }
 
@@ -160,14 +180,6 @@ function Chat() {
     const updatedRecipe = { ...recipe, title: newTitle };
     updateRecipe(updatedRecipe);
   }
-
-  // function checkValidResponse(recipe) {
-  //   return !!(
-  //     recipe.title?.trim() ||
-  //     recipe.ingredients?.trim() ||
-  //     recipe.instructions?.trim()
-  //   );
-  // }
 
   return (
     <div className="relative bg-base flex flex-col h-screen text-text-primary py-5 px-4 w-full">
@@ -237,6 +249,7 @@ function Chat() {
         isErrorModalOpen={isErrorModalOpen}
         setIsErrorModalOpen={setIsErrorModalOpen}
         errors={errors}
+        deleteError={deleteError}
       />
       {toast && (
         <Toast

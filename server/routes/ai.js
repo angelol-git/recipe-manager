@@ -77,7 +77,6 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
                 VALUES (?, ?, 'assistant', ?,'error')
             `).run(req.user.id, recipeId || null, JSON.stringify(reply));
 
-
             return res.status(400).json({ error: { code: "INVALID_RECIPE", message: "Recipe could not be generated from this input", details: reply } });
         }
         db.prepare(`
