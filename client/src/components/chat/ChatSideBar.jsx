@@ -19,8 +19,8 @@ function ChatSideBar({ recipes, isSideBarOpen, setIsSideBarOpen }) {
         </button>
       </div>
       <div className="flex flex-col gap-6">
-        <Link to={`/home`}>
-          <h2 className="cursor-pointer">Home</h2>
+        <Link to={`/home`} className="cursor-pointer w-min">
+          <h2>Home</h2>
         </Link>
         <div>
           <h2 className="text-text-secondary/70 pb-3">Recipes</h2>
