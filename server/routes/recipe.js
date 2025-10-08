@@ -183,8 +183,33 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     }
 })
 
+
+router.get("/:id/askMessages", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    try {
+
+        const response = db.prepare(`
+            SELECT * 
+            FROM messages 
+            WHERE recipe_id = ? 
+                AND status = 'ask' 
+            ORDER BY created_at ASC`)
+            .all(id);
+
+        if (!response) {
+            return res.status(404).json({ error: "Recipe not found" });
+        }
+
+        return res.json({ response });
+    }
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
 //Currently only supports title
 router.put("/:id", authMiddleware, async (req, res) => {
+
     const { id } = req.params;
     const recipe = req.body;
 
@@ -208,37 +233,3 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
 export default router;
 
-// router.post("/save", authMiddleware, async (req, res) => {
-//     const userId = req.user.id;
-//     const { recipeId, recipe } = req.body;
-//     try {
-//         //if first save/new insert into recipes parent
-//         if (!recipeId) {
-//             const recipeResult = db.prepare(`
-//                 INSERT INTO recipes (user_id, title)
-//                 VALUES (?, ?)
-//                 `).run(userId, recipe.title);
-
-//             const newRecipeId = recipeResult.lastInsertRowid;
-//             db.prepare(
-//                 `INSERT INTO recipe_versions (recipe_id,description,instructions,ingredients,source_prompt,ai_model,relation)
-//                 VALUES (?,?,?,?,?,?,?)
-//                 `).run(newRecipeId, recipe.description, recipe.instructions, recipe.ingredients, recipe.source_prompt, recipe.ai_model, recipe.relation)
-//             return res.json({ success: true });
-//         }
-//         else {
-//             // if (recipe.relation === "reply") {
-//             db.prepare(
-//                 `INSERT INTO recipe_versions (recipe_id,description,instructions,ingredients,source_prompt,ai_model,relation)
-//                 VALUES (?,?,?,?,?,?,?)
-//                 `).run(recipeId, recipe.description, recipe.instructions, recipe.ingredients, recipe.source_prompt, recipe.ai_model, recipe.relation)
-//             // }
-//             return res.json({ success: true });
-//         }
-//     }
-
-//     catch (error) {
-//         console.error("DB error:", error);
-//         return res.status(500).json({ error: `DB error: ${error}` });
-//     }
-// })

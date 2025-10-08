@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext.jsx";
 import Toast from "../components/Toast.jsx";
@@ -10,8 +10,8 @@ import ChatReply from "../components/chat/ChatReply.jsx";
 import ChatModal from "../components/chat/ChatModal.jsx";
 import MenuSvg from "../components/icons/MenuSvg.jsx";
 import ForkSvg from "../components/icons/ForkSvg.jsx";
-import { useEffect } from "react";
 import ChatErrorModal from "../components/chat/ChatErrorModal.jsx";
+import ChatAskModal from "../components/chat/ChatAskModal.jsx";
 
 function Chat() {
   const navigate = useNavigate();
@@ -27,9 +27,11 @@ function Chat() {
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [errors, setErrors] = useState([]);
   const [toast, setToast] = useState(null);
   const [chatInputMode, setChatInputMode] = useState("Create");
+  const [askMessages, setAskMessages] = useState([]);
   function showToast(message, type = "error") {
     setToast({ message, type });
 
@@ -41,6 +43,11 @@ function Chat() {
   useEffect(() => {
     if (!recipe?.id) return;
     fetchErrors(recipe.id);
+  }, [recipe?.id]);
+
+  useEffect(() => {
+    if (!recipe?.id) return;
+    fetchAskMessages(recipe.id);
   }, [recipe?.id]);
 
   function handleSendMessage() {
@@ -133,11 +140,11 @@ function Chat() {
       setMessage("");
 
       console.log(data);
-      // if (!result.ok || !data.reply) {
-      //   showToast("Recipe could not be generated from this input");
-      //   fetchErrors(recipe?.id);
-      //   return;
-      // }
+      if (!result.ok || !data.reply) {
+        showToast("Recipe could not be generated from this input");
+        fetchErrors(recipe?.id);
+        return;
+      }
     } catch (error) {
       showToast("Network error. Please try again.");
       console.error("Network error:", error);
@@ -146,6 +153,25 @@ function Chat() {
       // }
     } finally {
       setIsReplyLoading(false);
+    }
+  }
+
+  async function fetchAskMessages(recipeId) {
+    try {
+      const result = await fetch(
+        `http://localhost:8080/api/recipes/${recipeId}/askMessages`,
+        {
+          credentials: "include",
+        }
+      );
+      const data = await result.json();
+      if (!result.ok) {
+        console.error(data.error.message);
+        return null;
+      }
+      setAskMessages(data.response);
+    } catch (error) {
+      console.log("Network error", error);
     }
   }
   async function fetchErrors(recipeId) {
@@ -290,6 +316,11 @@ function Chat() {
         errors={errors}
         deleteError={deleteError}
       />
+      <ChatAskModal
+        isAskModalOpen={isAskModalOpen}
+        setIsAskModalOpen={setIsAskModalOpen}
+        askMessages={askMessages}
+      />
       {toast && (
         <Toast
           message={toast.message}
@@ -308,6 +339,8 @@ function Chat() {
         setCurrentVersion={setCurrentVersion}
         chatInputMode={chatInputMode}
         setChatInputMode={setChatInputMode}
+        isAskModalOpen={isAskModalOpen}
+        setIsAskModalOpen={setIsAskModalOpen}
       />
     </div>
   );

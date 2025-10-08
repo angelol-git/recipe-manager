@@ -16,6 +16,8 @@ function ChatInput({
   setCurrentVersion,
   chatInputMode,
   setChatInputMode,
+  isAskModalOpen,
+  setIsAskModalOpen,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandedRef = useRef();
@@ -118,7 +120,12 @@ function ChatInput({
             <option value="Ask">Ask</option>
           </select>
           {chatInputMode === "Ask" ? (
-            <button className="bg-lavender p-1 rounded-full cursor-pointer">
+            <button
+              onClick={() => {
+                setIsAskModalOpen(!isAskModalOpen);
+              }}
+              className="bg-lavender p-1 rounded-full cursor-pointer"
+            >
               <HistorySvg />
             </button>
           ) : null}

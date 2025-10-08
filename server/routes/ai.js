@@ -47,6 +47,10 @@ router.post("/ask", authMiddleware, async (req, res) => {
         });
 
         let reply = response.candidates[0].content.parts[0].text.trim();
+        db.prepare(`
+            INSERT INTO messages (user_id, recipe_id, role, content,status)
+            VALUES (?, ?, 'assistant', ?,'ask')
+        `).run(req.user.id, recipeId || null, reply);
         return res.json({ reply });
     }
 
