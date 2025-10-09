@@ -35,7 +35,7 @@ function Chat() {
     askMessages,
     sendMessage,
     sendAsk,
-    deleteError,
+    handleDeleteError,
     handleDelete,
     handleDeleteAll,
     handleRename,
@@ -129,7 +129,7 @@ function Chat() {
         isErrorModalOpen={isErrorModalOpen}
         setIsErrorModalOpen={setIsErrorModalOpen}
         errors={errors}
-        deleteError={deleteError}
+        handleDeleteError={handleDeleteError}
       />
       <ChatAskModal
         isAskModalOpen={isAskModalOpen}

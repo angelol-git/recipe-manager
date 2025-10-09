@@ -7,7 +7,7 @@ function ChatErrorModal({
   isErrorModalOpen,
   setIsErrorModalOpen,
   errors,
-  deleteError,
+  handleDeleteError,
 }) {
   const modalRef = useRef(null);
   useEffect(() => {
@@ -76,32 +76,31 @@ function ChatErrorModal({
         <h2 className="font-bold pb-2">Errors</h2>
         <ul className="flex flex-col gap-3">
           {errors?.length > 0
-            ? errors.map((element) => {
-                const content = JSON.parse(element.content);
+            ? errors.map((item) => {
                 return (
                   <li
                     className="bg-rose-100 px-2 py-3 flex gap-2 rounded-lg"
-                    key={element.id}
+                    key={item.id}
                   >
                     <WarningSvg />
                     <div className="flex flex-col">
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-rose-900 text-large">
-                          {content.error}
+                          {item.error}
                         </h3>
                         <button
-                          onClick={() => deleteError(element.id)}
+                          onClick={() => handleDeleteError(item.id)}
                           className="text-rose-600 hover:text-rose-900 text-sm"
                         >
                           Delete
                         </button>
                       </div>
-                      <p className="text-rose-900">{content.errorMessage}</p>
+                      <p className="text-rose-900">{item.errorMessage}</p>
                       <p className="text-gray-500 text-sm italic">
-                        Input: {content.source_prompt}
+                        Input: {item.source_prompt}
                       </p>
                       <div className="text-rose-800 self-end text-sm">
-                        {convertTime(element.created_at)}
+                        {convertTime(item.created_at)}
                       </div>
                     </div>
                   </li>

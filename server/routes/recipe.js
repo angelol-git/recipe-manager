@@ -27,8 +27,9 @@ router.get("/", authMiddleware, async (req, res) => {
         `).all(userId);
 
         const recipes = {};
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
 
-        for (const row of rows) {
             if (!recipes[row.recipe_id]) {
                 recipes[row.recipe_id] = {
                     id: row.recipe_id,
@@ -49,6 +50,7 @@ router.get("/", authMiddleware, async (req, res) => {
                 total_time: row.total_time
             })
         }
+
         return res.json(Object.values(recipes));
     }
     catch (error) {
@@ -117,7 +119,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
 router.get("/errors/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
-        const response = db.prepare(`
+        const rows = db.prepare(`
             SELECT id,status,content,created_at
             FROM messages
             WHERE recipe_id = ?
@@ -125,7 +127,23 @@ router.get("/errors/:id", authMiddleware, async (req, res) => {
             ORDER BY created_At DESC;
             `).all(id);
 
-        return res.json({ errors: response });
+        const errors = [];
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const parsed = JSON.parse(row.content || "{}");
+            errors.push({
+                id: row.id,
+                status: row.status,
+                created_at: row.created_at,
+                ai_model: parsed.ai_model,
+                source_prompt: parsed.source_prompt,
+                error: parsed.error,
+                errorMessage: parsed.errorMessage || "Recipe could not be generated",
+                raw: parsed.raw,
+            })
+        }
+
+        return res.json({ errors });
     }
     catch (error) {
         console.error("DB error:", error);

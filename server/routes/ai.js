@@ -71,7 +71,6 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
     try {
         reply = JSON.parse(rawResponse);
     } catch (err) {
-
         reply = {
             error: "Invalid JSON from AI",
             errorMessage: "The recipe could not be generated because the AI’s response was incomplete. Please try again.",
@@ -101,12 +100,25 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
                 ai_model: "gemini-2.5-flash"
             };
 
-            db.prepare(`
+            const result = db.prepare(`
                 INSERT INTO messages (user_id, recipe_id, role, content,status)
                 VALUES (?, ?, 'assistant', ?,'error')
             `).run(req.user.id, recipeId || null, JSON.stringify(reply));
+            const inserted = db.prepare(`SELECT id, status, content, created_at FROM messages WHERE id = ?`).get(result.lastInsertRowid);
+            const parsed = JSON.parse(inserted.content);
 
-            return res.status(400).json({ error: { code: "INVALID_RECIPE", message: "Recipe could not be generated from this input", details: reply } });
+            const formatted = {
+                id: inserted.id,
+                status: inserted.status,
+                created_at: inserted.created_at,
+                ai_model: parsed.ai_model,
+                error: parsed.error,
+                source_prompt: parsed.source_prompt,
+                errorMessage: parsed.errorMessage || "Recipe could not be generated",
+                raw: parsed.raw,
+            };
+
+            return res.status(400).json({ error: formatted });
         }
         db.prepare(`
                 INSERT INTO messages (user_id, recipe_id, role, content,status)

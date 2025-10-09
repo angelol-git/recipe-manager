@@ -29,8 +29,12 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
         body: JSON.stringify({ message, currentVersion, recipeId: recipe?.id }),
       });
       const data = await res.json();
-      if (!res.ok || !data.reply) throw new Error("Recipe generation failed");
 
+      if (!data.ok || !data.reply) {
+        showToast("Recipe could not be generated from this input");
+        fetchErrors(recipe?.id);
+        return;
+      }
       const newVersion = {
         id: data.reply.versionId,
         ai_model: data.reply.ai_model,
@@ -115,13 +119,14 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
         console.error(data.error.message);
         return null;
       }
+      console.log(data.errors);
       setErrors(data.errors);
     } catch (error) {
       console.log("Network error", error);
     }
   }
 
-  async function deleteError(messageId) {
+  async function handleDeleteError(messageId) {
     const prevErrors = [...errors];
     setErrors((prev) => {
       return prev.filter((item) => {
@@ -177,7 +182,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     askMessages,
     sendMessage,
     sendAsk,
-    deleteError,
+    handleDeleteError,
     handleDelete,
     handleDeleteAll,
     handleRename,
