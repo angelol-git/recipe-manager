@@ -32,7 +32,19 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
 
       if (!data.ok || !data.reply) {
         showToast("Recipe could not be generated from this input");
-        fetchErrors(recipe?.id);
+        const newError = {
+          id: data.error.id,
+          status: data.error.status,
+          created_at: data.error.created_at,
+          ai_model: data.error.ai_model,
+          source_prompt: data.error.source_prompt,
+          error: data.error.error,
+          errorMessage:
+            data.error.errorMessage || "Recipe could not be generated",
+          raw: data.error.raw,
+        };
+
+        setErrors((prev) => [newError, ...prev]);
         return;
       }
       const newVersion = {
@@ -119,7 +131,6 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
         console.error(data.error.message);
         return null;
       }
-      console.log(data.errors);
       setErrors(data.errors);
     } catch (error) {
       console.log("Network error", error);
