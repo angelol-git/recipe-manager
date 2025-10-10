@@ -8,21 +8,22 @@ dotenv.config();
 const router = express.Router();
 const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
-router.post("/message", authMiddleware, async (req, res) => {
-    const { message, recipe, currentVersion, recipeId } = req.body;
+router.post("/create", authMiddleware, async (req, res) => {
+    const { message, currentRecipeVersion, recipeId } = req.body;
     try {
+        console.log("Creating a recipe...");
         db.prepare(`
             INSERT INTO messages (user_id, recipe_id, role, content,status)
             VALUES (?, ?, 'user', ?,'create')
         `).run(req.user.id, recipeId || null, message);
 
-        const prompt = createPrompt(currentVersion, message);
+        const prompt = createPrompt(currentRecipeVersion, message);
         const response = await genAI.models.generateContent({
             model: "gemini-2.5-flash",
             contents: [{ type: "text", text: prompt }],
         });
 
-        validateAiResponse(response, recipe, recipeId, req, res);
+        validateAiResponse(response, recipeId, req, res);
     }
 
     catch (err) {
@@ -71,7 +72,7 @@ router.post("/ask", authMiddleware, async (req, res) => {
     }
 })
 
-function validateAiResponse(response, recipe, recipeId, req, res) {
+function validateAiResponse(response, recipeId, req, res) {
     let rawResponse = response.candidates[0].content.parts[0].text.trim();
 
     if (rawResponse.startsWith("```")) {
@@ -99,9 +100,13 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
     }
 
     try {
-        if (!reply.title?.trim() ||
-            !reply.ingredients?.trim() ||
-            !reply.instructions?.trim()) {
+        if (!reply.title?.trim() &&
+            !reply.ingredients?.trim() &&
+            !reply.instructions?.trim() &&
+            reply.servings === 0 &&
+            reply.calories === 0 &&
+            reply.total_time === 0
+        ) {
 
             reply = {
                 error: "Invalid input",
@@ -156,7 +161,7 @@ function validateAiResponse(response, recipe, recipeId, req, res) {
             const versionResult = db.prepare(`
                 INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `).run(recipeId, reply.servings, reply.total_time, reply.calories, reply.description, reply.instructions, reply.ingredients, reply.source_prompt, reply.ai_model, reply.relation);
+                `).run(recipeId, reply.servings, reply.total_time, reply.calories, reply.description, reply.instructions, JSON.stringify(reply.ingredients), reply.source_prompt, reply.ai_model, reply.relation);
 
             reply.id = recipeId;
             reply.versionId = versionResult.lastInsertRowid;
@@ -232,7 +237,7 @@ function createPrompt(currentVersion, message) {
     - If both are present in the source, keep them as-is without duplication.
     - If an ingredient uses teaspoons (tsp) or tablespoons (tbsp), do NOT add grams.
     - Only add grams for larger volume-based measurements like cups, pints, or quarts.
-    
+
     Here is the user message: "${message}"
     `)
 }

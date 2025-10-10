@@ -19,18 +19,24 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     fetchAskMessages(recipe.id);
   }, [recipe?.id]);
 
-  async function sendMessage(message, recipe, currentVersion) {
+  async function sendCreateMessage(message, currentVersion, recipe) {
     setIsReplyLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/ai/message`, {
+      const currentRecipeVersion = recipe.versions[currentVersion];
+      const res = await fetch(`${API_BASE}/ai/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ message, currentVersion, recipeId: recipe?.id }),
+        body: JSON.stringify({
+          message,
+          currentRecipeVersion,
+          recipeId: recipe?.id,
+        }),
       });
       const data = await res.json();
 
-      if (!data.ok || !data.reply) {
+      if (!data.reply) {
+        console.log(data);
         showToast("Recipe could not be generated from this input");
         const newError = {
           id: data.error.id,
@@ -47,6 +53,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
         setErrors((prev) => [newError, ...prev]);
         return;
       }
+
       const newVersion = {
         id: data.reply.versionId,
         ai_model: data.reply.ai_model,
@@ -72,7 +79,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     }
   }
 
-  async function sendAsk(message) {
+  async function sendAskMessage(message) {
     try {
       setIsReplyLoading(true);
 
@@ -210,8 +217,8 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     errors,
     askMessages,
     setAskMessages,
-    sendMessage,
-    sendAsk,
+    sendCreateMessage,
+    sendAskMessage,
     handleDeleteError,
     handleDelete,
     handleDeleteAll,

@@ -2,7 +2,12 @@ import { useRef, useEffect } from "react";
 import UpArrowSvg from "../icons/UpArrowSvg";
 import SpinnerSvg from "../icons/SpinnerSvg";
 
-function ChatAskInput({ askMessage, setAskMessage, sendAsk, isReplyLoading }) {
+function ChatAskInput({
+  askMessage,
+  setAskMessage,
+  sendAskMessage,
+  isReplyLoading,
+}) {
   const textAreaRef = useRef(null);
   const minHeight = 24;
   const maxHeight = 160;
@@ -39,7 +44,7 @@ function ChatAskInput({ askMessage, setAskMessage, sendAsk, isReplyLoading }) {
         className="cursor-pointer flex items-center justify-center w-9 h-9 p-0 text-white bg-lavender hover:bg-accent-dark rounded-full shrink-0"
         onClick={() => {
           if (askMessage.trim().length === 0) return;
-          sendAsk(askMessage);
+          sendAskMessage(askMessage);
           setAskMessage("");
         }}
       >

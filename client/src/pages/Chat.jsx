@@ -35,8 +35,8 @@ function Chat() {
     errors,
     askMessages,
     setAskMessages,
-    sendMessage,
-    sendAsk,
+    sendCreateMessage,
+    sendAskMessage,
     handleDeleteError,
     handleDelete,
     handleDeleteAll,
@@ -55,10 +55,10 @@ function Chat() {
   function handleSendMessage() {
     if (message.trim().length === 0) return;
     if (chatInputMode === "Create") {
-      sendMessage(message, recipe, currentVersion);
+      sendCreateMessage(message, currentVersion, recipe);
     }
     if (chatInputMode === "Ask") {
-      sendAsk(message);
+      sendAskMessage(message);
       setIsAskModalOpen(true);
     }
     setMessage("");
@@ -139,7 +139,7 @@ function Chat() {
         setIsAskModalOpen={setIsAskModalOpen}
         askMessages={askMessages}
         setAskMessages={setAskMessages}
-        sendAsk={sendAsk}
+        sendAskMessage={sendAskMessage}
         isReplyLoading={isReplyLoading}
       />
       {toast && (

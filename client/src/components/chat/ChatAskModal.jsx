@@ -6,7 +6,7 @@ function ChatAskModal({
   isAskModalOpen,
   setIsAskModalOpen,
   askMessages,
-  sendAsk,
+  sendAskMessage,
   isReplyLoading,
 }) {
   const messagesEndRef = useRef(null);
@@ -56,7 +56,7 @@ function ChatAskModal({
         <div className="flex">
           <button
             onClick={() => setIsAskModalOpen(false)}
-            className="bg-crust p-2 rounded-full"
+            className="bg-crust p-2 rounded-full cursor-pointer"
           >
             <CloseSvg />
           </button>
@@ -83,7 +83,7 @@ function ChatAskModal({
         <ChatAskInput
           askMessage={askMessage}
           setAskMessage={setAskMessage}
-          sendAsk={sendAsk}
+          sendAsk={sendAskMessage}
           isReplyLoading={isReplyLoading}
         />
       </div>
