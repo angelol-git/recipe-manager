@@ -9,6 +9,7 @@ function ChatAskModal({
   sendAsk,
   isReplyLoading,
 }) {
+  const messagesEndRef = useRef(null);
   const modalRef = useRef(null);
   const [askMessage, setAskMessage] = useState("");
 
@@ -25,16 +26,29 @@ function ChatAskModal({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isAskModalOpen, setIsAskModalOpen]);
-  //   if (errors?.length > 0) {
-  //     console.log(JSON.parse(errors?.[0].content));
-  //     console.log(JSON.parse(errors?.[0].content).source_prompt);
-  //   }
-  //   console.log(JSON.parse(errors));
+
+  function scrollToBottom() {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTo({
+        top: messagesEndRef.current.scrollHeight,
+        // behavior: "smooth",
+      });
+    }
+  }
+
+  useEffect(() => {
+    if (isAskModalOpen) {
+      scrollToBottom();
+    }
+  }, [isAskModalOpen]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [askMessages]);
 
   if (!isAskModalOpen) return null;
-
   return createPortal(
-    <div className="fixed inset-0 bg-black/40  flex justify-center  z-50 p-4 w-full ">
+    <div className="fixed inset-0 bg-black/40 flex justify-center  z-50 p-4 w-full">
       <div
         ref={modalRef}
         className="p-4 flex flex-col gap-2 rounded shadow-lg w-full overflow-y-auto"
@@ -47,7 +61,10 @@ function ChatAskModal({
             <CloseSvg />
           </button>
         </div>
-        <div className="flex overflow-y-auto h-full flex-col gap-2">
+        <div
+          className="flex overflow-y-auto h-full flex-col gap-2 rounded-lg"
+          ref={messagesEndRef}
+        >
           {askMessages.map((item) => {
             return (
               <div

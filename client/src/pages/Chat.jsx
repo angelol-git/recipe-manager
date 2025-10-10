@@ -18,16 +18,17 @@ function Chat() {
   const { id } = useParams();
   const { recipes } = useRecipes();
   const recipe = recipes.find((r) => r.id === parseInt(id)) || null;
-
   const [currentVersion, setCurrentVersion] = useState(0);
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
-  const [chatInputMode, setChatInputMode] = useState("Create");
+
   const [message, setMessage] = useState("");
+  const [chatInputMode, setChatInputMode] = useState("Create");
 
   const {
     isReplyLoading,

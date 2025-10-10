@@ -75,6 +75,22 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
   async function sendAsk(message) {
     try {
       setIsReplyLoading(true);
+
+      const created_at = new Date().toISOString();
+      const tempId = `temp-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
+      // Example:
+      const placeHolderUserMessage = {
+        id: tempId,
+        content: message,
+        created_at: created_at,
+        role: "user",
+        status: "ask",
+      };
+
+      setAskMessages((prev) => [...prev, placeHolderUserMessage]);
+
       const result = await fetch(`${API_BASE}/ai/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -87,13 +103,14 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
       });
 
       const data = await result.json();
-      console.log(data);
 
       if (!result.ok || !data.reply) {
         // showToast("Recipe could not be generated from this input");
         // fetchErrors(recipe?.id);
         return;
       }
+
+      setAskMessages((prev) => [...prev, data.reply]);
     } catch (error) {
       // showToast("Network error. Please try again.");
       console.error("Network error:", error);
