@@ -1,9 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import CloseSvg from "../icons/CloseSvg";
 import ChatAskInput from "./ChatAskInput";
-function ChatAskModal({ isAskModalOpen, setIsAskModalOpen, askMessages }) {
+function ChatAskModal({
+  isAskModalOpen,
+  setIsAskModalOpen,
+  askMessages,
+  sendAsk,
+  isReplyLoading,
+}) {
   const modalRef = useRef(null);
+  const [askMessage, setAskMessage] = useState("");
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -17,7 +25,6 @@ function ChatAskModal({ isAskModalOpen, setIsAskModalOpen, askMessages }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isAskModalOpen, setIsAskModalOpen]);
-
   //   if (errors?.length > 0) {
   //     console.log(JSON.parse(errors?.[0].content));
   //     console.log(JSON.parse(errors?.[0].content).source_prompt);
@@ -40,7 +47,7 @@ function ChatAskModal({ isAskModalOpen, setIsAskModalOpen, askMessages }) {
             <CloseSvg />
           </button>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex overflow-y-auto h-full flex-col gap-2">
           {askMessages.map((item) => {
             return (
               <div
@@ -48,7 +55,7 @@ function ChatAskModal({ isAskModalOpen, setIsAskModalOpen, askMessages }) {
                 className={`${
                   item.role === "assistant"
                     ? "bg-sky p-2 rounded-lg"
-                    : "bg-pink p-2 rounded-lg self-end"
+                    : "bg-pink p-2 rounded-lg self-end max-w-[80%]"
                 }`}
               >
                 {item.content}
@@ -56,7 +63,12 @@ function ChatAskModal({ isAskModalOpen, setIsAskModalOpen, askMessages }) {
             );
           })}
         </div>
-        <ChatAskInput />
+        <ChatAskInput
+          askMessage={askMessage}
+          setAskMessage={setAskMessage}
+          sendAsk={sendAsk}
+          isReplyLoading={isReplyLoading}
+        />
       </div>
     </div>,
     document.body

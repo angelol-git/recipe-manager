@@ -206,7 +206,7 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
 
-        const response = db.prepare(`
+        const rows = db.prepare(`
             SELECT * 
             FROM messages 
             WHERE recipe_id = ? 
@@ -214,11 +214,23 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
             ORDER BY created_at ASC`)
             .all(id);
 
-        if (!response) {
+        if (!rows) {
             return res.status(404).json({ error: "Recipe not found" });
         }
 
-        return res.json({ response });
+        const askMessages = []
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            askMessages.push({
+                id: row.id,
+                content: row.content,
+                created_at: row.created_at,
+                user_id: row.user_id,
+                status: row.status,
+                role: row.role,
+            })
+        }
+        return res.json({ askMessages });
     }
     catch (error) {
         console.error("DB error:", error);

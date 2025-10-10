@@ -47,11 +47,22 @@ router.post("/ask", authMiddleware, async (req, res) => {
         });
 
         let reply = response.candidates[0].content.parts[0].text.trim();
-        db.prepare(`
+
+        const result = db.prepare(`
             INSERT INTO messages (user_id, recipe_id, role, content,status)
             VALUES (?, ?, 'assistant', ?,'ask')
         `).run(req.user.id, recipeId || null, reply);
-        return res.json({ reply });
+        const inserted = db.prepare(`SELECT * FROM messages WHERE id = ?`).get(result.lastInsertRowid);
+        const formatted = {
+            id: inserted.id,
+            content: inserted.content,
+            created_at: inserted.created_at,
+            user_id: inserted.user_id,
+            status: inserted.status,
+            role: inserted.role,
+        };
+
+        return res.json({ reply: formatted });
     }
 
     catch (err) {

@@ -1,13 +1,8 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import UpArrowSvg from "../icons/UpArrowSvg";
 import SpinnerSvg from "../icons/SpinnerSvg";
 
-function ChatAskInput({
-  message,
-  setMessage,
-  handleAskMessage,
-  isReplyLoading,
-}) {
+function ChatAskInput({ askMessage, setAskMessage, sendAsk, isReplyLoading }) {
   const textAreaRef = useRef(null);
   const minHeight = 24;
   const maxHeight = 160;
@@ -20,7 +15,7 @@ function ChatAskInput({
         maxHeight
       )}px`;
     }
-  }, [message]);
+  }, [askMessage]);
 
   return (
     <div className="flex p-2 rounded-2xl bg-crust">
@@ -35,14 +30,18 @@ function ChatAskInput({
           maxHeight: `${maxHeight}px`,
           overflowY: "auto",
         }}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        value={askMessage}
+        onChange={(e) => setAskMessage(e.target.value)}
         placeholder="Ask a question about your recipe..."
       />
 
       <button
         className="cursor-pointer flex items-center justify-center w-9 h-9 p-0 text-white bg-lavender hover:bg-accent-dark rounded-full shrink-0"
-        onClick={handleAskMessage}
+        onClick={() => {
+          if (askMessage.trim().length === 0) return;
+          sendAsk(askMessage);
+          setAskMessage("");
+        }}
       >
         {isReplyLoading ? <SpinnerSvg /> : <UpArrowSvg />}
       </button>

@@ -27,12 +27,13 @@ function Chat() {
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [chatInputMode, setChatInputMode] = useState("Create");
-  const [createMessage, setCreateMessage] = useState("");
+  const [message, setMessage] = useState("");
 
   const {
     isReplyLoading,
     errors,
     askMessages,
+    setAskMessages,
     sendMessage,
     sendAsk,
     handleDeleteError,
@@ -51,14 +52,15 @@ function Chat() {
   }
 
   function handleSendMessage() {
-    if (createMessage.trim().length === 0) return;
+    if (message.trim().length === 0) return;
     if (chatInputMode === "Create") {
-      sendMessage(createMessage, recipe, currentVersion);
+      sendMessage(message, recipe, currentVersion);
     }
     if (chatInputMode === "Ask") {
-      sendAsk();
+      sendAsk(message);
+      setIsAskModalOpen(true);
     }
-    setCreateMessage("");
+    setMessage("");
   }
 
   return (
@@ -135,6 +137,9 @@ function Chat() {
         isAskModalOpen={isAskModalOpen}
         setIsAskModalOpen={setIsAskModalOpen}
         askMessages={askMessages}
+        setAskMessages={setAskMessages}
+        sendAsk={sendAsk}
+        isReplyLoading={isReplyLoading}
       />
       {toast && (
         <Toast
@@ -145,8 +150,8 @@ function Chat() {
       )}
 
       <ChatInput
-        message={createMessage}
-        setMessage={setCreateMessage}
+        message={message}
+        setMessage={setMessage}
         handleSendMessage={handleSendMessage}
         isReplyLoading={isReplyLoading}
         recipeVersions={recipe?.versions}

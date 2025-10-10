@@ -87,14 +87,15 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
       });
 
       const data = await result.json();
+      console.log(data);
 
       if (!result.ok || !data.reply) {
-        showToast("Recipe could not be generated from this input");
-        fetchErrors(recipe?.id);
+        // showToast("Recipe could not be generated from this input");
+        // fetchErrors(recipe?.id);
         return;
       }
     } catch (error) {
-      showToast("Network error. Please try again.");
+      // showToast("Network error. Please try again.");
       console.error("Network error:", error);
       // if (recipe?.id) {
       //   fetchErrors(recipe.id);
@@ -116,7 +117,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
         console.error(data.error.message);
         return null;
       }
-      setAskMessages(data.response);
+      setAskMessages(data.askMessages);
     } catch (error) {
       console.log("Network error", error);
     }
@@ -191,6 +192,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     isReplyLoading,
     errors,
     askMessages,
+    setAskMessages,
     sendMessage,
     sendAsk,
     handleDeleteError,
