@@ -19,7 +19,6 @@ function Chat() {
   const { recipes } = useRecipes();
   const recipe = recipes.find((r) => r.id === parseInt(id)) || null;
   const [currentVersion, setCurrentVersion] = useState(0);
-
   const [isEditing, setIsEditing] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
@@ -126,6 +125,7 @@ function Chat() {
       <ChatModal
         isPromptModalOpen={isPromptModalOpen}
         setIsPromptModalOpen={setIsPromptModalOpen}
+        original_prompt={recipe?.source_prompt}
         source_prompt={recipe?.versions?.[currentVersion].source_prompt}
       />
       <ChatErrorModal

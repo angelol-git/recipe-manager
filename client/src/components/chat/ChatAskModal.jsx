@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
+import Markdown from "react-markdown";
 import CloseSvg from "../icons/CloseSvg";
 import ChatAskInput from "./ChatAskInput";
 function ChatAskModal({
@@ -75,7 +76,18 @@ function ChatAskModal({
                     : "bg-pink p-2 rounded-lg self-end max-w-[80%]"
                 }`}
               >
-                {item.content}
+                <Markdown
+                  components={{
+                    ul: ({ node, ...props }) => (
+                      <ul
+                        className="list-disc my-2 pl-4 flex flex-col gap-2"
+                        {...props}
+                      />
+                    ),
+                  }}
+                >
+                  {item.content}
+                </Markdown>
               </div>
             );
           })}
@@ -83,7 +95,7 @@ function ChatAskModal({
         <ChatAskInput
           askMessage={askMessage}
           setAskMessage={setAskMessage}
-          sendAsk={sendAskMessage}
+          sendAskMessage={sendAskMessage}
           isReplyLoading={isReplyLoading}
         />
       </div>

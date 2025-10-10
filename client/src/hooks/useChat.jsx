@@ -22,7 +22,10 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
   async function sendCreateMessage(message, currentVersion, recipe) {
     setIsReplyLoading(true);
     try {
-      const currentRecipeVersion = recipe.versions[currentVersion];
+      let currentRecipeVersion = {};
+      if (recipe?.id) {
+        currentRecipeVersion = recipe.versions[currentVersion];
+      }
       const res = await fetch(`${API_BASE}/ai/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
