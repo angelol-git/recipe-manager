@@ -161,7 +161,7 @@ function validateAiResponse(response, recipeId, req, res) {
             const versionResult = db.prepare(`
                 INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `).run(recipeId, reply.servings, reply.total_time, reply.calories, reply.description, reply.instructions, JSON.stringify(reply.ingredients), reply.source_prompt, reply.ai_model, reply.relation);
+                `).run(recipeId, reply.servings, reply.total_time, reply.calories, reply.description, reply.instructions, reply.ingredients, reply.source_prompt, reply.ai_model, reply.relation);
 
             reply.id = recipeId;
             reply.versionId = versionResult.lastInsertRowid;

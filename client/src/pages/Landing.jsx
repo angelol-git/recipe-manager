@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useNavigate } from "react-router";
+import BookSvg from "../components/icons/BookSvg";
 function Landing() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -39,11 +40,18 @@ function Landing() {
   }
 
   return (
-    <div className="p-10 text-white bg-black h-screen flex flex-col gap-10">
-      <h1 className="text-2xl">Landing page</h1>
+    <div className="p-10 bg-crust h-screen flex flex-col gap-5 text-primary">
+      <h1 className="text-3xl font-serif text-bold flex gap-2 items-center">
+        <BookSvg />
+        Recipes
+      </h1>
+      <p className="text-lg font-medium">
+        For creating, organizing and reading recipes, with AI.
+      </p>
       <div>
         <GoogleLoginButton onSuccess={handleSuccess} />
       </div>
+      <div>Add screenshots later</div>
     </div>
   );
 }

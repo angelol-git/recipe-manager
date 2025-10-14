@@ -31,6 +31,11 @@ body,
   --color-modal: #E8E3DD;
 
   /* Text */
+  --color-primary: #2C3039;
+  --color-secondary: #55595E;
+  --color-accent: #74B7C4;
+
+
   --color-text-primary: #2C3039;
   --color-text-secondary: #55595E;
   --color-text-accent: #74B7C4;

@@ -6,6 +6,7 @@ function Home() {
   const navigate = useNavigate();
   const { user, recipes } = useRecipes();
 
+  console.log(user);
   async function handleLogout() {
     try {
       const result = await fetch("http://localhost:8080/api/auth/logout", {
@@ -39,7 +40,7 @@ function Home() {
   return (
     <div className="text-text-primary bg-base p-5 lg:p-15 flex flex-col h-screen gap-5">
       <div className="flex gap-5 justify-between items-center">
-        <h2>User: {user.email}</h2>
+        <h2>User: {user?.email}</h2>
         <button
           onClick={handleLogout}
           className="rounded-md bg-blue-500 text-white p-2"
