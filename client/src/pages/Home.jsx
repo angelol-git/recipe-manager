@@ -1,18 +1,11 @@
-import { useRecipes } from "../contexts/RecipesContext";
+import { useState } from "react";
 import { Link } from "react-router";
+import { useRecipes } from "../contexts/RecipesContext";
 import UserOptions from "../components/UserOptions";
 
 function Home() {
-  const { user, recipes } = useRecipes();
-
-  function formatDescription(description) {
-    if (!description) return null;
-    if (description.length > 125) {
-      let truncatedString = description.slice(0, 125).concat("...");
-      return truncatedString;
-    }
-    return description;
-  }
+  const { user, recipes, tags } = useRecipes();
+  const [tagsSelected, setTagsSelected] = useState([]);
 
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -29,10 +22,19 @@ function Home() {
       </div>
       <div>
         <h2 className="font-semibold">Tags</h2>
-        <div className="flex gap-2">
-          {/* {recipes?.map((item) => {
-            item;
-          })} */}
+        <div className="flex gap-2 py-2">
+          {tags?.map((item) => {
+            return (
+              <button
+                className="bg-test1 inline-flex gap-2 items-center px-2 py-0.5 text-sm
+  text-[#5C5046] border border-mantle rounded-full cursor-pointer"
+                key={item}
+              >
+                <div className="w-4 h-4 bg-peach rounded-full"></div>
+                {item}
+              </button>
+            );
+          })}
         </div>
       </div>
       <div className="flex flex-col gap-4">

@@ -19,10 +19,14 @@ router.get("/", authMiddleware, async (req, res) => {
                 rv.description,
                 rv.instructions,
                 rv.ingredients,
-                rv.source_prompt
+                rv.source_prompt,
+              GROUP_CONCAT(DISTINCT t.name) AS tags
             FROM recipes r
             LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id 
+            LEFT JOIN recipe_tags rt ON rt.recipe_id = r.id
+            LEFT JOIN tags t ON t.id = rt.tag_id
             WHERE r.user_id = ?
+            GROUP BY r.id
             ORDER BY r.created_at,rv.created_at DESC
         `).all(userId);
 
@@ -35,6 +39,7 @@ router.get("/", authMiddleware, async (req, res) => {
                     id: row.recipe_id,
                     title: row.title,
                     created_at: row.created_at,
+                    tags: row.tags,
                     versions: [],
                 }
             }
@@ -52,6 +57,27 @@ router.get("/", authMiddleware, async (req, res) => {
         }
 
         return res.json(Object.values(recipes));
+    }
+    catch (error) {
+        console.error("DB error:", error);
+        return res.status(500).json({ error: `DB error: ${error}` });
+    }
+})
+
+router.get("/tags", authMiddleware, async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const rows = db.prepare(`
+           SELECT DISTINCT t.name
+           FROM tags t
+           JOIN recipe_tags rt ON rt.tag_id = t.id
+           JOIN recipes r ON r.id = rt.recipe_id
+           WHERE r.user_id = ?
+        `).all(userId);
+
+        const tags = rows.map(row => row.name);
+
+        return res.json(tags);
     }
     catch (error) {
         console.error("DB error:", error);
@@ -244,11 +270,11 @@ router.put("/:id", authMiddleware, async (req, res) => {
     const recipe = req.body;
 
     try {
-        const result = db.prepare(
-            `UPDATE recipes
-             SET title = ?
-             WHERE id = ?`
-        ).run(recipe.title, id);
+        const result = db.prepare(`
+            UPDATE recipes
+            SET title = ?
+            WHERE id = ?
+        `).run(recipe.title, id);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: "Recipe not found" });
@@ -258,6 +284,46 @@ router.put("/:id", authMiddleware, async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: `Failed to update recipe: ${error}` });
+    }
+});
+
+router.post("/:id/tag", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    const { tag } = req.body;
+    console.log("Tag: ", tag);
+    try {
+        let tagRow = db.prepare(`
+            SELECT * 
+            FROM tags 
+            WHERE name = ?
+        `).get(tag);
+
+        if (!tagRow) {
+            const result = db.prepare(`
+               INSERT INTO tags (name) VALUES (?) 
+            `).run(tag);
+            tagRow = { id: result.lastInsertRowid };
+        }
+
+        const recipeTag = db.prepare(`
+            SELECT 1 
+            FROM recipe_tags 
+            WHERE recipe_id = ? AND tag_id = ? 
+            `).get(id, tagRow.id);
+
+        if (recipeTag) {
+            return res.status(400).json({ error: "Tag already associated with this recipe" });
+        }
+
+        db.prepare(`
+            INSERT INTO recipe_tags (recipe_id,tag_id)
+            VALUES (?,?)
+            `).run(id, tagRow.id);
+
+        res.json({ success: true, tag });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to add tag" });
     }
 });
 

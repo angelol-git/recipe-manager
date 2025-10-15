@@ -5,6 +5,7 @@ const RecipesContext = createContext();
 export function RecipesProvider({ children }) {
   const [user, setUser] = useState({});
   const [recipes, setRecipes] = useState([]);
+  const [tags, setTags] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +25,14 @@ export function RecipesProvider({ children }) {
         });
         const recipesData = await recipesRes.json();
         setRecipes(recipesData);
-        // console.log(recipesData);
+
+        const tagsRes = await fetch("http://localhost:8080/api/recipes/tags", {
+          credentials: "include",
+        });
+        const tagsData = await tagsRes.json();
+        setTags(tagsData);
+
+        console.log(tagsData);
       } catch (error) {
         console.error(error);
       } finally {
@@ -166,6 +174,7 @@ export function RecipesProvider({ children }) {
       value={{
         user,
         recipes,
+        tags,
         addRecipe,
         updateRecipe,
         deleteRecipe,

@@ -12,6 +12,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
   const [isReplyLoading, setIsReplyLoading] = useState(false);
   const [errors, setErrors] = useState([]);
   const [askMessages, setAskMessages] = useState([]);
+  const [tags, setTags] = useState([]);
 
   useEffect(() => {
     if (!recipe?.id) return;
@@ -215,6 +216,27 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     updateRecipe(updatedRecipe);
   }
 
+  async function handleAddTag(id, tag) {
+    try {
+      const result = await fetch(`${API_BASE}/recipes/${id}/tag`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag: tag.trim() }),
+      });
+      const data = await result.json();
+      if (!result.ok) {
+        console.error(data.error.message);
+        return null;
+      }
+      // setErrors(data.errors);
+    } catch (error) {
+      console.log("Network error", error);
+    }
+    // const updatedRecipe = { ...recipe, tags: newTags };
+    // updateRecipe(updatedRecipe);
+  }
+
   return {
     isReplyLoading,
     errors,
@@ -227,6 +249,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     handleDeleteAll,
     handleRename,
     handleFork,
+    handleAddTag,
     // add other methods like sendAsk, fetchErrors, etc.
   };
 }

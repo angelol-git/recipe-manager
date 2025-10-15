@@ -41,7 +41,7 @@ function Chat() {
     handleDelete,
     handleDeleteAll,
     handleRename,
-    handleFork,
+    handleAddTag,
   } = useChat(recipe, currentVersion, setCurrentVersion, showToast);
 
   function showToast(message, type = "error") {
@@ -109,7 +109,7 @@ function Chat() {
         </div>
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">
-        <ChatTags />
+        <ChatTags recipe={recipe} handleAddTag={handleAddTag} />
         {recipe?.id ? (
           <ChatReply
             versions={recipe.versions}
