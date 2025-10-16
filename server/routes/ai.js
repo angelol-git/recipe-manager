@@ -141,7 +141,7 @@ function validateAiResponse(response, recipeId, req, res) {
                 INSERT INTO messages (user_id, recipe_id, role, content,status)
                 VALUES (?, ?, 'assistant', ?,'recipe')
             `).run(req.user.id, recipeId || null, JSON.stringify(reply));
-        // Only save recipe/version if the reply contains actual recipe content
+        // Save new recipe and new version 
         if (!recipeId) {
             const recipeResult = db.prepare(`
                 INSERT INTO recipes (user_id, title)
@@ -167,7 +167,7 @@ function validateAiResponse(response, recipeId, req, res) {
             reply.id = newRecipeId;
             reply.versionId = versionResult.lastInsertRowid;
         } else {
-            // add new version to existing recipe 
+            // Save new version to existing recipe
             const versionResult = db.prepare(`
                 INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

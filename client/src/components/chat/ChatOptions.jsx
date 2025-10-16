@@ -10,8 +10,8 @@ function ChatOptions({
   recipe,
   isEditing,
   setIsEditing,
-  handleDelete,
-  handleDeleteAll,
+  handleDeleteRecipeVersion,
+  handleDeleteRecipe,
 }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -88,9 +88,9 @@ function ChatOptions({
                 onClick={() => {
                   setIsOptionsOpen((prev) => !prev);
                   if (recipe.versions?.length === 1) {
-                    handleDeleteAll();
+                    handleDeleteRecipe();
                   } else {
-                    handleDelete();
+                    handleDeleteRecipeVersion();
                   }
                 }}
                 className="flex w-full justify-between items-center"
@@ -104,7 +104,7 @@ function ChatOptions({
               <button
                 onClick={() => {
                   setIsOptionsOpen((prev) => !prev);
-                  handleDeleteAll();
+                  handleDeleteRecipe();
                 }}
                 className="flex w-full justify-between items-center"
               >

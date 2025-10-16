@@ -12,7 +12,6 @@ import ChatErrorModal from "../components/chat/ChatErrorModal.jsx";
 import ChatAskModal from "../components/chat/ChatAskModal.jsx";
 import Toast from "../components/Toast.jsx";
 import MenuSvg from "../components/icons/MenuSvg.jsx";
-import ForkSvg from "../components/icons/CloneSvg.jsx";
 import ChatTags from "../components/chat/ChatTags.jsx";
 
 function Chat() {
@@ -34,14 +33,13 @@ function Chat() {
     isReplyLoading,
     errors,
     askMessages,
+    sendAskMessage,
     setAskMessages,
     sendCreateMessage,
-    sendAskMessage,
     handleDeleteError,
-    handleDelete,
-    handleDeleteAll,
+    handleDeleteRecipeVersion,
+    handleDeleteRecipe,
     handleRename,
-    handleAddTag,
   } = useChat(recipe, currentVersion, setCurrentVersion, showToast);
 
   function showToast(message, type = "error") {
@@ -103,13 +101,13 @@ function Chat() {
             recipe={recipe}
             isEditing={isEditing}
             setIsEditing={setIsEditing}
-            handleDelete={handleDelete}
-            handleDeleteAll={handleDeleteAll}
+            handleDeleteRecipeVersion={handleDeleteRecipeVersion}
+            handleDeleteRecipe={handleDeleteRecipe}
           />
         </div>
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">
-        <ChatTags recipe={recipe} handleAddTag={handleAddTag} />
+        <ChatTags recipe={recipe} />
         {recipe?.id ? (
           <ChatReply
             versions={recipe.versions}

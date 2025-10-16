@@ -4,22 +4,17 @@ import { useRecipes } from "../contexts/RecipesContext";
 import UserOptions from "../components/UserOptions";
 
 function Home() {
-  const { user, recipes, tags } = useRecipes();
+  const { user, recipes } = useRecipes();
   const [tagsSelected, setTagsSelected] = useState([]);
-  // const filteredRecipes =
-  //   tagsSelected.length === 0
-  //     ? recipes
-  //     : recipes.filter((recipe) =>
-  //         recipe.tags.some((tag) => tagsSelected.includes(tag))
-  //       );
-  function handleTagClick(tag) {
-    setTagsSelected((prev) => {
-      if (prev.includes(tag)) {
-        return prev.filter((t) => t !== tag);
-      }
-      return [...prev, tag];
-    });
-  }
+  const tags = [...new Set(recipes.flatMap((recipe) => recipe.tags))];
+  // function handleTagClick(tag) {
+  //   setTagsSelected((prev) => {
+  //     if (prev.includes(tag)) {
+  //       return prev.filter((t) => t !== tag);
+  //     }
+  //     return [...prev, tag];
+  //   });
+  // }
 
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -37,8 +32,8 @@ function Home() {
       <div>
         <h2 className="font-semibold">Tags</h2>
         <div className="flex gap-2 py-2 flex-wrap">
-          {tags?.length > 0 ? (
-            tags?.map((item) => {
+          {tags.length > 0 ? (
+            tags.map((item) => {
               return (
                 <button
                   onClick={() => {

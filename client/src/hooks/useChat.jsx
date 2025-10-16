@@ -7,7 +7,7 @@ const API_BASE = "http://localhost:8080/api";
 
 export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
   const navigate = useNavigate();
-  const { addRecipe, updateRecipe, deleteRecipe, deleteRecipeAll } =
+  const { addRecipeVersion, updateRecipe, deleteRecipeVersion, deleteRecipe } =
     useRecipes();
   const [isReplyLoading, setIsReplyLoading] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -72,10 +72,10 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
       if (!recipe?.id) {
         console.log(data);
         const newRecipe = { id: data.reply.id, title: data.reply.title };
-        addRecipe(newRecipe, newVersion);
+        addRecipeVersion(newRecipe, newVersion);
         navigate(`/chat/${newRecipe.id}`);
       } else {
-        addRecipe(recipe, newVersion);
+        addRecipeVersion(recipe, newVersion);
       }
       return data;
     } finally {
@@ -189,23 +189,19 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     }
   }
 
-  async function handleFork() {
-    console.log("Fork");
-  }
-
-  async function handleDelete() {
+  async function handleDeleteRecipeVersion() {
     if (!recipe.id) return;
-    deleteRecipe(recipe.id, recipe.versions[currentVersion].id);
+    deleteRecipeVersion(recipe.id, recipe.versions[currentVersion].id);
 
     if (currentVersion === recipe.versions.length - 1) {
       setCurrentVersion((prev) => prev - 1);
     }
   }
 
-  async function handleDeleteAll() {
+  async function handleDeleteRecipe() {
     if (!recipe.id) return;
 
-    const result = await deleteRecipeAll(recipe.id);
+    const result = await deleteRecipe(recipe.id);
     if (result.ok) {
       navigate("/home");
     }
@@ -216,40 +212,17 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
     updateRecipe(updatedRecipe);
   }
 
-  async function handleAddTag(id, tag) {
-    try {
-      const result = await fetch(`${API_BASE}/recipes/${id}/tag`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tag: tag.trim() }),
-      });
-      const data = await result.json();
-      if (!result.ok) {
-        console.error(data.error.message);
-        return null;
-      }
-      // setErrors(data.errors);
-    } catch (error) {
-      console.log("Network error", error);
-    }
-    // const updatedRecipe = { ...recipe, tags: newTags };
-    // updateRecipe(updatedRecipe);
-  }
-
   return {
     isReplyLoading,
     errors,
     askMessages,
+    sendAskMessage,
     setAskMessages,
     sendCreateMessage,
-    sendAskMessage,
     handleDeleteError,
-    handleDelete,
-    handleDeleteAll,
+    handleDeleteRecipeVersion,
+    handleDeleteRecipe,
     handleRename,
-    handleFork,
-    handleAddTag,
     // add other methods like sendAsk, fetchErrors, etc.
   };
 }

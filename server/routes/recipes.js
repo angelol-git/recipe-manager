@@ -290,7 +290,6 @@ router.put("/:id", authMiddleware, async (req, res) => {
 router.post("/:id/tag", authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { tag } = req.body;
-    console.log("Tag: ", tag);
     try {
         let tagRow = db.prepare(`
             SELECT * 

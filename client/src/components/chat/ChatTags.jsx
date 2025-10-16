@@ -1,14 +1,23 @@
 import { useState } from "react";
+import { useRecipes } from "../../contexts/RecipesContext";
 import CloseSvg from "../icons/CloseSvg";
 import CheckSvg from "../icons/CheckSvg";
-function ChatTags({ recipe, handleAddTag }) {
+function ChatTags({ recipe }) {
+  const { addRecipeTag } = useRecipes();
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [tag, setTag] = useState("");
-  const tags = recipe?.tags;
+  const tags = recipe?.tags || [];
+
+  function handleAddTag() {
+    if (tag.length === 0) return;
+    addRecipeTag(recipe?.id, tag.trim());
+    setTag("");
+    setIsAddingTag(false);
+  }
+
   return (
-    <div className="flex gap-2">
-      {!isAddingTag &&
-        tags?.length > 0 &&
+    <div className="flex gap-2 flex-wrap">
+      {tags?.length > 0 &&
         tags.map((item) => {
           return (
             <div
@@ -45,12 +54,7 @@ function ChatTags({ recipe, handleAddTag }) {
             <CloseSvg height={"12px"} width={"12px"} />
           </button>
           <button
-            onClick={() => {
-              if (tag.length === 0) return;
-              setIsAddingTag((prev) => !prev);
-              handleAddTag(recipe?.id, tag);
-              setTag("");
-            }}
+            onClick={handleAddTag}
             className="rounded-full border border-gray-300 px-2 flex items-center justify-center"
           >
             <CheckSvg />

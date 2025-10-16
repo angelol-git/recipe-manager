@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 const RecipesContext = createContext();
+const API_BASE = "http://localhost:8080/api";
 
 export function RecipesProvider({ children }) {
   const [user, setUser] = useState({});
   const [recipes, setRecipes] = useState([]);
-  const [tags, setTags] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -13,26 +13,26 @@ export function RecipesProvider({ children }) {
     async function getData() {
       try {
         console.log("Fetching data");
-        const result = await fetch("http://localhost:8080/api/auth/me", {
+        const result = await fetch(`${API_BASE}/auth/me`, {
           credentials: "include",
         });
 
         const data = await result.json();
         setUser(data.user);
 
-        const recipesRes = await fetch("http://localhost:8080/api/recipes/", {
+        const recipesRes = await fetch(`${API_BASE}/recipes/`, {
           credentials: "include",
         });
+
         const recipesData = await recipesRes.json();
         setRecipes(recipesData);
 
-        const tagsRes = await fetch("http://localhost:8080/api/recipes/tags", {
-          credentials: "include",
-        });
+        // const tagsRes = await fetch(`${API_BASE}/recipes/tags`, {
+        //   credentials: "include",
+        // });
 
-        const tagsData = await tagsRes.json();
-        console.log(recipesData);
-        setTags(tagsData);
+        // const tagsData = await tagsRes.json();
+        // setTags(tagsData);
       } catch (error) {
         console.error(error);
       } finally {
@@ -43,7 +43,7 @@ export function RecipesProvider({ children }) {
     getData();
   }, []);
 
-  function addRecipe(recipe, newVersion) {
+  function addRecipeVersion(recipe, newVersion) {
     setRecipes((prev) => {
       const index = prev.findIndex((r) => r.id === recipe.id);
       //existing recipe
@@ -68,7 +68,7 @@ export function RecipesProvider({ children }) {
     });
   }
 
-  async function deleteRecipe(recipeId, recipeVersionId) {
+  async function deleteRecipeVersion(recipeId, recipeVersionId) {
     const prevRecipe = recipes;
     const index = recipes.findIndex((r) => r.id === recipeId);
 
@@ -89,7 +89,7 @@ export function RecipesProvider({ children }) {
 
     try {
       const result = await fetch(
-        `http://localhost:8080/api/recipes/version/${recipeVersionId}`,
+        `${API_BASE}/recipes/version/${recipeVersionId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -105,8 +105,9 @@ export function RecipesProvider({ children }) {
     }
   }
 
-  async function deleteRecipeAll(recipeId) {
+  async function deleteRecipe(recipeId) {
     const prevRecipes = recipes;
+    // const prevTags = tags;
     const index = recipes.findIndex((r) => r.id === recipeId);
 
     if (index === -1) return;
@@ -117,14 +118,12 @@ export function RecipesProvider({ children }) {
         }
       });
     });
+
     try {
-      const result = await fetch(
-        `http://localhost:8080/api/recipes/${recipeId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const result = await fetch(`${API_BASE}/recipes/${recipeId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (!result.ok) {
         const errorText = await result.text();
@@ -149,15 +148,12 @@ export function RecipesProvider({ children }) {
       });
     });
     try {
-      const result = await fetch(
-        `http://localhost:8080/api/recipes/${updatedRecipe.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(updatedRecipe),
-        }
-      );
+      const result = await fetch(`${API_BASE}/recipes/${updatedRecipe.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updatedRecipe),
+      });
       if (!result.ok) {
         throw new Error("Failed to update recipe");
       }
@@ -169,17 +165,65 @@ export function RecipesProvider({ children }) {
     }
   }
 
+  async function addRecipeTag(id, tag) {
+    const prevRecipes = recipes;
+    // const prevTags = tags;
+    setRecipes((prev) => {
+      return prev.map((recipe) => {
+        if (recipe.id === id) {
+          if (recipe.tags.includes(tag)) {
+            return recipe;
+          }
+          return {
+            ...recipe,
+            tags: [...recipe.tags, tag],
+          };
+        } else {
+          return recipe;
+        }
+      });
+    });
+    // setTags((prev) => {
+    //   if (prev.includes(tag)) {
+    //     return prev;
+    //   } else {
+    //     return [...prev, tag];
+    //   }
+    // });
+    try {
+      const result = await fetch(`${API_BASE}/recipes/${id}/tag`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag: tag.trim() }),
+      });
+      const data = await result.json();
+      if (!result.ok) {
+        console.error(data.error.message);
+        return null;
+      }
+      // setErrors(data.errors);
+    } catch (error) {
+      setRecipes(prevRecipes);
+      // setTags(prevTags);
+      console.log("Network error", error);
+    }
+    // const updatedRecipe = { ...recipe, tags: newTags };
+    // updateRecipe(updatedRecipe);
+  }
+
   return (
     <RecipesContext.Provider
       value={{
         user,
         recipes,
-        tags,
-        addRecipe,
-        updateRecipe,
-        deleteRecipe,
-        deleteRecipeAll,
+        // tags,
         isLoading,
+        addRecipeVersion,
+        updateRecipe,
+        deleteRecipeVersion,
+        deleteRecipe,
+        addRecipeTag,
       }}
     >
       {children}
@@ -191,19 +235,3 @@ export function RecipesProvider({ children }) {
 export function useRecipes() {
   return useContext(RecipesContext);
 }
-
-// async function fetchRecipe() {
-//   try {
-//     const result = await fetch(`http://localhost:8080/api/recipes/${id}`, {
-//       credentials: "include",
-//     });
-//     const data = await result.json();
-//     handleUpdateRecipe(data);
-//     // setErrorMessage(null);
-//     setIsValidResponse(true);
-//   } catch (error) {
-//     console.log("Error fetching recipe:", error);
-//   } finally {
-//     setIsLoading(false);
-//   }
-// }
