@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext";
 import UserOptions from "../components/UserOptions";
@@ -6,7 +6,8 @@ import UserOptions from "../components/UserOptions";
 function Home() {
   const { user, recipes } = useRecipes();
   const [tagsSelected, setTagsSelected] = useState([]);
-  const tags = [...new Set(recipes.flatMap((recipe) => recipe.tags))];
+  const tags = Array.from(new Set(recipes.flatMap((recipe) => recipe.tags)));
+
   // function handleTagClick(tag) {
   //   setTagsSelected((prev) => {
   //     if (prev.includes(tag)) {

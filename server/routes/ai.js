@@ -75,127 +75,124 @@ router.post("/ask", authMiddleware, async (req, res) => {
 function validateAiResponse(response, recipeId, req, res) {
     let rawResponse = response.candidates[0].content.parts[0].text.trim();
 
+    // Strip code fences if present
     if (rawResponse.startsWith("```")) {
         rawResponse = rawResponse.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "").trim();
     }
 
     let reply;
+    // Check for invalid JSON
     try {
         reply = JSON.parse(rawResponse);
     } catch (err) {
-        reply = {
+        const error = {
+            type: "invalid_json",
             error: "Invalid JSON from AI",
             errorMessage: "The recipe could not be generated because the AI’s response was incomplete. Please try again.",
             raw: rawResponse,
             source_prompt: req.body.message,
-            ai_model: "gemini-2.5-flash"
+            ai_model: "gemini-2.5-flash",
         };
 
-        db.prepare(`
-        INSERT INTO messages (user_id, recipe_id, role, content,status)
-        VALUES (?, ?, 'assistant', ?,'error')
-        `).run(req.user.id, recipeId || null, JSON.stringify(reply));
-
-        return res.json({ reply });
+        const formatted = saveAiError(req.user.id, recipeId, error);
+        return res.status(400).json({ error: formatted });
     }
 
-    try {
-        if (
-            !reply.title?.trim() &&
-            (!reply.ingredients || reply.ingredients.length === 0) &&
-            (!reply.instructions || reply.instructions.length === 0) &&
-            (!reply.servings || reply.servings === 0) &&
-            (!reply.calories || reply.calories === 0) &&
-            (!reply.total_time || reply.total_time === 0)
-        ) {
+    // Check for empty recipe content, ai returns empty object if any error
+    if (
+        !reply.title?.trim() &&
+        (!reply.ingredients || reply.ingredients.length === 0) &&
+        (!reply.instructions || reply.instructions.length === 0) &&
+        (!reply.servings || reply.servings === 0) &&
+        (!reply.calories || reply.calories === 0) &&
+        (!reply.total_time || reply.total_time === 0)
+    ) {
+        const error = {
+            type: "empty_recipe",
+            error: "Invalid input",
+            errorMessage: "Recipe could not be generated from this input. Please try again.",
+            raw: rawResponse,
+            source_prompt: req.body.message,
+            ai_model: "gemini-2.5-flash",
+        };
 
-            reply = {
-                error: "Invalid input",
-                errorMessage: "Recipe could not be generated from this input. Please try again.",
-                raw: rawResponse,
-                source_prompt: req.body.message,
-                ai_model: "gemini-2.5-flash"
-            };
+        const formatted = saveAiError(req.user.id, recipeId, error);
+        return res.status(400).json({ error: formatted });
+    }
 
-            const result = db.prepare(`
-                INSERT INTO messages (user_id, recipe_id, role, content,status)
-                VALUES (?, ?, 'assistant', ?,'error')
-            `).run(req.user.id, recipeId || null, JSON.stringify(reply));
-            const inserted = db.prepare(`SELECT id, status, content, created_at FROM messages WHERE id = ?`).get(result.lastInsertRowid);
-            const parsed = JSON.parse(inserted.content);
+    //Add new recipe and or version
+    const newRecipeTransaction = db.transaction(() => {
+        let newRecipeId = recipeId;
 
-            const formatted = {
-                id: inserted.id,
-                status: inserted.status,
-                created_at: inserted.created_at,
-                ai_model: parsed.ai_model,
-                error: parsed.error,
-                source_prompt: parsed.source_prompt,
-                errorMessage: parsed.errorMessage || "Recipe could not be generated",
-                raw: parsed.raw,
-            };
-
-            return res.status(400).json({ error: formatted });
-        }
-        db.prepare(`
-                INSERT INTO messages (user_id, recipe_id, role, content,status)
-                VALUES (?, ?, 'assistant', ?,'recipe')
-            `).run(req.user.id, recipeId || null, JSON.stringify(reply));
-        // Save new recipe and new version 
         if (!recipeId) {
             const recipeResult = db.prepare(`
                 INSERT INTO recipes (user_id, title)
                 VALUES (?, ?)
-                `).run(req.user.id, reply.title);
+            `).run(req.user.id, reply.title);
 
-            const newRecipeId = recipeResult.lastInsertRowid;
-            const versionResult = db.prepare(`
-                INSERT INTO recipe_versions 
-                (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `).run(
-                newRecipeId,
-                reply.servings,
-                reply.total_time,
-                reply.calories,
-                reply.description,
-                JSON.stringify(Array.isArray(reply.instructions) ? reply.instructions : [reply.instructions]),
-                JSON.stringify(Array.isArray(reply.ingredients) ? reply.ingredients : [reply.ingredients]),
-                reply.source_prompt,
-                reply.ai_model
-            );
-            reply.id = newRecipeId;
-            reply.versionId = versionResult.lastInsertRowid;
-        } else {
-            // Save new version to existing recipe
-            const versionResult = db.prepare(`
-                INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `).run(
-                recipeId,
-                reply.servings,
-                reply.total_time,
-                reply.calories,
-                reply.description,
-                JSON.stringify(Array.isArray(reply.instructions) ? reply.instructions : [reply.instructions]),
-                JSON.stringify(Array.isArray(reply.ingredients) ? reply.ingredients : [reply.ingredients]),
-                reply.source_prompt,
-                reply.ai_model,
-                reply.relation
-            );
-            reply.id = recipeId;
-            reply.versionId = versionResult.lastInsertRowid;
+            newRecipeId = recipeResult.lastInsertRowid;
+            const insertedRecipe = db
+                .prepare(`SELECT id, user_id, title, created_at FROM recipes WHERE id = ?`)
+                .get(newRecipeId);
+
+            reply.tags = [];
+            reply.id = insertedRecipe.id;
+            reply.created_at = insertedRecipe.created_at;
         }
-        reply.tags = [];
-        return res.json({ reply });
-    }
 
-    catch (err) {
+        const versionResult = db.prepare(`
+            INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+            newRecipeId,
+            reply.servings,
+            reply.total_time,
+            reply.calories,
+            reply.description,
+            JSON.stringify(Array.isArray(reply.instructions) ? reply.instructions : [reply.instructions]),
+            JSON.stringify(Array.isArray(reply.ingredients) ? reply.ingredients : [reply.ingredients]),
+            reply.source_prompt,
+            reply.ai_model,
+            reply.relation
+        );
+
+        db.prepare(`
+            INSERT INTO messages (user_id, recipe_id, role, content, status)
+            VALUES (?, ?, 'assistant', ?, 'recipe')
+        `).run(req.user.id, newRecipeId, JSON.stringify(reply));
+
+        reply.id = newRecipeId;
+        reply.versionId = versionResult.lastInsertRowid;
+
+    });
+
+    try {
+        newRecipeTransaction();
+        return res.json({ reply });
+    } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "Something went wrong" })
+        return res.status(500).json({ error: "Something went wrong while saving the recipe" });
     }
 }
 
+function saveAiError(userId, recipeId, error) {
+    const result = db.prepare(`
+            INSERT INTO messages (user_id, recipe_id, role, content, status)
+            VALUES (?, ?, 'assistant', ?, 'error')
+        `).run(userId, recipeId || null, JSON.stringify(error));
+
+    const inserted = db.prepare(`SELECT id, status, content, created_at FROM messages WHERE id = ?`).get(result.lastInsertRowid);
+    const parsed = JSON.parse(inserted.content);
+
+    return {
+        status: "error",
+        id: inserted.id,
+        created_at: inserted.created_at,
+        ...parsed,
+    };
+
+
+}
 function createPrompt(currentVersion, message) {
     return (`
 You are a recipe extraction and transformation assistant.

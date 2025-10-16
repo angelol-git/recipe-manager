@@ -58,11 +58,11 @@ export function RecipesProvider({ children }) {
       //new recipe
       else {
         return [
-          ...prev,
           {
             ...recipe,
             versions: [newVersion],
           },
+          ...prev,
         ];
       }
     });

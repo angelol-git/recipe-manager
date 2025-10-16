@@ -70,8 +70,13 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
       };
 
       if (!recipe?.id) {
-        console.log(data);
-        const newRecipe = { id: data.reply.id, title: data.reply.title };
+        console.log(data.reply);
+        const newRecipe = {
+          id: data.reply.id,
+          title: data.reply.title,
+          tags: data.reply.tags,
+          created_at: data.reply.created_at,
+        };
         addRecipeVersion(newRecipe, newVersion);
         navigate(`/chat/${newRecipe.id}`);
       } else {
