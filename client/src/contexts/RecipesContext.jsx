@@ -26,13 +26,6 @@ export function RecipesProvider({ children }) {
 
         const recipesData = await recipesRes.json();
         setRecipes(recipesData);
-
-        // const tagsRes = await fetch(`${API_BASE}/recipes/tags`, {
-        //   credentials: "include",
-        // });
-
-        // const tagsData = await tagsRes.json();
-        // setTags(tagsData);
       } catch (error) {
         console.error(error);
       } finally {

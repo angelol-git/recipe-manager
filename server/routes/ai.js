@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import db from "../db.js"
 import authMiddleware from "../middleware.js";
+import { v4 as uuidv4 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
@@ -83,6 +84,7 @@ function validateAiResponse(response, recipeId, req, res) {
     let reply;
     // Check for invalid JSON
     try {
+        console.log(rawResponse);
         reply = JSON.parse(rawResponse);
     } catch (err) {
         const error = {
@@ -125,10 +127,11 @@ function validateAiResponse(response, recipeId, req, res) {
         let newRecipeId = recipeId;
 
         if (!recipeId) {
+            const userId = uuidv4();
             const recipeResult = db.prepare(`
-                INSERT INTO recipes (user_id, title)
-                VALUES (?, ?)
-            `).run(req.user.id, reply.title);
+                INSERT INTO recipes (id,user_id, title)
+                VALUES (?,?,?)
+            `).run(userId, req.user.id, reply.title);
 
             newRecipeId = recipeResult.lastInsertRowid;
             const insertedRecipe = db

@@ -1,21 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext";
 import UserOptions from "../components/UserOptions";
 
 function Home() {
   const { user, recipes } = useRecipes();
+  const tags = Array.from(
+    new Set(
+      Array.isArray(recipes) ? recipes?.flatMap((recipe) => recipe.tags) : []
+    )
+  );
   const [tagsSelected, setTagsSelected] = useState([]);
-  const tags = Array.from(new Set(recipes.flatMap((recipe) => recipe.tags)));
 
-  // function handleTagClick(tag) {
-  //   setTagsSelected((prev) => {
-  //     if (prev.includes(tag)) {
-  //       return prev.filter((t) => t !== tag);
-  //     }
-  //     return [...prev, tag];
-  //   });
-  // }
+  useEffect(() => {
+    localStorage.setItem("tagsSelected", JSON.stringify(tagsSelected));
+  });
+  const filteredRecipes = recipes?.filter((recipe) => {
+    if (tagsSelected.length > 0) {
+      if (recipe.tags.some((tag) => tagsSelected.includes(tag))) {
+        return recipe;
+      }
+    } else {
+      return recipe;
+    }
+  });
+
+  function handleTagClick(tag) {
+    setTagsSelected((prev) => {
+      if (prev.includes(tag)) {
+        return prev.filter((t) => t !== tag);
+      }
+      return [...prev, tag];
+    });
+  }
 
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -40,8 +57,11 @@ function Home() {
                   onClick={() => {
                     handleTagClick(item);
                   }}
-                  className="bg-test1 inline-flex gap-2 items-center px-2 py-0.5 text-sm
-  text-[#5C5046] border border-mantle rounded-full cursor-pointer"
+                  className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border border-mantle rounded-full cursor-pointer ${
+                    tagsSelected.includes(item)
+                      ? "bg-tag-selected text-white"
+                      : "bg-tag text-primary"
+                  }`}
                   key={item}
                 >
                   <div className="w-4 h-4 bg-peach rounded-full"></div>
@@ -67,7 +87,7 @@ function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-4 md:flex">
-          {recipes?.map((item) => {
+          {filteredRecipes?.map((item) => {
             return (
               <Link
                 to={`/chat/${item.id}`}

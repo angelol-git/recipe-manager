@@ -18,10 +18,10 @@ router.post("/google", async (req, res) => {
         const payload = ticket.getPayload();
 
         const existingUser = db.prepare("SELECT * FROM users WHERE external_id = ?").get(payload.sub);
-
+        const userId = uuidv4();
         if (!existingUser) {
-            db.prepare("INSERT INTO users (external_id,email) VALUES (?,?)").run(payload.sub, payload.email);
-            createSession(payload.sub, res);
+            db.prepare("INSERT INTO users (id,external_id,email) VALUES (?,?,?)").run(userId, payload.sub, payload.email);
+            createSession(userId, res);
         }
         else {
             createSession(existingUser.id, res);

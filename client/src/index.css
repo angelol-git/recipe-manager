@@ -30,11 +30,9 @@ body,
   --color-crust: #EAE2DC;
   --color-modal: #E8E3DD;
 
+  --color-tag: #EDE6DE;
+  --color-tag-selected: #C6B9AD;
 
-  --color-test1: #EDE6DE;
-  --color-test2: #E2D7CC;
-  /* light warm brown surface */
-  --color-test3: #D6C7B9;
   /* Text */
   --color-icon: #5A4634;
   --color-icon-muted: #8C7A68;

@@ -2,10 +2,9 @@ import Database from "better-sqlite3";
 const db = new Database("recipes.db");
 
 db.pragma("foreign_keys = ON");
-
 db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         external_id TEXT UNIQUE, 
         email TEXT UNIQUE,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -15,7 +14,7 @@ db.prepare(`
 db.prepare(
     `CREATE TABLE IF NOT EXISTS sessions (
     sid TEXT PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expires INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -23,9 +22,9 @@ db.prepare(
 `).run();
 
 db.prepare(`CREATE TABLE IF NOT EXISTS recipes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    parent_id INTEGER,
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    parent_id TEXT,
     title TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -35,8 +34,8 @@ db.prepare(`CREATE TABLE IF NOT EXISTS recipes (
 
 db.prepare(`CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    recipe_id INTEGER,
+    user_id TEXT NOT NULL,
+    recipe_id TEXT,
     role TEXT CHECK(role IN ('user','assistant')) NOT NULL,
     content TEXT NOT NULL,
     status TEXT,
@@ -48,7 +47,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS messages (
 
 db.prepare(`CREATE TABLE IF NOT EXISTS recipe_versions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    recipe_id INTEGER NOT NULL,
+    recipe_id TEXT NOT NULL,
     servings INTEGER,
     total_time INTEGER,
     calories INTEGER,
@@ -63,7 +62,6 @@ db.prepare(`CREATE TABLE IF NOT EXISTS recipe_versions (
     )
 `).run();
 
-
 db.prepare(`CREATE TABLE IF NOT EXISTS tags (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE NOT NULL
@@ -71,7 +69,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS tags (
 `).run();
 
 db.prepare(`CREATE TABLE IF NOT EXISTS recipe_tags(
-    recipe_id INTEGER NOT NULL,
+    recipe_id TEXT NOT NULL,
     tag_id INTEGER NOT NULL,
     PRIMARY KEY(recipe_id, tag_id),
     FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
