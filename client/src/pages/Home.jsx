@@ -7,14 +7,43 @@ function Home() {
   const { user, recipes } = useRecipes();
   const tags = Array.from(
     new Set(
-      Array.isArray(recipes) ? recipes?.flatMap((recipe) => recipe.tags) : []
+      Array.isArray(recipes)
+        ? recipes.flatMap((recipe) => recipe.tags || [])
+        : []
     )
   );
-  const [tagsSelected, setTagsSelected] = useState([]);
+
+  const [tagsSelected, setTagsSelected] = useState(() => {
+    if (!user?.id) return [];
+    //Initialize react state when using react router actions, otherwise it will be empty.
+    //useEffect below will not run because user.id is already mounted and does not change.
+    try {
+      const stored = localStorage.getItem(`tagsSelected_${user.id}`);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  //Waits for user.id to be initialized on mount
+  useEffect(() => {
+    if (!user?.id) return;
+    try {
+      const stored = localStorage.getItem(`tagsSelected_${user.id}`);
+      if (stored) setTagsSelected(JSON.parse(stored));
+    } catch (err) {
+      console.log("Failed to parse saved tags: ", err);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
-    localStorage.setItem("tagsSelected", JSON.stringify(tagsSelected));
-  });
+    if (!user?.id) return;
+    localStorage.setItem(
+      `tagsSelected_${user.id}`,
+      JSON.stringify(tagsSelected)
+    );
+  }, [tagsSelected, user?.id]);
+
   const filteredRecipes = recipes?.filter((recipe) => {
     if (tagsSelected.length > 0) {
       if (recipe.tags.some((tag) => tagsSelected.includes(tag))) {

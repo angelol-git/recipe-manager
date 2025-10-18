@@ -21,7 +21,7 @@ function ChatTags({ recipe }) {
         tags.map((item) => {
           return (
             <div
-              className="bg-test1 inline-flex gap-2 items-center px-2 py-0.5 text-sm
+              className="bg-tag inline-flex gap-2 items-center px-2 py-0.5 text-sm
   text-[#5C5046] border border-mantle rounded-full cursor-pointer"
               key={item}
             >
@@ -61,7 +61,7 @@ function ChatTags({ recipe }) {
           </button>
         </div>
       )}
-      {!isAddingTag && tags.length === 0 && (
+      {!isAddingTag && tags.length === 0 && recipe !== null && (
         <button
           onClick={() => {
             setIsAddingTag((prev) => !prev);

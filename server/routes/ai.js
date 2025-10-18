@@ -84,7 +84,6 @@ function validateAiResponse(response, recipeId, req, res) {
     let reply;
     // Check for invalid JSON
     try {
-        console.log(rawResponse);
         reply = JSON.parse(rawResponse);
     } catch (err) {
         const error = {
@@ -96,6 +95,7 @@ function validateAiResponse(response, recipeId, req, res) {
             ai_model: "gemini-2.5-flash",
         };
 
+        console.log(error);
         const formatted = saveAiError(req.user.id, recipeId, error);
         return res.status(400).json({ error: formatted });
     }
@@ -127,13 +127,12 @@ function validateAiResponse(response, recipeId, req, res) {
         let newRecipeId = recipeId;
 
         if (!recipeId) {
-            const userId = uuidv4();
-            const recipeResult = db.prepare(`
+            newRecipeId = uuidv4();
+            db.prepare(`
                 INSERT INTO recipes (id,user_id, title)
                 VALUES (?,?,?)
-            `).run(userId, req.user.id, reply.title);
+            `).run(newRecipeId, req.user.id, reply.title);
 
-            newRecipeId = recipeResult.lastInsertRowid;
             const insertedRecipe = db
                 .prepare(`SELECT id, user_id, title, created_at FROM recipes WHERE id = ?`)
                 .get(newRecipeId);

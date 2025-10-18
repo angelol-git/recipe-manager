@@ -70,7 +70,6 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
       };
 
       if (!recipe?.id) {
-        console.log(data.reply);
         const newRecipe = {
           id: data.reply.id,
           title: data.reply.title,

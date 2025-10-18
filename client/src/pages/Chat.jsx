@@ -17,7 +17,7 @@ import ChatTags from "../components/chat/ChatTags.jsx";
 function Chat() {
   const { id } = useParams();
   const { recipes } = useRecipes();
-  const recipe = recipes.find((r) => r.id === parseInt(id)) || null;
+  const recipe = recipes.find((r) => r.id === id) || null;
   const [currentVersion, setCurrentVersion] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
