@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext";
+import DotsSvg from "../components/icons/DotsSvg";
 import UserOptions from "../components/UserOptions";
+import TagSettings from "../components/home/TagSettings";
 
 function Home() {
   const { user, recipes } = useRecipes();
+  const [isTagSettingsOpen, setIsTagSettingsOpen] = useState(false);
   const tags = Array.from(
     new Set(
       Array.isArray(recipes)
@@ -77,7 +80,16 @@ function Home() {
         </div>
       </div>
       <div>
-        <h2 className="font-semibold">Tags</h2>
+        <div className="flex gap-2 items-center">
+          <h2 className="font-semibold">Tags</h2>
+          <button
+            onClick={() => {
+              setIsTagSettingsOpen(true);
+            }}
+          >
+            <DotsSvg height="14px" width="14px" fill="secondary" />
+          </button>
+        </div>
         <div className="flex gap-2 py-2 flex-wrap">
           {tags.length > 0 ? (
             tags.map((item) => {
@@ -137,6 +149,11 @@ function Home() {
           })}
         </div>
       </div>
+      <TagSettings
+        isTagSettingsOpen={isTagSettingsOpen}
+        setIsTagSettingsOpen={setIsTagSettingsOpen}
+        tags={tags}
+      />
     </div>
   );
 }
