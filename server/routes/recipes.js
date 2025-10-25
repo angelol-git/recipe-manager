@@ -20,7 +20,7 @@ router.get("/", authMiddleware, async (req, res) => {
                 rv.instructions,
                 rv.ingredients,
                 rv.source_prompt,
-                GROUP_CONCAT(DISTINCT t.name || ':' || t.color ORDER BY t.name) AS tags
+                GROUP_CONCAT(DISTINCT t.id || ':' || t.name || ':' || t.color ORDER BY t.name) AS tags
             FROM recipes r
             LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id 
             LEFT JOIN recipe_tags rt ON rt.recipe_id = r.id
@@ -37,8 +37,8 @@ router.get("/", authMiddleware, async (req, res) => {
             let tags = [];
             if (row.tags) {
                 tags = row.tags.split(",").map((tag) => {
-                    const [name, color] = tag.split(':');
-                    return { name, color };
+                    const [id, name, color] = tag.split(':');
+                    return { id, name, color };
                 })
             }
 
@@ -297,26 +297,28 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
 router.post("/:id/tag", authMiddleware, async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
     const { tag } = req.body;
     try {
-        let tagRow = db.prepare(`
+        let newTagRow = db.prepare(`
             SELECT * 
             FROM tags 
-            WHERE name = ?
-        `).get(tag);
+            WHERE user_id = ?
+            AND name = ?
+        `).get(userId, tag.name);
 
-        if (!tagRow) {
+        if (!newTagRow) {
             const result = db.prepare(`
-               INSERT INTO tags (name) VALUES (?) 
-            `).run(tag);
-            tagRow = { id: result.lastInsertRowid };
+               INSERT INTO tags (user_id,name) VALUES (?,?) 
+            `).run(userId, tag.name);
+            newTagRow = { id: result.lastInsertRowid, name: tag.name, color: tag.color };
         }
-
+        newTagRow.id = newTagRow.id.toString();
         const recipeTag = db.prepare(`
             SELECT 1 
             FROM recipe_tags 
             WHERE recipe_id = ? AND tag_id = ? 
-            `).get(id, tagRow.id);
+            `).get(id, newTagRow.id);
 
         if (recipeTag) {
             return res.status(400).json({ error: "Tag already associated with this recipe" });
@@ -325,14 +327,35 @@ router.post("/:id/tag", authMiddleware, async (req, res) => {
         db.prepare(`
             INSERT INTO recipe_tags (recipe_id,tag_id)
             VALUES (?,?)
-            `).run(id, tagRow.id);
+            `).run(id, newTagRow.id);
 
-        res.json({ success: true, tag });
+        res.json({ success: true, tag: newTagRow });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Failed to add tag" });
     }
 });
+
+router.delete("/tag/:id", authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    try {
+        db.prepare(`
+            DELETE FROM recipe_tags WHERE tag_id = ?
+        `).run(id);
+
+        db.prepare(`
+            DELETE FROM tags WHERE id = ?
+        `).run(id);
+
+        return res.status(204).send();
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to add tag" });
+    }
+
+});
+
 
 function safeParse(jsonString) {
     try {

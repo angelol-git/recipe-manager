@@ -107,7 +107,7 @@ function Chat() {
         </div>
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">
-        <ChatTags recipe={recipe} />
+        <ChatTags recipeId={recipe?.id} />
         {recipe?.id ? (
           <ChatReply
             versions={recipe.versions}

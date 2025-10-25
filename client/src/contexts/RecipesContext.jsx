@@ -160,54 +160,157 @@ export function RecipesProvider({ children }) {
     }
   }
 
-  async function addRecipeTag(id, tag) {
+  async function deleteRecipeTagAll(deletedTag) {
     const prevRecipes = recipes;
-    // const prevTags = tags;
     setRecipes((prev) => {
-      return prev.map((recipe) => {
-        if (recipe.id === id) {
-          const ifExists = recipe.tags.some((existingTag) => {
-            return existingTag.name === tag;
-          });
-
-          if (ifExists) {
-            return recipe;
-          }
-          const newTag = {
-            name: tag,
-            color: "#FFB86C",
-          };
-          return {
-            ...recipe,
-            tags: [...recipe.tags, newTag],
-          };
-        } else {
-          return recipe;
-        }
-      });
+      //Filter through every recipe
+      return prev.map((recipe) => ({
+        ...recipe,
+        tags: recipe.tags.filter((tag) => {
+          return tag.name !== deletedTag.name;
+        }),
+      }));
     });
+
+    try {
+      const result = await fetch(`${API_BASE}/recipes/tag/${deletedTag.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!result.ok) {
+        throw new Error("Failed to update recipe");
+      }
+    } catch (error) {
+      setRecipes(prevRecipes);
+      // setTags(prevTags);
+      console.log("Network error", error);
+    }
+  }
+
+  async function addRecipeTag(id, newTag) {
+    const prevRecipes = recipes;
+    const tempId = `temp-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    const tempTag = { ...newTag, id: tempId };
+
+    // Optimistically add temp tag
+    setRecipes((prev) =>
+      prev.map((recipe) => {
+        if (recipe.id === id) {
+          const currentTags = Array.isArray(recipe.tags) ? recipe.tags : [];
+          const exists = currentTags.some((t) => t.name === newTag.name);
+          if (exists) return recipe;
+          return { ...recipe, tags: [...currentTags, tempTag] };
+        }
+        return recipe;
+      })
+    );
 
     try {
       const result = await fetch(`${API_BASE}/recipes/${id}/tag`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tag: tag.trim() }),
+        body: JSON.stringify({ tag: tempTag }),
       });
       const data = await result.json();
-      if (!result.ok) {
-        console.error(data.error.message);
-        return null;
-      }
-      // setErrors(data.errors);
+
+      if (!result.ok)
+        throw new Error(data?.error?.message || "Failed to add tag");
+
+      //Replace temp id with permanent
+      setRecipes((prev) => {
+        return prev.map((recipe) => {
+          if (recipe.id === id) {
+            return {
+              ...recipe,
+              tags: recipe.tags.map((tag) => {
+                if (tag.name === tempTag.name) {
+                  return data.tag;
+                } else {
+                  return tag;
+                }
+              }),
+            };
+          } else {
+            return recipe;
+          }
+        });
+      });
     } catch (error) {
+      console.error("Network error", error);
       setRecipes(prevRecipes);
-      // setTags(prevTags);
-      console.log("Network error", error);
     }
-    // const updatedRecipe = { ...recipe, tags: newTags };
-    // updateRecipe(updatedRecipe);
   }
+
+  // async function addRecipeTag(id, tag) {
+  //   const prevRecipes = recipes;
+  //   const tempId = `temp-${Date.now()}-${Math.random()
+  //     .toString(36)
+  //     .slice(2, 8)}`;
+  //   const tempTag = { ...tag, id: tempId };
+
+  //   setRecipes((prev) => {
+  //     return prev.map((recipe) => {
+  //       if (recipe.id === id) {
+  //         const ifExists = recipe.tags.some((existingTag) => {
+  //           return existingTag.name === tag.name;
+  //         });
+
+  //         if (ifExists) {
+  //           return recipe;
+  //         }
+
+  //         return {
+  //           ...recipe,
+  //           tags: [...recipe.tags, tempTag],
+  //         };
+  //       } else {
+  //         return recipe;
+  //       }
+  //     });
+  //   });
+
+  //   try {
+  //     const result = await fetch(`${API_BASE}/recipes/${id}/tag`, {
+  //       method: "POST",
+  //       credentials: "include",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ tag }),
+  //     });
+  //     const data = await result.json();
+
+  //     //Replace temp id with permanent
+  //     setRecipes((prev) => {
+  //       return prev.map((recipe) => {
+  //         if (recipe.id === id) {
+  //           return {
+  //             ...recipe,
+  //             tags: recipe.tags.map((tag) => {
+  //               if (tag.id === tempId) {
+  //                 return data.tag;
+  //               } else {
+  //                 return tag;
+  //               }
+  //             }),
+  //           };
+  //         } else {
+  //           return recipe;
+  //         }
+  //       });
+  //     });
+
+  //     if (!result.ok) {
+  //       console.error(data.error.message);
+  //       return null;
+  //     }
+  //     // setErrors(data.errors);
+  //   } catch (error) {
+  //     setRecipes(prevRecipes);
+  //     console.log("Network error", error);
+  //   }
+  // }
 
   return (
     <RecipesContext.Provider
@@ -221,6 +324,7 @@ export function RecipesProvider({ children }) {
         deleteRecipeVersion,
         deleteRecipe,
         addRecipeTag,
+        deleteRecipeTagAll,
       }}
     >
       {children}

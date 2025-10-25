@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext";
-import DotsSvg from "../components/icons/DotsSvg";
 import UserOptions from "../components/UserOptions";
-import TagSettings from "../components/home/TagSettings";
 import CloseSvg from "../components/icons/CloseSvg";
 
 function Home() {
-  const { user, recipes } = useRecipes();
+  const { user, recipes, deleteRecipeTagAll } = useRecipes();
   const [isEditTags, setIsEditTags] = useState(false);
   const tags = Array.from(
     new Set(
@@ -16,7 +14,6 @@ function Home() {
         : []
     )
   );
-
   const [tagsSelected, setTagsSelected] = useState(() => {
     if (!user?.id) return [];
     //Initialize react state when using react router actions, otherwise it will be empty.
@@ -52,7 +49,6 @@ function Home() {
 
   const filteredRecipes = recipes?.filter((recipe) => {
     if (tagsSelected.length === 0) return true;
-
     return recipe.tags.some((recipeTag) => {
       return tagsSelected.some(
         (selectedTag) => selectedTag.name === recipeTag.name
@@ -76,7 +72,7 @@ function Home() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
 
-  // console.log(tagsSelected);
+  console.log(recipes);
   return (
     <div className="text-primary bg-base p-5 lg:p-15 flex flex-col min-h-screen gap-5">
       <div className="flex justify-between items-center">
@@ -144,20 +140,26 @@ function Home() {
               Done
             </button>
           </div>
-          <div className="flex gap-4 py-2 flex-wrap">
+          <div className="flex gap-3 py-2 flex-wrap">
             {tags.length > 0 ? (
               tags.map((tag) => {
                 return (
-                  <div className="gap-2 flex items-center">
+                  <div key={tag.id} className="gap-1 flex items-center ">
                     <div
-                      className={`inline-flex gap-2 items-center text-base px-3 py-1 border border-mantle rounded-full cursor-pointer bg-tag text-primary hover:scale-105 transition`}
-                      key={tag.name}
+                      className={`inline-flex gap-2 items-center px-2 py-0.5 border border-mantle rounded-full cursor-pointer bg-tag text-primary text-sm`}
                     >
-                      <div className="w-5 h-5 bg-peach rounded-full"></div>
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: tag.color }}
+                      ></div>
                       {tag.name}
                     </div>
-                    <button>
-                      <CloseSvg />
+                    <button
+                      onClick={() => {
+                        deleteRecipeTagAll(tag);
+                      }}
+                    >
+                      <CloseSvg height="12px" width="12px" />
                     </button>
                   </div>
                 );

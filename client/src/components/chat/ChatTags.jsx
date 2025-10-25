@@ -2,34 +2,41 @@ import { useState } from "react";
 import { useRecipes } from "../../contexts/RecipesContext";
 import CloseSvg from "../icons/CloseSvg";
 import CheckSvg from "../icons/CheckSvg";
-function ChatTags({ recipe }) {
-  const { addRecipeTag } = useRecipes();
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const [tag, setTag] = useState("");
+
+function ChatTags({ recipeId }) {
+  const { recipes, addRecipeTag } = useRecipes();
+  const recipe = recipes.find((r) => r.id === recipeId);
   const tags = recipe?.tags || [];
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [newTag, setNewTag] = useState({
+    id: "",
+    name: "",
+    color: "#FFB86C",
+  });
 
   function handleAddTag() {
-    if (tag.length === 0) return;
-    addRecipeTag(recipe?.id, tag.trim());
-    setTag("");
+    if (!newTag.name.trim()) return;
+    if (!recipe) return;
+    addRecipeTag(recipe?.id, { ...newTag, name: newTag.name.trim() });
+    setNewTag({ id: "", name: "", color: "#FFB86C" });
     setIsAddingTag(false);
   }
 
   return (
     <div className="flex gap-2 flex-wrap">
       {tags?.length > 0 &&
-        tags.map((item) => {
+        tags.map((tag) => {
           return (
             <div
               className="bg-tag inline-flex gap-2 items-center px-2 py-0.5 text-sm
   text-[#5C5046] border border-mantle rounded-full cursor-pointer"
-              key={item.name}
+              key={tag.id}
             >
               <div
                 className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: item.color }}
+                style={{ backgroundColor: tag.color }}
               ></div>
-              {item.name}
+              {tag.name}
             </div>
           );
         })}
@@ -37,9 +44,12 @@ function ChatTags({ recipe }) {
         <div className="flex gap-2">
           <input
             onChange={(event) => {
-              setTag(event.target.value);
+              setNewTag((prev) => ({
+                ...prev,
+                name: event.target.value,
+              }));
             }}
-            value={tag}
+            value={newTag.name}
             type="text"
             className="inline-flex justify-center items-center px-2 py-0.5 text-sm
     text-gray-500 border border-gray-300 rounded-full
@@ -49,7 +59,8 @@ function ChatTags({ recipe }) {
 
           <button
             onClick={() => {
-              setTag("");
+              console.log("Closing Tag");
+              setNewTag({ id: "", name: "", color: "#FFB86C" });
               setIsAddingTag(false);
             }}
             className="rounded-full border border-gray-300 px-2 flex items-center justify-center"
@@ -64,7 +75,7 @@ function ChatTags({ recipe }) {
           </button>
         </div>
       )}
-      {!isAddingTag && tags.length === 0 && recipe !== null && (
+      {!isAddingTag && tags.length === 0 && recipe && (
         <button
           onClick={() => {
             setIsAddingTag((prev) => !prev);
