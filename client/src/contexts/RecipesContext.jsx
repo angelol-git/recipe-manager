@@ -246,7 +246,8 @@ export function RecipesProvider({ children }) {
   async function editRecipeTagColor(newColor, editTag) {
     const prevRecipes = recipes;
     const newTag = { ...editTag, color: newColor };
-
+    const cleanTag = { ...newTag };
+    delete cleanTag.anchor;
     setRecipes((prev) => {
       return prev.map((recipe) => {
         return {
@@ -267,8 +268,9 @@ export function RecipesProvider({ children }) {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tag: newTag }),
+        body: JSON.stringify({ tag: cleanTag }),
       });
+
       const data = await result.json();
       if (!result.ok)
         throw new Error(data?.error?.message || "Failed to edit tag color");

@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { SketchPicker } from "react-color";
 import { useRecipes } from "../contexts/RecipesContext";
+import HomeTags from "../components/home/HomeTags";
 import UserOptions from "../components/UserOptions";
-import CloseSvg from "../components/icons/CloseSvg";
 
 function Home() {
   const { user, recipes, deleteRecipeTagAll, editRecipeTagColor } =
     useRecipes();
-  const [isEditTags, setIsEditTags] = useState(false);
-  const [editTagId, setEditTagId] = useState(null);
   const tags = Array.from(
     new Set(
       Array.isArray(recipes)
@@ -70,11 +67,6 @@ function Home() {
     });
   }
 
-  function handleTagColorChange(event, tag) {
-    const newColor = event.target.value;
-    editRecipeTagColor(newColor, tag);
-  }
-
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -88,131 +80,15 @@ function Home() {
           <UserOptions user={user} />
         </div>
       </div>
-      {!isEditTags ? (
-        <div>
-          <div className="flex justify-between items-end">
-            <h2 className="font-semibold">Tags</h2>
-            <button
-              onClick={() => {
-                setIsEditTags(true);
-              }}
-              className="text-sm text-secondary underline rounded-lg py-1 px-2"
-            >
-              Edit
-            </button>
-          </div>
-          <div className="flex gap-2 py-2 flex-wrap">
-            {tags.length > 0 ? (
-              tags.map((tag) => {
-                const isSelected = tagsSelected.some((selectedTag) => {
-                  return selectedTag.name === tag.name;
-                });
-                return (
-                  <button
-                    onClick={() => {
-                      handleTagClick(tag);
-                    }}
-                    className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border border-mantle rounded-full cursor-pointer ${
-                      isSelected
-                        ? "bg-tag-selected text-white"
-                        : "bg-tag text-primary"
-                    }`}
-                    key={tag.name}
-                  >
-                    <div
-                      className={`w-4 h-4 rounded-full`}
-                      style={{ backgroundColor: tag.color }}
-                    ></div>
-                    {tag.name}
-                  </button>
-                );
-              })
-            ) : (
-              <div className="text-secondary/70 text-sm italic">
-                No tags created yet.
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div>
-          <div className="flex justify-between items-end">
-            <h2 className="font-semibold">Edit Tags</h2>
-            <button
-              onClick={() => {
-                setIsEditTags(false);
-                setEditTagId(null);
-              }}
-              className="text-sm text-white bg-accent rounded-lg py-1 px-2"
-            >
-              Done
-            </button>
-          </div>
-          <div className="flex gap-3 py-2 flex-wrap">
-            {tags.length > 0 ? (
-              tags.map((tag) => {
-                return (
-                  <div key={tag.id} className="gap-1 flex items-center ">
-                    <div
-                      className={`inline-flex gap-2 items-center px-2 py-0.5 border border-mantle rounded-full cursor-pointer bg-tag text-primary text-sm relative`}
-                    >
-                      <button
-                        className="h-4 w-4"
-                        style={{ backgroundColor: tag.color }}
-                        onClick={() => {
-                          setEditTagId(tag.id);
-                        }}
-                      ></button>
-                      {editTagId === tag.id && (
-                        <div className="absolute top-8">
-                          <SketchPicker
-                            color={tag.color}
-                            onChangeComplete={(color) =>
-                              editRecipeTagColor(color.hex, tag)
-                            }
-                            presetColors={[
-                              "#FFB86C",
-                              "#A94D54",
-                              "#E5C890",
-                              "#A6D189",
-                              "#89DCEB",
-                              "#739DF2",
-                              "#B4BEFE",
-                              "#F5C2E7",
-                            ]}
-                          />
-                        </div>
-                      )}
-                      {/* <input
-                          className="w-5 h-6 rounded-full"
-                          type="color"
-                          id={`${tag.id}-color`}
-                          defaultValue={tag.color}
-                          onChange={(event) => {
-                            handleTagColorChange(event, tag);
-                          }}
-                        /> */}
-                      {/* <div style={{ backgroundColor: tag.color }}></div> */}
-                      <div className="underline">{tag.name}</div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        deleteRecipeTagAll(tag);
-                      }}
-                    >
-                      <CloseSvg height="12px" width="12px" />
-                    </button>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-secondary/70 text-sm italic">
-                No tags created yet.
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <div>
+        <HomeTags
+          tags={tags}
+          tagsSelected={tagsSelected}
+          handleTagClick={handleTagClick}
+          editRecipeTagColor={editRecipeTagColor}
+          deleteRecipeTagAll={deleteRecipeTagAll}
+        />
+      </div>
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
