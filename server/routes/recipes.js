@@ -63,6 +63,7 @@ router.get("/", authMiddleware, async (req, res) => {
                 servings: row.servings,
                 total_time: row.total_time
             })
+            console.log(recipes[row.recipe_id]);
         }
 
         return res.json(Object.values(recipes));
@@ -313,6 +314,9 @@ router.post("/:id/tag", authMiddleware, async (req, res) => {
                INSERT INTO tags (user_id,name) VALUES (?,?) 
             `).run(userId, tag.name);
             newTagRow = { id: result.lastInsertRowid, name: tag.name, color: tag.color };
+        }
+        else {
+            newTagRow.color = tag.color;
         }
         newTagRow.id = newTagRow.id.toString();
         const recipeTag = db.prepare(`

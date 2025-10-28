@@ -7,13 +7,24 @@ import UserOptions from "../components/UserOptions";
 function Home() {
   const { user, recipes, deleteRecipeTagAll, editRecipeTagColor } =
     useRecipes();
-  const tags = Array.from(
-    new Set(
-      Array.isArray(recipes)
-        ? recipes.flatMap((recipe) => recipe.tags || [])
-        : []
-    )
-  );
+
+  const tagMap = new Map();
+
+  if (Array.isArray(recipes)) {
+    for (const recipe of recipes) {
+      if (Array.isArray(recipe.tags)) {
+        for (const tag of recipe.tags) {
+          if (!tagMap.has(tag.id)) {
+            tagMap.set(tag.id, tag);
+          }
+        }
+      }
+    }
+  }
+
+  const tags = Array.from(tagMap.values());
+
+  // );
   const [tagsSelected, setTagsSelected] = useState(() => {
     if (!user?.id) return [];
     //Initialize react state when using react router actions, otherwise it will be empty.

@@ -8,8 +8,7 @@ import WarningSvg from "../icons/WarningSvg.jsx";
 
 function ChatOptions({
   recipe,
-  isEditing,
-  setIsEditing,
+  setIsEditModalOpen,
   handleDeleteRecipeVersion,
   handleDeleteRecipe,
 }) {
@@ -75,7 +74,7 @@ function ChatOptions({
               <button
                 onClick={() => {
                   setIsOptionsOpen((prev) => !prev);
-                  setIsEditing(!isEditing);
+                  setIsEditModalOpen(true);
                 }}
                 className="flex w-full justify-between items-center"
               >

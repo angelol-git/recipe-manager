@@ -7,7 +7,6 @@ function ColorPickerPortal({ anchorRef, color, onChange, onClose }) {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      console.log(anchorRef);
       if (
         popRef.current &&
         !popRef.current.contains(event.target) &&
@@ -21,16 +20,16 @@ function ColorPickerPortal({ anchorRef, color, onChange, onClose }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose, anchorRef]);
 
-  // calculate position
   const rect = anchorRef.current?.getBoundingClientRect() ?? {
     top: 0,
     left: 0,
   };
+
   return createPortal(
     <div
       ref={popRef}
       style={{
-        top: rect.top + rect.height + 6 + "px",
+        top: rect.top + rect.height + "px",
         left: rect.left + "px",
         zIndex: 9999,
       }}

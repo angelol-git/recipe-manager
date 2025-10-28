@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext.jsx";
 import { useChat } from "../hooks/useChat.jsx";
-import ChatTitle from "../components/chat/ChatTitle.jsx";
 import ChatSideBar from "../components/chat/ChatSideBar.jsx";
 import ChatOptions from "../components/chat/ChatOptions.jsx";
 import ChatInput from "../components/chat/ChatInput.jsx";
 import ChatReply from "../components/chat/ChatReply.jsx";
 import ChatModal from "../components/chat/ChatModal.jsx";
+import ChatEditModal from "../components/chat/ChatEditModal.jsx";
 import ChatErrorModal from "../components/chat/ChatErrorModal.jsx";
 import ChatAskModal from "../components/chat/ChatAskModal.jsx";
 import Toast from "../components/Toast.jsx";
@@ -19,7 +19,7 @@ function Chat() {
   const { recipes } = useRecipes();
   const recipe = recipes.find((r) => r.id === id) || null;
   const [currentVersion, setCurrentVersion] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
@@ -83,12 +83,9 @@ function Chat() {
           >
             <MenuSvg />
           </button>
-          <ChatTitle
-            title={recipe?.title}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-            handleRename={handleRename}
-          />
+          <h1 className="text-xl font-bold font-lora w-full">
+            {recipe?.title}
+          </h1>
         </div>
         <div className="flex gap-2">
           {/* <button
@@ -99,9 +96,8 @@ function Chat() {
           </button> */}
           <ChatOptions
             recipe={recipe}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-            handleDeleteRecipeVersion={handleDeleteRecipeVersion}
+            setIsEditModalOpen={setIsEditModalOpen}
+            // handleDeleteRecipeVersion={handleDeleteRecipeVersion}
             handleDeleteRecipe={handleDeleteRecipe}
           />
         </div>
@@ -122,6 +118,11 @@ function Chat() {
           <div className="text-gray-400">No messages yet</div>
         )}
       </div>
+      <ChatEditModal
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        recipe={recipe}
+      />
       <ChatModal
         isPromptModalOpen={isPromptModalOpen}
         setIsPromptModalOpen={setIsPromptModalOpen}
