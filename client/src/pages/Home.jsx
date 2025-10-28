@@ -9,7 +9,6 @@ function Home() {
     useRecipes();
 
   const tagMap = new Map();
-
   if (Array.isArray(recipes)) {
     for (const recipe of recipes) {
       if (Array.isArray(recipe.tags)) {
@@ -21,7 +20,6 @@ function Home() {
       }
     }
   }
-
   const tags = Array.from(tagMap.values());
 
   // );

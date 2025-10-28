@@ -63,7 +63,6 @@ router.get("/", authMiddleware, async (req, res) => {
                 servings: row.servings,
                 total_time: row.total_time
             })
-            console.log(recipes[row.recipe_id]);
         }
 
         return res.json(Object.values(recipes));
@@ -361,6 +360,23 @@ router.patch("/tag/:id", authMiddleware, async (req, res) => {
     }
 
 })
+
+router.delete("/:id/tag/:tagId", authMiddleware, async (req, res) => {
+    const { id, tagId } = req.params;
+    try {
+        db.prepare(`
+            DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?
+        `).run(id, parseInt(tagId));
+
+        return res.status(204).send();
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to add tag" });
+    }
+
+});
+
 
 router.delete("/tag/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;

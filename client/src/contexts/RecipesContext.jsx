@@ -159,33 +159,6 @@ export function RecipesProvider({ children }) {
     }
   }
 
-  async function deleteRecipeTagAll(deletedTag) {
-    const prevRecipes = recipes;
-    setRecipes((prev) => {
-      //Filter through every recipe
-      return prev.map((recipe) => ({
-        ...recipe,
-        tags: recipe.tags.filter((tag) => {
-          return tag.name !== deletedTag.name;
-        }),
-      }));
-    });
-
-    try {
-      const result = await fetch(`${API_BASE}/recipes/tag/${deletedTag.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!result.ok) {
-        throw new Error("Failed to update recipe");
-      }
-    } catch (error) {
-      setRecipes(prevRecipes);
-      // setTags(prevTags);
-      console.log("Network error", error);
-    }
-  }
-
   async function addRecipeTag(id, newTag) {
     const prevRecipes = recipes;
     const tempId = `temp-${Date.now()}-${Math.random()
@@ -281,6 +254,67 @@ export function RecipesProvider({ children }) {
     }
   }
 
+  async function deleteRecipeTag(currentRecipe, deletedTag) {
+    const prevRecipes = recipes;
+    setRecipes((prev) => {
+      return prev.map((recipe) => {
+        if (recipe.id === currentRecipe.id) {
+          return {
+            ...recipe,
+            tags: recipe.tags.filter((tag) => {
+              return tag.name !== deletedTag.name;
+            }),
+          };
+        }
+        return recipe;
+      });
+    });
+
+    try {
+      const result = await fetch(
+        `${API_BASE}/recipes/${currentRecipe.id}/tag/${deletedTag.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!result.ok) {
+        throw new Error("Failed to delete recipe tag.");
+      }
+    } catch (error) {
+      setRecipes(prevRecipes);
+      // setTags(prevTags);
+      console.log("Network error", error);
+    }
+  }
+
+  async function deleteRecipeTagAll(deletedTag) {
+    const prevRecipes = recipes;
+    setRecipes((prev) => {
+      //Filter through every recipe
+      return prev.map((recipe) => ({
+        ...recipe,
+        tags: recipe.tags.filter((tag) => {
+          return tag.name !== deletedTag.name;
+        }),
+      }));
+    });
+
+    try {
+      const result = await fetch(`${API_BASE}/recipes/tag/${deletedTag.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!result.ok) {
+        throw new Error("Failed to update recipe");
+      }
+    } catch (error) {
+      setRecipes(prevRecipes);
+      // setTags(prevTags);
+      console.log("Network error", error);
+    }
+  }
+
   return (
     <RecipesContext.Provider
       value={{
@@ -292,6 +326,7 @@ export function RecipesProvider({ children }) {
         deleteRecipeVersion,
         deleteRecipe,
         addRecipeTag,
+        deleteRecipeTag,
         deleteRecipeTagAll,
         editRecipeTagColor,
       }}
