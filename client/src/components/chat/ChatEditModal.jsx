@@ -13,29 +13,9 @@ function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
 
   useEffect(() => {
     if (!recipe) return;
+    if (!isEditModalOpen) return;
     setDraft(recipe);
-  }, [recipe]);
-
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(e.target) &&
-        (!portalRef.current || !portalRef.current.contains(e.target))
-      ) {
-        console.log(e.target);
-        console.log("here");
-        setIsEditModalOpen(false);
-      }
-    }
-
-    if (isEditModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isEditModalOpen, setIsEditModalOpen]);
+  }, [recipe, isEditModalOpen]);
 
   function handleDraftEditTagColor(color, tag) {
     setDraft((prev) => {
@@ -91,7 +71,7 @@ function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
                 name="editTitle"
                 id="editTitle"
                 type="text"
-                value={draft?.title}
+                value={draft?.title || ""}
                 onChange={(event) => {
                   setDraft((prev) => ({ ...prev, title: event.target.value }));
                 }}

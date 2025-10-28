@@ -37,9 +37,7 @@ function Chat() {
     setAskMessages,
     sendCreateMessage,
     handleDeleteError,
-    handleDeleteRecipeVersion,
     handleDeleteRecipe,
-    handleRename,
   } = useChat(recipe, currentVersion, setCurrentVersion, showToast);
 
   function showToast(message, type = "error") {
@@ -66,6 +64,7 @@ function Chat() {
     <div className="relative bg-base flex flex-col h-screen text-primary py-5 px-4 w-full">
       <ChatSideBar
         recipes={recipes}
+        currentRecipe={recipe}
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
       />

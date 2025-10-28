@@ -1,10 +1,15 @@
 import { Link } from "react-router";
 
 import CloseSvg from "../icons/CloseSvg";
-function ChatSideBar({ recipes, isSideBarOpen, setIsSideBarOpen }) {
+function ChatSideBar({
+  recipes,
+  currentRecipe,
+  isSideBarOpen,
+  setIsSideBarOpen,
+}) {
   return (
     <nav
-      className={`z-100 p-7 fixed top-0 left-0 h-full w-72 bg-base transition-transform duration-300 ease-in-out ${
+      className={`z-100 p-6 fixed top-0 left-0 h-full w-72 bg-base transition-transform duration-300 ease-in-out ${
         isSideBarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
@@ -24,7 +29,7 @@ function ChatSideBar({ recipes, isSideBarOpen, setIsSideBarOpen }) {
         </Link>
         <div>
           <h2 className="text-secondary/70 pb-3">Recipes</h2>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             {recipes?.map((item) => {
               return (
                 <Link
@@ -34,6 +39,9 @@ function ChatSideBar({ recipes, isSideBarOpen, setIsSideBarOpen }) {
                   onClick={() => {
                     setIsSideBarOpen(!isSideBarOpen);
                   }}
+                  className={`p-1 w-full rounded-lg ${
+                    currentRecipe.id === item.id ? "bg-gray-200/70" : null
+                  }`}
                 >
                   <p className="cursor-pointer">{item.title}</p>
                 </Link>
