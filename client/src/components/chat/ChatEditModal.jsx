@@ -2,21 +2,27 @@ import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRecipes } from "../../contexts/RecipesContext";
 import CloseSvg from "../icons/CloseSvg";
+import ColorPickerPortal from "../home/ColorPickerPortal";
 function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
-  const { deleteRecipeTag } = useRecipes();
-
-  const [editTitle, setEditTitle] = useState(recipe?.id ? recipe?.title : "");
+  //   const { deleteRecipeTag, editRecipeTagColor } = useRecipes();
+  const [draft, setDraft] = useState(() => (recipe ? { ...recipe } : null));
+  const [editTagId, setEditTagId] = useState(null);
   //   console.log(recipe);
   const modalRef = useRef(null);
+  const portalRef = useRef(null);
 
   useEffect(() => {
-    if (!recipe?.id) return;
-    setEditTitle(recipe?.title || "");
+    if (!recipe) return;
+    setDraft(recipe);
   }, [recipe]);
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (modalRef.current && !modalRef.current.contains(e.target)) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(e.target) &&
+        (!portalRef.current || !portalRef.current.contains(e.target))
+      ) {
         console.log(e.target);
         console.log("here");
         setIsEditModalOpen(false);
@@ -30,6 +36,35 @@ function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isEditModalOpen, setIsEditModalOpen]);
+
+  function handleDraftEditTagColor(color, tag) {
+    setDraft((prev) => {
+      return {
+        ...prev,
+        tags: (prev.tags || []).map((prevTag) => {
+          if (prevTag.id === tag.id) {
+            return {
+              ...prevTag,
+              color: color.hex,
+            };
+          } else {
+            return prevTag;
+          }
+        }),
+      };
+    });
+  }
+
+  function handleDraftEditTagDelete(tag) {
+    setDraft((prev) => {
+      return {
+        ...prev,
+        tags: prev.tags.filter((prevTag) => {
+          return prevTag.name !== tag.name;
+        }),
+      };
+    });
+  }
 
   if (!isEditModalOpen) return null;
   return createPortal(
@@ -46,25 +81,26 @@ function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
           <button>Save</button>
         </div>
         <form className="flex flex-col gap-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <div className="flex flex-col gap-1 w-full">
-              <label htmlFor="editTitle" className="text-sm">
+              <label htmlFor="editTitle" className="text-sm text-secondary">
                 Title
               </label>
               <input
+                className="border-b-1 border-gray-300"
                 name="editTitle"
                 id="editTitle"
                 type="text"
-                value={editTitle}
+                value={draft?.title}
                 onChange={(event) => {
-                  setEditTitle(event.target.value);
+                  setDraft((prev) => ({ ...prev, title: event.target.value }));
                 }}
               />
             </div>
             <div
               className="self-end"
               onClick={() => {
-                setEditTitle("");
+                setDraft((prev) => ({ ...prev, title: "" }));
               }}
             >
               Delete
@@ -72,42 +108,45 @@ function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
           </div>
           <div className="flex justify-between">
             <div className="flex flex-col gap-1 w-full">
-              <label htmlFor="tags" className="text-sm">
+              <label htmlFor="tags" className="text-sm text-secondary">
                 Tags
               </label>
               <div>
-                {recipe?.tags.length > 0 ? (
-                  recipe?.tags.map((tag) => {
+                {draft?.tags.length > 0 ? (
+                  draft?.tags.map((tag) => {
                     return (
                       <div key={tag.id} className="gap-1 flex items-center ">
                         <div
-                          className={`inline-flex gap-2 items-center px-2 py-0.5 border border-mantle rounded-full cursor-pointer bg-tag text-primary text-sm`}
+                          className={`inline-flex gap-3 items-center px-3 py-1 border border-mantle rounded-full cursor-pointer bg-tag text-primary text-sm`}
                         >
                           <button
                             ref={(el) => (tag.anchor = el)}
                             className="h-4 w-4"
                             style={{ backgroundColor: tag.color }}
                             type="button"
-                            // onClick={() => {
-                            //   setEditTagId(tag.id);
-                            // }}
+                            onClick={() => {
+                              setEditTagId(tag.id);
+                            }}
                           ></button>
-                          {/* {editTagId === tag.id && (
+                          {editTagId === tag.id && (
                             <ColorPickerPortal
+                              portalRef={portalRef}
                               anchorRef={{ current: tag.anchor }}
                               color={tag.color}
                               onChange={(color) => {
-                                editRecipeTagColor(color.hex, tag);
+                                handleDraftEditTagColor(color, tag);
                               }}
-                              onClose={handleColorPickerClose}
+                              onClose={() => {
+                                setEditTagId(null);
+                              }}
                             />
-                          )} */}
+                          )}
                           <div className="underline">{tag.name}</div>
                         </div>
                         <button
                           type="button"
                           onClick={() => {
-                            deleteRecipeTag(recipe, tag);
+                            handleDraftEditTagDelete(tag);
                           }}
                         >
                           <CloseSvg height="12px" width="12px" />
@@ -122,14 +161,6 @@ function ChatEditModal({ isEditModalOpen, setIsEditModalOpen, recipe }) {
                 )}
               </div>
             </div>
-            {/* <div
-              className="self-end"
-              onClick={() => {
-                setEditTitle("");
-              }}
-            >
-              Delete
-            </div> */}
           </div>
         </form>
       </div>

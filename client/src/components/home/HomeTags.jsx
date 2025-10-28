@@ -101,7 +101,9 @@ function HomeTags({
                           onChange={(color) => {
                             editRecipeTagColor(color.hex, tag);
                           }}
-                          onClose={handleColorPickerClose}
+                          onClose={() => {
+                            setEditTagId(null);
+                          }}
                         />
                       )}
                       <div className="underline">{tag.name}</div>

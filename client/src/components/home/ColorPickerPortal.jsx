@@ -2,14 +2,12 @@ import { useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { SketchPicker } from "react-color";
 
-function ColorPickerPortal({ anchorRef, color, onChange, onClose }) {
-  const popRef = useRef(null);
-
+function ColorPickerPortal({ portalRef, anchorRef, color, onChange, onClose }) {
   useEffect(() => {
     function handleClickOutside(event) {
       if (
-        popRef.current &&
-        !popRef.current.contains(event.target) &&
+        portalRef.current &&
+        !portalRef.current.contains(event.target) &&
         !anchorRef.current.contains(event.target)
       ) {
         onClose();
@@ -27,7 +25,7 @@ function ColorPickerPortal({ anchorRef, color, onChange, onClose }) {
 
   return createPortal(
     <div
-      ref={popRef}
+      ref={portalRef}
       style={{
         top: rect.top + rect.height + "px",
         left: rect.left + "px",
