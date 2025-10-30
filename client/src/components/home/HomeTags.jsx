@@ -127,7 +127,6 @@ function HomeTags({
                           editDraftTagName(event, tag.id);
                         }}
                         onBlur={(event) => {
-                          console.log("On blur triggered");
                           const newName = event.target.value.trim();
                           const originalTag = tags.find((t) => t.id === tag.id);
                           if (newName && newName !== originalTag.name) {
