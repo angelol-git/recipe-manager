@@ -119,7 +119,7 @@ function ChatInput({
             className={`ml-2 ${
               chatInputMode === "Create"
                 ? "bg-overlay0 text-secondary"
-                : "bg-icon-disabled text-white"
+                : "bg-overlay2 text-white"
             } w-min px-2 cursor-pointer py-1 rounded-2xl text-sm flex items-center gap-1`}
           >
             <option value="Create">Create</option>
@@ -130,7 +130,7 @@ function ChatInput({
               onClick={() => {
                 setIsAskModalOpen(!isAskModalOpen);
               }}
-              className="bg-icon-disabled p-1 rounded-full cursor-pointer"
+              className="bg-overlay2 p-1 rounded-full cursor-pointer"
             >
               <HistorySvg />
             </button>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useRecipes } from "../contexts/RecipesContext.jsx";
 import { useChat } from "../hooks/useChat.jsx";
@@ -29,6 +29,13 @@ function Chat() {
 
   const [message, setMessage] = useState("");
   const [chatInputMode, setChatInputMode] = useState("Create");
+
+  //If new/no recipe chat should be open
+  useEffect(() => {
+    if (!recipe) {
+      setIsChatOpen(true);
+    }
+  }, [recipe]);
 
   const {
     isReplyLoading,
