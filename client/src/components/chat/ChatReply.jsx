@@ -1,3 +1,4 @@
+import { useState } from "react";
 import UtensilsSvg from "../icons/UtensilsSvg";
 import FireSvg from "../icons/FireSvg";
 import ClockSvg from "../icons/ClockSvg";
@@ -6,11 +7,11 @@ function ChatReply({
   versions,
   errors,
   isReplyLoading,
-  setIsPromptModalOpen,
   setIsErrorModalOpen,
   currentVersion,
   totalVersion,
 }) {
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const {
     calories,
     total_time,
@@ -65,14 +66,15 @@ function ChatReply({
         </div>
       )}
       {source_prompt && !isReplyLoading && (
-        <div className="flex justify-between text-secondary/80 text-sm">
-          <div className="flex gap-2 py-2">
+        <div className="flex gap-4 justify-between text-secondary text-sm">
+          <div className="flex flex-col items-start gap-2 py-2">
             <button
-              onClick={() => setIsPromptModalOpen(true)}
+              onClick={() => setIsPromptModalOpen((prev) => !prev)}
               className="underline cursor-pointer"
             >
               View prompt
             </button>
+            {isPromptModalOpen && <div>{source_prompt}</div>}
             {errors?.length > 0 ? (
               <button
                 onClick={() => setIsErrorModalOpen(true)}
@@ -82,7 +84,7 @@ function ChatReply({
               </button>
             ) : null}
           </div>
-          <p className="text-secondary/80">
+          <p className="whitespace-nowrap">
             {currentVersion + 1} of {totalVersion}
           </p>
         </div>

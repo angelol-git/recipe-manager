@@ -149,6 +149,7 @@ function ChatInput({
       <button
         className="bg-accent rounded-full p-2"
         onClick={() => {
+          console.log("Here");
           setIsChatOpen(true);
         }}
       >

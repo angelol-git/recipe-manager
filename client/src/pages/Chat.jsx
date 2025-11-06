@@ -6,7 +6,6 @@ import ChatSideBar from "../components/chat/ChatSideBar.jsx";
 import ChatOptions from "../components/chat/ChatOptions.jsx";
 import ChatInput from "../components/chat/ChatInput.jsx";
 import ChatReply from "../components/chat/ChatReply.jsx";
-import ChatModal from "../components/chat/ChatModal.jsx";
 import ChatEditModal from "../components/chat/ChatEditModal.jsx";
 import ChatErrorModal from "../components/chat/ChatErrorModal.jsx";
 import ChatAskModal from "../components/chat/ChatAskModal.jsx";
@@ -21,7 +20,6 @@ function Chat() {
   const [currentVersion, setCurrentVersion] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
-  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -32,10 +30,10 @@ function Chat() {
 
   //If new/no recipe chat should be open
   useEffect(() => {
-    if (!recipe) {
+    if (recipes.length > 0 && !recipe) {
       setIsChatOpen(true);
     }
-  }, [recipe]);
+  }, [recipe, recipes]);
 
   const {
     isReplyLoading,
@@ -106,7 +104,6 @@ function Chat() {
             versions={recipe.versions}
             errors={errors}
             isReplyLoading={isReplyLoading}
-            setIsPromptModalOpen={setIsPromptModalOpen}
             setIsErrorModalOpen={setIsErrorModalOpen}
             currentVersion={currentVersion}
             totalVersion={recipe.versions.length}
@@ -121,12 +118,12 @@ function Chat() {
         recipe={recipe}
         currentVersion={currentVersion}
       />
-      <ChatModal
+      {/* <ChatModal
         isPromptModalOpen={isPromptModalOpen}
         setIsPromptModalOpen={setIsPromptModalOpen}
         original_prompt={recipe?.source_prompt}
         source_prompt={recipe?.versions?.[currentVersion].source_prompt}
-      />
+      /> */}
       <ChatErrorModal
         isErrorModalOpen={isErrorModalOpen}
         setIsErrorModalOpen={setIsErrorModalOpen}
