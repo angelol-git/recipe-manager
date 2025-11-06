@@ -66,6 +66,10 @@ function ChatErrorModal({
     <div className="fixed inset-0 bg-black/30 flex justify-center  z-50 p-4 w-full ">
       <div
         ref={modalRef}
+        id="error-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="error-modal-title"
         className="p-4 flex my-20 flex-col bg-crust rounded shadow-lg w-full overflow-y-auto"
       >
         <div className="flex justify-end">
@@ -73,7 +77,9 @@ function ChatErrorModal({
             <CloseSvg />
           </button>
         </div>
-        <h2 className="font-bold pb-2">Errors</h2>
+        <h2 id="error-modal-title" className="font-bold pb-2">
+          Errors
+        </h2>
         <ul className="flex flex-col gap-3">
           {errors?.length > 0
             ? errors.map((item) => {

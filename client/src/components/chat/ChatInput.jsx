@@ -78,7 +78,7 @@ function ChatInput({
       <textarea
         rows={1}
         ref={textAreaRef}
-        className="w-full px-2 rounded-xl bg-transparent text-primary
+        className="w-full px-2 rounded-xl text-primary
                  outline-none resize-none leading-6
                  placeholder:text-icon-disabled"
         style={{
@@ -149,7 +149,6 @@ function ChatInput({
       <button
         className="bg-accent rounded-full p-2"
         onClick={() => {
-          console.log("Here");
           setIsChatOpen(true);
         }}
       >
