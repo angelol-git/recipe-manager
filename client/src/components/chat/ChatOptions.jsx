@@ -14,6 +14,7 @@ function ChatOptions({
 }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const menuRef = useRef(null);
+
   useEffect(() => {
     if (!isOptionsOpen) return;
 
@@ -22,90 +23,91 @@ function ChatOptions({
         setIsOptionsOpen(false);
       }
     }
-    if (isOptionsOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOptionsOpen]);
 
   return (
-    <div ref={menuRef}>
+    <div ref={menuRef} className="relative">
       <button
-        onClick={() => {
-          setIsOptionsOpen((prev) => !prev);
-        }}
-        className={`cursor-pointer font-bold px-2 py-1 color-black rounded-md relative ${
-          isOptionsOpen ? "bg-gray-300/30" : null
+        onClick={() => setIsOptionsOpen((prev) => !prev)}
+        aria-haspopup="true"
+        aria-expanded={isOptionsOpen}
+        aria-label="Chat options"
+        className={`cursor-pointer font-bold px-2 py-1 color-black rounded-md ${
+          isOptionsOpen ? "bg-crust" : ""
         }`}
       >
         <DotsSvg />
       </button>
-      {isOptionsOpen ? (
+
+      {isOptionsOpen && (
         <div
-          className="absolute right-5 z-50 bg-crust  p-2 rounded-lg shadow-lg"
+          className="absolute right-0 z-50 bg-mantle w-42 py-0 px-3 rounded-lg shadow-xl border border-secondary/60"
           role="menu"
         >
-          <ul className="p-1 flex gap-2 flex-col w-[150px]">
-            <li className="border-b-1 border-black/40 py-2" role="menu-item">
+          <ul className="flex flex-col divide-y divide-secondary/60 text-primary">
+            {/* Uncomment if you want Clone functionality */}
+            {/* <li>
               <button
-                onClick={() => {
-                  setIsOptionsOpen((prev) => !prev);
-                }}
-                className="flex z-100 w-full justify-between items-center"
+                onClick={() => setIsOptionsOpen(false)}
+                className="w-full flex justify-between items-center py-2"
               >
                 <CloneSvg />
                 <div>Clone</div>
               </button>
-            </li>
-            <li className="border-b-1 border-black/40 py-2" role="menu-item">
+            </li> */}
+
+            <li>
               <button
-                onClick={() => {
-                  setIsOptionsOpen((prev) => !prev);
-                }}
-                className="flex z-100 w-full justify-between items-center"
+                onClick={() => setIsOptionsOpen(false)}
+                className="w-full flex justify-between items-center py-3"
               >
                 <ShareSvg />
                 <div>Share</div>
               </button>
             </li>
-            <li className="border-b-1 border-black/40 py-2">
+
+            <li>
               <button
                 onClick={() => {
-                  setIsOptionsOpen((prev) => !prev);
+                  setIsOptionsOpen(false);
                   setIsEditModalOpen(true);
                 }}
-                className="flex w-full justify-between items-center"
+                className="w-full flex justify-between items-center py-3"
               >
                 <EditSvg />
                 <div>Edit</div>
               </button>
             </li>
-            <li className="text-rose py-2 border-black/40 border-b-1">
+
+            <li>
               <button
                 onClick={() => {
-                  setIsOptionsOpen((prev) => !prev);
+                  setIsOptionsOpen(false);
                   if (recipe.versions?.length === 1) {
                     handleDeleteRecipe();
                   } else {
                     handleDeleteRecipeVersion();
                   }
                 }}
-                className="flex w-full justify-between items-center"
+                className="w-full flex justify-between items-center py-3 text-rose"
               >
                 <DeleteSvg />
                 <div>Delete</div>
               </button>
             </li>
 
-            <li className="text-rose py-2">
+            <li>
               <button
                 onClick={() => {
-                  setIsOptionsOpen((prev) => !prev);
+                  setIsOptionsOpen(false);
                   handleDeleteRecipe();
                 }}
-                className="flex w-full justify-between items-center"
+                className="w-full flex justify-between items-center py-3 text-rose"
               >
                 <WarningSvg />
                 <div>Delete All</div>
@@ -113,7 +115,7 @@ function ChatOptions({
             </li>
           </ul>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

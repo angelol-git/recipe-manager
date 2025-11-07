@@ -8,6 +8,7 @@ function DotsSvg({ height = "20px", width = "20px", fill = "primary" }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={fillColor}
+      aria-hidden="true"
     >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g

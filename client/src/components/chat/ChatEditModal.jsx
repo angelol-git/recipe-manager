@@ -193,7 +193,7 @@ function Title({ setDraft, draft }) {
     <div className="flex justify-between gap-4">
       <div className="flex flex-col gap-2 w-full">
         <input
-          className="border-b-1 border-gray-300"
+          className="border-b-1 border-overlay0"
           name="editTitle"
           id="editTitle"
           type="text"

@@ -36,7 +36,7 @@ function ChatReply({
     <div
       role="log"
       aria-live="polite"
-      className="flex flex-col gap-4 pt-4 text-primary"
+      className="flex flex-col gap-4 py-4 text-primary"
     >
       <div
         role="group"
@@ -68,7 +68,7 @@ function ChatReply({
           >
             Ingredients
           </h3>
-          <ul className="list-disc pl-4 py-1">
+          <ul className="list-disc pl-4">
             {ingredients.map((item, index) => (
               <li key={index}>{item}</li>
             ))}
@@ -83,7 +83,7 @@ function ChatReply({
           >
             Instructions
           </h3>
-          <ol className="list-decimal flex flex-col gap-2 py-1">
+          <ol className="list-decimal flex flex-col gap-2">
             {instructions.map((item, index) => (
               <li key={index}>{item}</li>
             ))}

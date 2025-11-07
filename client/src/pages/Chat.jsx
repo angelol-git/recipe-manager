@@ -118,12 +118,6 @@ function Chat() {
         recipe={recipe}
         currentVersion={currentVersion}
       />
-      {/* <ChatModal
-        isPromptModalOpen={isPromptModalOpen}
-        setIsPromptModalOpen={setIsPromptModalOpen}
-        original_prompt={recipe?.source_prompt}
-        source_prompt={recipe?.versions?.[currentVersion].source_prompt}
-      /> */}
       <ChatErrorModal
         isErrorModalOpen={isErrorModalOpen}
         setIsErrorModalOpen={setIsErrorModalOpen}
