@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import Markdown from "react-markdown";
-import CloseSvg from "../icons/CloseSvg";
+
+import { X } from "lucide-react";
 import ChatAskInput from "./ChatAskInput";
 function ChatAskModal({
   isAskModalOpen,
@@ -59,7 +60,7 @@ function ChatAskModal({
             onClick={() => setIsAskModalOpen(false)}
             className="bg-crust p-2 rounded-full cursor-pointer"
           >
-            <CloseSvg />
+            <X size={20} strokeWidth={1.5} className="text-icon" />
           </button>
         </div>
         <div

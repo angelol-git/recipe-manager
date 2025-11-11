@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import UtensilsSvg from "../icons/UtensilsSvg";
-import FireSvg from "../icons/FireSvg";
-import ClockSvg from "../icons/ClockSvg";
+import { Flame, Clock, Utensils } from "lucide-react";
 
 function ChatReply({
   versions,
@@ -44,17 +42,21 @@ function ChatReply({
         className="flex gap-5 text-secondary"
       >
         <div className="flex gap-1 items-center">
-          <FireSvg />
+          <Flame size={"20"} strokeWidth={1.5} className="stroke-secondary" />
           <div>{calories}</div>
           kcal
         </div>
         <div className="flex gap-1 items-center">
-          <ClockSvg />
+          <Clock size={"20"} strokeWidth={1.5} className="stroke-secondary" />
           <div>{total_time}</div>
           mins
         </div>
         <div className="flex gap-1 items-center">
-          <UtensilsSvg />
+          <Utensils
+            size={"20"}
+            strokeWidth={1.5}
+            className="stroke-secondary"
+          />
           <div>{servings}</div>
           servings
         </div>
@@ -68,7 +70,7 @@ function ChatReply({
           >
             Ingredients
           </h3>
-          <ul className="list-disc pl-4">
+          <ul className="list-disc pl-4 pt-2">
             {ingredients.map((item, index) => (
               <li key={index}>{item}</li>
             ))}
@@ -83,9 +85,12 @@ function ChatReply({
           >
             Instructions
           </h3>
-          <ol className="list-decimal flex flex-col gap-2">
+          <ol className="list-decimal flex flex-col gap-2 pt-2">
             {instructions.map((item, index) => (
-              <li key={index}>{item}</li>
+              <li key={index} className="flex gap-2">
+                <span className="font-semibold font-lora">{index + 1}.</span>
+                {item}
+              </li>
             ))}
           </ol>
         </section>

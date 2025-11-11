@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import CloseSvg from "../icons/CloseSvg";
-import ErrorSvg from "../icons/ErrorSvg";
-import WarningSvg from "../icons/WarningSvg";
+import { X, CircleX } from "lucide-react";
 function ChatErrorModal({
   isErrorModalOpen,
   setIsErrorModalOpen,
@@ -74,7 +72,7 @@ function ChatErrorModal({
       >
         <div className="flex justify-end">
           <button onClick={() => setIsErrorModalOpen(false)}>
-            <CloseSvg />
+            <X size={24} strokeWidth={1.5} className="stroke-white" />
           </button>
         </div>
         <h2 id="error-modal-title" className="font-bold pb-2">
@@ -88,7 +86,11 @@ function ChatErrorModal({
                     className="bg-rose-100 px-2 py-3 flex gap-2 rounded-lg"
                     key={item.id}
                   >
-                    <WarningSvg />
+                    <CircleX
+                      size={24}
+                      strokeWidth={1.5}
+                      className="fill-rose"
+                    />
                     <div className="flex flex-col w-full">
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-rose-900 text-large">

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useRecipes } from "../../contexts/RecipesContext";
-import CloseSvg from "../icons/CloseSvg";
-import CheckSvg from "../icons/CheckSvg";
-
+import { X } from "lucide-react";
+import { Check } from "lucide-react";
 function ChatTags({ recipeId }) {
   const { recipes, addRecipeTag } = useRecipes();
   const recipe = recipes.find((r) => r.id === recipeId);
@@ -64,13 +63,17 @@ function ChatTags({ recipeId }) {
             }}
             className="rounded-full border border-gray-300 px-2 flex items-center justify-center"
           >
-            <CloseSvg height={"12px"} width={"12px"} />
+            <X size={14} strokeWidth={1.5} className="stroke-icon-muted" />
           </button>
           <button
             onClick={handleAddTag}
             className="rounded-full border border-gray-300 px-2 flex items-center justify-center"
           >
-            <CheckSvg />
+            <Check
+              size={"14"}
+              strokeWidth={1.5}
+              className="stroke-icon-muted"
+            />
           </button>
         </div>
       )}

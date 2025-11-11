@@ -1,6 +1,5 @@
 import { Link } from "react-router";
-
-import CloseSvg from "../icons/CloseSvg";
+import { X } from "lucide-react";
 function ChatSideBar({
   recipes,
   currentRecipe,
@@ -23,7 +22,7 @@ function ChatSideBar({
           }}
           className="cursor-pointer"
         >
-          <CloseSvg />
+          <X size={20} strokeWidth={1.5} className="stroke-icon" />
         </button>
       </div>
       <div className="flex flex-col gap-1 pt-5">

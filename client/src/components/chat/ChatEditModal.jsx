@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRecipes } from "../../contexts/RecipesContext";
-
-import CloseSvg from "../icons/CloseSvg";
+import { X } from "lucide-react";
 import ColorPickerPortal from "../home/ColorPickerPortal";
 function ChatEditModal({
   isEditModalOpen,
@@ -336,7 +335,7 @@ function Tags({
                       deleteDraftTag(tag.id);
                     }}
                   >
-                    <CloseSvg height="12px" width="12px" />
+                    <X size={14} color={"#8C7A68"} strokeWidth={1.5} />
                   </button>
                 </div>
               );
@@ -494,7 +493,7 @@ function Ingredients({
               deleteDraftArray(version.id, "ingredients", index);
             }}
           >
-            <CloseSvg height="14px" width="14px" fill="secondary" />
+            <X size={14} color={"#8C7A68"} strokeWidth={1.5} />
           </button>
         </li>
       ))}
@@ -510,45 +509,48 @@ function Instructions({
 }) {
   const version = draft?.versions[currentVersion];
   return (
-    <ul className="flex flex-col gap-2">
+    <ol className="list-decimal space-y-2">
       {version?.instructions.map((ingredient, index) => (
         <li
           key={index}
           className="flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl px-3 py-2 transition-all hover:shadow-sm"
         >
-          <textarea
-            className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary text-sm leading-relaxed"
-            value={ingredient}
-            rows={1}
-            onChange={(event) => {
-              const el = event.target;
-              el.style.height = "auto";
-              el.style.height = `${el.scrollHeight}px`;
-              editDraftVersionArray(
-                version.id,
-                "instructions",
-                event.target.value,
-                index
-              );
-            }}
-            ref={(el) => {
-              if (el) {
+          <div className="flex gap-2 w-full">
+            <span className="font-semibold font-lora">{index + 1}. </span>
+            <textarea
+              className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary text-sm leading-relaxed"
+              value={ingredient}
+              rows={1}
+              onChange={(event) => {
+                const el = event.target;
                 el.style.height = "auto";
                 el.style.height = `${el.scrollHeight}px`;
-              }
-            }}
-          />
+                editDraftVersionArray(
+                  version.id,
+                  "instructions",
+                  event.target.value,
+                  index
+                );
+              }}
+              ref={(el) => {
+                if (el) {
+                  el.style.height = "auto";
+                  el.style.height = `${el.scrollHeight}px`;
+                }
+              }}
+            />
+          </div>
           <button
             type="button"
             onClick={() => {
               deleteDraftArray(version.id, "instructions", index);
             }}
           >
-            <CloseSvg height="14px" width="14px" fill="secondary" />
+            <X size={14} color={"#8C7A68"} strokeWidth={1.5} />
           </button>
         </li>
       ))}
-    </ul>
+    </ol>
   );
 }
 export default ChatEditModal;

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
-import UserSvg from "./icons/UserSvg";
+import { CircleUserRound } from "lucide-react";
 
 function UserOptions({ user }) {
   const [isUserOptionsOpen, setIsUserOptionsOpen] = useState(false);
@@ -49,7 +49,7 @@ function UserOptions({ user }) {
           setIsUserOptionsOpen((prev) => !prev);
         }}
       >
-        <UserSvg />
+        <CircleUserRound size={28} strokeWidth={1.5} className="stroke-icon" />
       </button>
 
       {isUserOptionsOpen && (

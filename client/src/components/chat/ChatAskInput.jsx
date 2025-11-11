@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
-import UpArrowSvg from "../icons/UpArrowSvg";
-import SpinnerSvg from "../icons/SpinnerSvg";
+import { LoaderCircle } from "lucide-react";
 
 function ChatAskInput({
   askMessage,
@@ -48,7 +47,11 @@ function ChatAskInput({
           setAskMessage("");
         }}
       >
-        {isReplyLoading ? <SpinnerSvg /> : <UpArrowSvg />}
+        {isReplyLoading ? (
+          <LoaderCircle size={20} strokeWidth={1.5} className="stroke-white" />
+        ) : (
+          <ArrowUp size={20} strokeWidth={1.5} className="stroke-white" />
+        )}
       </button>
     </div>
   );

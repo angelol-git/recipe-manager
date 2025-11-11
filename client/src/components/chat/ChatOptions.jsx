@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import DeleteSvg from "../icons/DeleteSvg.jsx";
-import ShareSvg from "../icons/ShareSvg.jsx";
-import EditSvg from "../icons/EditSvg.jsx";
-import DotsSvg from "../icons/DotsSvg.jsx";
-import CloneSvg from "../icons/CloneSvg.jsx";
-import WarningSvg from "../icons/WarningSvg.jsx";
+import { CircleX, Share, Ellipsis, Trash2, SquarePen } from "lucide-react";
 
 function ChatOptions({
   recipe,
@@ -41,7 +36,7 @@ function ChatOptions({
           isOptionsOpen ? "bg-crust" : ""
         }`}
       >
-        <DotsSvg />
+        <Ellipsis size={24} strokeWidth={1.5} className="stroke-icon" />
       </button>
 
       {isOptionsOpen && (
@@ -66,7 +61,7 @@ function ChatOptions({
                 onClick={() => setIsOptionsOpen(false)}
                 className="w-full flex justify-between items-center py-3"
               >
-                <ShareSvg />
+                <Share size={22} strokeWidth={1.5} className="stroke-icon" />
                 <div>Share</div>
               </button>
             </li>
@@ -79,7 +74,11 @@ function ChatOptions({
                 }}
                 className="w-full flex justify-between items-center py-3"
               >
-                <EditSvg />
+                <SquarePen
+                  size={22}
+                  strokeWidth={1.5}
+                  className="stroke-icon"
+                />
                 <div>Edit</div>
               </button>
             </li>
@@ -96,7 +95,7 @@ function ChatOptions({
                 }}
                 className="w-full flex justify-between items-center py-3 text-rose"
               >
-                <DeleteSvg />
+                <Trash2 size={22} strokeWidth={1.5} className="stroke-icon" />
                 <div>Delete</div>
               </button>
             </li>
@@ -109,7 +108,7 @@ function ChatOptions({
                 }}
                 className="w-full flex justify-between items-center py-3 text-rose"
               >
-                <WarningSvg />
+                <CircleX size={22} strokeWidth={1.5} className="stroke-rose" />
                 <div>Delete All</div>
               </button>
             </li>

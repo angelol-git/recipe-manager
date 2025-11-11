@@ -1,11 +1,12 @@
 import { useRef, useEffect, useState } from "react";
-import UpArrowSvg from "../icons/UpArrowSvg";
-import LeftArrowSvg from "../icons/LeftArrowSvg";
-import RightArrowSvg from "../icons/RightArrowSvg";
-import SpinnerSvg from "../icons/SpinnerSvg";
-import HistorySvg from "../icons/HistorySvg";
-import ChatSvg from "../icons/ChatSvg";
-import MinimizeSvg from "../icons/MinimizeSvg";
+import { ArrowUp, LoaderCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  History,
+  MessageCircleMore,
+  Minimize2,
+} from "lucide-react";
 
 function ChatInput({
   isChatOpen,
@@ -95,19 +96,30 @@ function ChatInput({
         className="absolute top-1 right-1 p-1 rounded-full hover:bg-overlay0"
         aria-label="Minimize chat"
       >
-        <MinimizeSvg />
+        <Minimize2 size={20} strokeWidth={1.5} className="stroke-icon-muted" />
       </button>
 
       <div className={`flex bg-gap-3 items-center justify-between`}>
         <div className="flex gap-2">
           <div className="flex gap-3">
             <button onClick={handlePrevVersion} className="cursor-pointer">
-              <LeftArrowSvg currentVersion={currentVersion} />
+              <ArrowLeft
+                size={20}
+                strokeWidth={2}
+                className={
+                  currentVersion === 0 ? "stroke-icon-disabled" : "stroke-icon"
+                }
+              />
             </button>
             <button onClick={handleNextVersion} className="cursor-pointer">
-              <RightArrowSvg
-                currentVersion={currentVersion}
-                max={recipeVersions?.length - 1}
+              <ArrowRight
+                size={20}
+                strokeWidth={2}
+                className={
+                  currentVersion === recipeVersions?.length - 1
+                    ? "stroke-icon-disabled"
+                    : "-icon"
+                }
               />
             </button>
           </div>
@@ -132,7 +144,7 @@ function ChatInput({
               }}
               className="bg-overlay2 p-1 rounded-full cursor-pointer"
             >
-              <HistorySvg />
+              <History size={20} strokeWidth={1.5} color={"white"} />
             </button>
           ) : null}
         </div>
@@ -140,7 +152,15 @@ function ChatInput({
           className="cursor-pointer flex items-center justify-center w-9 h-9 p-0 text-white bg-accent hover:bg-accent-dark rounded-full shrink-0"
           onClick={handleSendMessage}
         >
-          {isReplyLoading ? <SpinnerSvg /> : <UpArrowSvg />}
+          {isReplyLoading ? (
+            <LoaderCircle
+              size={20}
+              strokeWidth={1.5}
+              className="stroke-white"
+            />
+          ) : (
+            <ArrowUp size={20} strokeWidth={1.5} className="stroke-white" />
+          )}
         </button>
       </div>
     </div>
@@ -152,7 +172,7 @@ function ChatInput({
           setIsChatOpen(true);
         }}
       >
-        <ChatSvg />
+        <MessageCircleMore size={24} strokeWidth={1.5} color={"white"} />
       </button>
     </div>
   );

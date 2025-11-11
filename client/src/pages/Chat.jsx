@@ -10,7 +10,7 @@ import ChatEditModal from "../components/chat/ChatEditModal.jsx";
 import ChatErrorModal from "../components/chat/ChatErrorModal.jsx";
 import ChatAskModal from "../components/chat/ChatAskModal.jsx";
 import Toast from "../components/Toast.jsx";
-import MenuSvg from "../components/icons/MenuSvg.jsx";
+import { PanelLeftOpen } from "lucide-react";
 import ChatTags from "../components/chat/ChatTags.jsx";
 
 function Chat() {
@@ -85,7 +85,7 @@ function Chat() {
           onClick={() => setIsSideBarOpen(!isSideBarOpen)}
           className="cursor-pointer pt-1"
         >
-          <MenuSvg />
+          <PanelLeftOpen size={24} strokeWidth={1.5} className="stroke-icon" />
         </button>
         <h1 className="text-2xl font-semibold font-lora w-full">
           {recipe?.title}

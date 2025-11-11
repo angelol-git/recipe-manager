@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useNavigate } from "react-router";
-import BookSvg from "../components/icons/BookSvg";
+import { BookMarked } from "lucide-react";
 function Landing() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -42,7 +42,7 @@ function Landing() {
   return (
     <div className="p-10 bg-crust h-screen flex flex-col gap-5 text-primary">
       <h1 className="text-3xl font-lora text-bold flex gap-2 items-center">
-        <BookSvg />
+        <BookMarked size={24} />
         Recipes
       </h1>
       <p className="text-lg font-medium">

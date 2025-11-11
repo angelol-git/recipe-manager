@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import CloseSvg from "../icons/CloseSvg.jsx";
 import ColorPickerPortal from "./ColorPickerPortal.jsx";
-
+import { X } from "lucide-react";
 function HomeTags({
   tags,
   tagsSelected,
@@ -162,7 +161,11 @@ function HomeTags({
                         deleteRecipeTagAll(tag);
                       }}
                     >
-                      <CloseSvg height="12px" width="12px" />
+                      <X
+                        size={12}
+                        strokeWidth={1.5}
+                        className="stroke-icon-muted"
+                      />
                     </button>
                   </div>
                 );
