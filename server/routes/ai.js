@@ -221,8 +221,10 @@ You must reply **ONLY** with raw, valid JSON.
 Formatting Rules:
 - "ingredients" must **always** be an array of strings.
   Example: ["1 cup flour", "2 eggs", "1 tsp salt"]
-- "instructions" must **always** be an array of numbered strings.
-  Example: ["1. Preheat oven...", "2. Mix flour and sugar..."]
+- "instructions" must be an array of short, unnumbered step strings.
+- Each string should describe a single cooking action in order.
+- Do not include step numbers or bullet points — just plain text.
+- Example: ["Preheat oven to 350°F", "Mix flour and sugar in a bowl"]
 - Do not return ingredients or instructions as a single string or block of text.
 - For "servings", "calories", and "total_time", return **integers only**.
   (Example: 12, not "12 servings")

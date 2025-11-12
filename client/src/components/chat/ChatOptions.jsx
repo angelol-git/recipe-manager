@@ -45,7 +45,6 @@ function ChatOptions({
           role="menu"
         >
           <ul className="flex flex-col divide-y divide-secondary/60 text-primary">
-            {/* Uncomment if you want Clone functionality */}
             {/* <li>
               <button
                 onClick={() => setIsOptionsOpen(false)}

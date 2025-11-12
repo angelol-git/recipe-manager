@@ -130,7 +130,8 @@ export function RecipesProvider({ children }) {
     }
   }
 
-  async function updateRecipe(updatedRecipe) {
+  async function updateRecipe(updatedRecipe, currentVersion) {
+    const prevRecipes = recipes;
     setRecipes((prev) => {
       return prev.map((item) => {
         if (item.id === updatedRecipe.id) {
@@ -140,25 +141,48 @@ export function RecipesProvider({ children }) {
         }
       });
     });
-    // try {
-    //   const result = await fetch(`${API_BASE}/recipes/${updatedRecipe.id}`, {
-    //     method: "PUT",
-    //     headers: { "Content-Type": "application/json" },
-    //     credentials: "include",
-    //     body: JSON.stringify(updatedRecipe),
-    //   });
-    //   if (!result.ok) {
-    //     throw new Error("Failed to update recipe");
-    //   }
-    //   // const data = await result.json();
-    //   // console.log(data);
-    // } catch (error) {
-    //   console.error(error);
-    //   setRecipes(prevRecipe);
-    // }
+    try {
+      const updatedVersion = updatedRecipe.versions[currentVersion];
+      const payload = {
+        recipe: {
+          title: updatedRecipe.title,
+          tags: updatedRecipe.tags,
+        },
+
+        version: {
+          id: updatedVersion.id,
+          description: updatedVersion.description,
+          servings: updatedVersion.servings,
+          total_time: updatedVersion.total_time,
+          calories: updatedVersion.calories,
+          instructions: updatedVersion.instructions,
+          ingredients: updatedVersion.ingredients,
+        },
+      };
+
+      console.log(payload);
+
+      const result = await fetch(`${API_BASE}/recipes/${updatedRecipe.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ payload }),
+      });
+
+      if (!result.ok) {
+        const errorText = await result.text();
+        throw new Error(`Server returned ${result.status}: ${errorText}`);
+      }
+      const data = await result.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+      setRecipes(prevRecipes);
+    }
   }
 
   async function addRecipeTag(id, newTag) {
+    console.log(newTag);
     const prevRecipes = recipes;
     const tempId = `temp-${Date.now()}-${Math.random()
       .toString(36)

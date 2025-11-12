@@ -92,6 +92,7 @@ function Home() {
         <HomeTags
           tags={tags}
           tagsSelected={tagsSelected}
+          setTagsSelected={setTagsSelected}
           handleTagClick={handleTagClick}
           editRecipeTagAll={editRecipeTagAll}
           deleteRecipeTagAll={deleteRecipeTagAll}

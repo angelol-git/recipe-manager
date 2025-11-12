@@ -1,8 +1,6 @@
 import express from "express";
 import db from "../db.js";
 import authMiddleware from "../middleware.js";
-import { auth } from "google-auth-library";
-
 const router = express.Router();
 
 router.get("/", authMiddleware, async (req, res) => {
@@ -273,50 +271,84 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
     }
 })
 
-//Currently only supports title
 router.put("/:id", authMiddleware, async (req, res) => {
 
     const { id } = req.params;
-    const recipe = req.body;
+    const { recipe: newRecipe, version } = req.body.payload;
 
     const updateRecipeTransaction = db.transaction((recipe) => {
-        //1. Update recipe title 
+
+        //1. Update recipe 
         const updateRecipe = db.prepare(`
             UPDATE recipes
-            SET title = ?
+            SET title = ? 
             WHERE id = ?
-        `).run(recipe.title, id);
+        `).run(newRecipe.title, id);
 
         if (updateRecipe.changes === 0) {
             return res.status(404).json({ error: "Recipe not found" });
         }
 
-        //2. Update or insert recipe version
-        const addRecipeVersion = db.prepare(`
-            INSERT INTO recipe_versions
-            (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        //2. Update recipe version
+        const updateRecipeVersion = db.prepare(`
+            UPDATE recipe_versions
+            SET servings = ?, 
+                total_time = ?, 
+                calories = ?, 
+                description= ?, 
+                instructions = ?, 
+                ingredients = ?
+            WHERE id = ?
         `).run(
-            id,
-            servings,
-            totalTime,
-            calories,
-            description,
-            instructions,
-            ingredients,
-            sourcePrompt,
-            aiModel,
+            version.servings,
+            version.total_time,
+            version.calories,
+            version.description,
+            JSON.stringify(version.instructions),
+            JSON.stringify(version.ingredients),
+            version.id,
         );
 
-
-
-
+        if (updateRecipeVersion.changes === 0) {
+            return res.status(404).json({ error: "Recipe version not found" });
+        }
         //3. Handle Tags
+        for (const tag of newRecipe.tags) {
+            let tagRow = db.prepare(`
+                SELECT * FROM tags 
+                WHERE user_id = ? AND name = ?
+                `).get(id, tag.name);
+
+            let test = db.prepare(`
+                SELECT * FROM tags 
+                WHERE user_id = ? 
+                `).get(id);
+
+            console.log(test);
+            console.log(tag.name);
+            if (!tagRow) {
+                if (tagRow.color !== tag.color) {
+                    db.prepare(`
+                        UPDATE tags 
+                        SET color = ? 
+                        WHERE id = ? 
+                        `).run(tag.color, tag.id);
+                }
+                if (tagRow.name !== tag.name) {
+                    db.prepare(`
+                        UPDATE tags 
+                        SET name = ? 
+                        WHERE id = ? 
+                        `).run(tag.name, tag.id);
+                }
+
+                tagRow.id = tagRow.id.toString();
+            }
+        }
     })
     try {
-
         updateRecipeTransaction();
-        return res.json({ success: true, updatedId: id });
+        return res.status(200).json({ success: true, updatedId: newRecipe.id });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: `Failed to update recipe: ${error}` });
@@ -337,8 +369,8 @@ router.post("/:id/tag", authMiddleware, async (req, res) => {
 
         if (!newTagRow) {
             const result = db.prepare(`
-               INSERT INTO tags (user_id,name) VALUES (?,?) 
-            `).run(userId, tag.name);
+               INSERT INTO tags (user_id,name,color) VALUES (?,?,?) 
+            `).run(userId, tag.name, tag.color);
             newTagRow = { id: result.lastInsertRowid, name: tag.name, color: tag.color };
         }
         else {

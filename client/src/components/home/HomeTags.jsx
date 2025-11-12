@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 function HomeTags({
   tags,
   tagsSelected,
+  setTagsSelected,
   handleTagClick,
   editRecipeTagAll,
   deleteRecipeTagAll,
@@ -36,6 +37,14 @@ function HomeTags({
     });
   }
 
+  function handleTagDelete(tag) {
+    setTagsSelected((prev) => {
+      return prev.filter((t) => {
+        t.id !== tag.id;
+      });
+    });
+    deleteRecipeTagAll(tag);
+  }
   return (
     <div>
       {!isEditTags ? (
@@ -158,7 +167,7 @@ function HomeTags({
                     </div>
                     <button
                       onClick={() => {
-                        deleteRecipeTagAll(tag);
+                        handleTagDelete(tag);
                       }}
                     >
                       <X

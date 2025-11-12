@@ -22,9 +22,10 @@ function ChatEditModal({
     setDraft(recipe);
   }, [recipe, isEditModalOpen]);
 
-  function handleSave() {
+  function handleSave(event) {
+    event.preventDefault();
     setIsEditModalOpen(false);
-    updateRecipe(draft);
+    updateRecipe(draft, currentVersion);
   }
 
   function editDraftVersion(versionId, field, value) {
@@ -285,6 +286,7 @@ function Tags({
   deleteDraftTag,
   portalRef,
 }) {
+  const tagAnchors = useRef({});
   return (
     <div className="flex justify-between">
       <div className="flex flex-col gap-2 w-full">
@@ -297,7 +299,7 @@ function Tags({
                     className={`inline-flex gap-3 items-center px-2 py-0.5 border border-mantle rounded-full cursor-pointer bg-tag text-primary text-sm`}
                   >
                     <button
-                      ref={(el) => (tag.anchor = el)}
+                      ref={(el) => (tagAnchors.current[tag.id] = el)}
                       className="h-4 w-4"
                       style={{ backgroundColor: tag.color }}
                       type="button"

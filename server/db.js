@@ -66,7 +66,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS tags (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  COLOR TEXT DEFAULT "#FFB86C",
+  color TEXT DEFAULT "#FFB86C",
   UNIQUE(user_id,name)
 )
 `).run();
@@ -76,7 +76,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS recipe_tags (
     tag_id INTEGER NOT NULL,
     PRIMARY KEY(recipe_id, tag_id)
     FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-    FOREIGN KEY(tag_id) REFERENCES tags(id)
+    FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
     )
 `).run();
 

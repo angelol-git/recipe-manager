@@ -28,7 +28,7 @@ function Landing() {
 
       if (result.ok) {
         const data = await result.json();
-        // console.log("Signed in as", data.user);
+        console.log("Signed in as", data.user);
         navigate("/home");
       } else {
         const err = await result.json();
