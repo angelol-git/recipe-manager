@@ -182,7 +182,6 @@ export function RecipesProvider({ children }) {
   }
 
   async function addRecipeTag(id, newTag) {
-    console.log(newTag);
     const prevRecipes = recipes;
     const tempId = `temp-${Date.now()}-${Math.random()
       .toString(36)

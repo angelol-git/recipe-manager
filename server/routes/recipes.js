@@ -274,6 +274,7 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
 router.put("/:id", authMiddleware, async (req, res) => {
 
     const { id } = req.params;
+    const userId = req.user.id;
     const { recipe: newRecipe, version } = req.body.payload;
 
     const updateRecipeTransaction = db.transaction((recipe) => {
@@ -316,17 +317,10 @@ router.put("/:id", authMiddleware, async (req, res) => {
         for (const tag of newRecipe.tags) {
             let tagRow = db.prepare(`
                 SELECT * FROM tags 
-                WHERE user_id = ? AND name = ?
-                `).get(id, tag.name);
+                WHERE user_id = ? AND id = ?
+                `).get(userId, tag.id);
 
-            let test = db.prepare(`
-                SELECT * FROM tags 
-                WHERE user_id = ? 
-                `).get(id);
-
-            console.log(test);
-            console.log(tag.name);
-            if (!tagRow) {
+            if (tagRow) {
                 if (tagRow.color !== tag.color) {
                     db.prepare(`
                         UPDATE tags 
@@ -345,10 +339,21 @@ router.put("/:id", authMiddleware, async (req, res) => {
                 tagRow.id = tagRow.id.toString();
             }
         }
+        const existingTags = db.prepare(`
+            SELECT tag_id FROM recipe_tags 
+            WHERE recipe_id = ?
+        `).all(id);
+
+        const newTagIds = newRecipe.tags.map(t => t.id);
+        const tagsToRemove = existingTags.filter(t => !newTagIds.includes((t.tag_id).toString()));
+        for (const tag of tagsToRemove) {
+            console.log(tag);
+            db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(id, tag.tag_id);
+        }
     })
     try {
         updateRecipeTransaction();
-        return res.status(200).json({ success: true, updatedId: newRecipe.id });
+        return res.status(200).json({ success: true, updatedId: id });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: `Failed to update recipe: ${error}` });
