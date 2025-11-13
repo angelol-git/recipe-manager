@@ -60,8 +60,8 @@ function ChatOptions({
                 onClick={() => setIsOptionsOpen(false)}
                 className="w-full flex justify-between items-center py-3"
               >
-                <Share size={22} strokeWidth={1.5} className="stroke-icon" />
-                <div>Share</div>
+                <Share size={22} strokeWidth={1.25} className="stroke-icon" />
+                <div className="text-sm">Share</div>
               </button>
             </li>
 
@@ -75,10 +75,10 @@ function ChatOptions({
               >
                 <SquarePen
                   size={22}
-                  strokeWidth={1.5}
+                  strokeWidth={1.25}
                   className="stroke-icon"
                 />
-                <div>Edit</div>
+                <div className="text-sm">Edit</div>
               </button>
             </li>
 
@@ -92,10 +92,10 @@ function ChatOptions({
                     handleDeleteRecipeVersion();
                   }
                 }}
-                className="w-full flex justify-between items-center py-3 text-rose"
+                className="w-full flex justify-between items-center py-3 "
               >
-                <Trash2 size={22} strokeWidth={1.5} className="stroke-icon" />
-                <div>Delete</div>
+                <Trash2 size={22} strokeWidth={1.25} className="stroke-icon" />
+                <div className="text-sm">Delete Current</div>
               </button>
             </li>
 
@@ -108,7 +108,9 @@ function ChatOptions({
                 className="w-full flex justify-between items-center py-3 text-rose"
               >
                 <CircleX size={22} strokeWidth={1.5} className="stroke-rose" />
-                <div>Delete All</div>
+                <div className="text-sm font-medium">
+                  Delete All ({recipe.versions.length})
+                </div>
               </button>
             </li>
           </ul>

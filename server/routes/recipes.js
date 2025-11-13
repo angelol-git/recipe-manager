@@ -271,6 +271,7 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
     }
 })
 
+//Currently overrides the whole thing
 router.put("/:id", authMiddleware, async (req, res) => {
 
     const { id } = req.params;
@@ -279,7 +280,6 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
     const updateRecipeTransaction = db.transaction((recipe) => {
 
-        //1. Update recipe 
         const updateRecipe = db.prepare(`
             UPDATE recipes
             SET title = ? 
@@ -290,7 +290,6 @@ router.put("/:id", authMiddleware, async (req, res) => {
             return res.status(404).json({ error: "Recipe not found" });
         }
 
-        //2. Update recipe version
         const updateRecipeVersion = db.prepare(`
             UPDATE recipe_versions
             SET servings = ?, 
@@ -313,7 +312,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
         if (updateRecipeVersion.changes === 0) {
             return res.status(404).json({ error: "Recipe version not found" });
         }
-        //3. Handle Tags
+
         for (const tag of newRecipe.tags) {
             let tagRow = db.prepare(`
                 SELECT * FROM tags 
