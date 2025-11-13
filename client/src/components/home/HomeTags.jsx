@@ -16,6 +16,15 @@ function HomeTags({
   });
   const tagRefs = useRef({});
 
+  const tagCount = tags.reduce((acc, tag) => {
+    if (acc[tag.id]) {
+      acc[tag.id] += 1;
+    } else {
+      acc[tag.id] = 1;
+    }
+    return acc;
+  }, {});
+
   const [draftTags, setDraftTags] = useState([]);
   useEffect(() => {
     if (isEditTags && tags) {
@@ -45,6 +54,7 @@ function HomeTags({
     });
     deleteRecipeTagAll(tag);
   }
+
   return (
     <div>
       {!isEditTags ? (
@@ -63,6 +73,7 @@ function HomeTags({
           <div className="flex gap-2 py-2 flex-wrap">
             {tags.length > 0 ? (
               tags.map((tag) => {
+                const count = tagCount[tag.id] || 0;
                 const isSelected = tagsSelected.some((selectedTag) => {
                   return selectedTag.name === tag.name;
                 });
@@ -73,7 +84,7 @@ function HomeTags({
                     }}
                     className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border border-mantle rounded-full cursor-pointer ${
                       isSelected
-                        ? "bg-tag-selected text-white"
+                        ? "bg-tag-selected text-base"
                         : "bg-tag text-primary"
                     }`}
                     key={tag.name}
@@ -82,7 +93,12 @@ function HomeTags({
                       className={`w-4 h-4 rounded-full`}
                       style={{ backgroundColor: tag.color }}
                     ></div>
-                    <div>{tag.name}</div>
+                    <div>
+                      {tag.name}{" "}
+                      <span className="text-secondary">({count})</span>
+                    </div>
+
+                    {/* <div>{tagCount.find((t) => t.id === tag.id)}</div> */}
                   </button>
                 );
               })

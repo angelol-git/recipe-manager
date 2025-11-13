@@ -20,8 +20,8 @@ function Home() {
     }
   }
   const tags = Array.from(tagMap.values());
-
   // );
+
   const [tagsSelected, setTagsSelected] = useState(() => {
     if (!user?.id) return [];
     //Initialize react state when using react router actions, otherwise it will be empty.
