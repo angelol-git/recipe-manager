@@ -30,6 +30,7 @@ router.get("/", authMiddleware, async (req, res) => {
             FROM recipe_tags rt 
             JOIN tags t ON t.id = rt.tag_id
             WHERE rt.recipe_id IN  (${recipeIds.map(() => '?').join(',')})
+            ORDER BY created_at ASC 
         `).all(...recipeIds);
 
         const recipeArray = [];
@@ -337,6 +338,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
                 tagRow.id = tagRow.id.toString();
             }
         }
+
         const existingTags = db.prepare(`
             SELECT tag_id FROM recipe_tags 
             WHERE recipe_id = ?
@@ -344,9 +346,20 @@ router.put("/:id", authMiddleware, async (req, res) => {
 
         const newTagIds = newRecipe.tags.map(t => t.id);
         const tagsToRemove = existingTags.filter(t => !newTagIds.includes((t.tag_id).toString()));
+        // console.log("current tags:", newTagIds);
+        // console.log("existing tags:", existingTags);
+        // console.log("removing tags:", tagsToRemove);
         for (const tag of tagsToRemove) {
             db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(id, tag.tag_id);
+
+            const usage = db.prepare(`SELECT COUNT (*) as count FROM recipe_tags WHERE tag_id = ?`).get(tag.tag_id);
+
+            if (usage.count === 0) {
+                db.prepare(`DELETE FROM tags WHERE id = ?`).run(tag.tag_id);
+            }
         }
+
+
     })
     try {
         updateRecipeTransaction();

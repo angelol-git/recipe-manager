@@ -142,7 +142,6 @@ function validateAiResponse(response, recipeId, req, res) {
             reply.created_at = insertedRecipe.created_at;
         }
 
-        console.log("adding new version");
         const versionResult = db.prepare(`
             INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

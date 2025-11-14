@@ -108,6 +108,7 @@ function ChatEditModal({
 
   function deleteDraftTag(tagId) {
     setDraft((prev) => {
+      console.log("Here");
       return {
         ...prev,
         tags: prev.tags.filter((prevTag) => {
