@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import db from "../db.js"
 import authMiddleware from "../middleware.js";
-import { v4 as uuidv4 } from "uuid";
+import { v7 as uuidv7 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
@@ -127,7 +127,7 @@ function validateAiResponse(response, recipeId, req, res) {
         let newRecipeId = recipeId;
 
         if (!recipeId) {
-            newRecipeId = uuidv4();
+            newRecipeId = uuidv7();
             db.prepare(`
                 INSERT INTO recipes (id,user_id, title)
                 VALUES (?,?,?)
