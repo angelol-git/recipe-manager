@@ -45,18 +45,18 @@ export function RecipesProvider({ children }) {
         const updated = [...prev];
         updated[index] = {
           ...updated[index],
-          versions: [newVersion, ...updated[index].versions],
+          versions: [...updated[index].versions, newVersion],
         };
         return updated;
       }
       //new recipe
       else {
         return [
+          ...prev,
           {
             ...recipe,
             versions: [newVersion],
           },
-          ...prev,
         ];
       }
     });

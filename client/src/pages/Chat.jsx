@@ -22,18 +22,20 @@ function Chat() {
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [toast, setToast] = useState(null);
 
   const [message, setMessage] = useState("");
   const [chatInputMode, setChatInputMode] = useState("Create");
 
-  //If new/no recipe chat should be open
   useEffect(() => {
-    if (recipes.length > 0 && !recipe) {
-      setIsChatOpen(true);
+    if (recipe) {
+      setIsChatOpen(false);
     }
-  }, [recipe, recipes]);
+    if (recipe?.versions?.length > 0) {
+      setCurrentVersion(recipe.versions.length - 1);
+    }
+  }, [recipe]);
 
   const {
     isReplyLoading,
@@ -43,8 +45,8 @@ function Chat() {
     setAskMessages,
     sendCreateMessage,
     handleDeleteError,
-    deleteRecipeVersion,
-    deleteRecipe,
+    handleDeleteRecipeVersion,
+    handleDeleteRecipe,
   } = useChat(recipe, currentVersion, setCurrentVersion, showToast);
 
   function showToast(message, type = "error") {
@@ -95,8 +97,8 @@ function Chat() {
           recipe={recipe}
           currentVersion={currentVersion}
           setIsEditModalOpen={setIsEditModalOpen}
-          deleteRecipeVersion={deleteRecipeVersion}
-          deleteRecipe={deleteRecipe}
+          handleDeleteRecipeVersion={handleDeleteRecipeVersion}
+          handleDeleteRecipe={handleDeleteRecipe}
         />
       </div>
       <div className="relative flex-1 py-3 overflow-y-auto">

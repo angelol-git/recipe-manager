@@ -195,6 +195,7 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
 
   async function handleDeleteRecipeVersion() {
     if (!recipe.id) return;
+
     deleteRecipeVersion(recipe.id, recipe.versions[currentVersion].id);
 
     if (currentVersion === recipe.versions.length - 1) {

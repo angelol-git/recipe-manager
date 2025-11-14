@@ -5,9 +5,8 @@ function ChatOptions({
   recipe,
   currentVersion,
   setIsEditModalOpen,
-
-  deleteRecipeVersion,
-  deleteRecipe,
+  handleDeleteRecipeVersion,
+  handleDeleteRecipe,
 }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -89,13 +88,9 @@ function ChatOptions({
                 onClick={() => {
                   setIsOptionsOpen(false);
                   if (recipe.versions?.length === 1) {
-                    console.log(recipe.versions[currentVersion]);
-                    deleteRecipeVersion(
-                      recipe.id,
-                      recipe.versions[currentVersion].id
-                    );
+                    handleDeleteRecipe();
                   } else {
-                    deleteRecipe(recipe.id);
+                    handleDeleteRecipeVersion();
                   }
                 }}
                 className="w-full flex justify-between items-center py-3 "
@@ -109,7 +104,7 @@ function ChatOptions({
               <button
                 onClick={() => {
                   setIsOptionsOpen(false);
-                  deleteRecipe(recipe.id);
+                  handleDeleteRecipe();
                 }}
                 className="w-full flex justify-between items-center py-3 text-rose"
               >

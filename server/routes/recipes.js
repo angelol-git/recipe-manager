@@ -6,64 +6,63 @@ const router = express.Router();
 router.get("/", authMiddleware, async (req, res) => {
     const userId = req.user.id;
     try {
-        const rows = db.prepare(`
-            SELECT 
-                r.id AS recipe_id,
-                r.title,
-                r.created_at,
-                rv.id AS version_id,
-                rv.calories,
-                rv.total_time,
-                rv.servings,
-                rv.description,
-                rv.instructions,
-                rv.ingredients,
-                rv.source_prompt,
-                GROUP_CONCAT(DISTINCT t.id || ':' || t.name || ':' || t.color ORDER BY t.name) AS tags
-            FROM recipes r
-            LEFT JOIN recipe_versions rv ON rv.recipe_id = r.id 
-            LEFT JOIN recipe_tags rt ON rt.recipe_id = r.id
-            LEFT JOIN tags t ON t.id = rt.tag_id
-            WHERE r.user_id = ?
-            GROUP BY r.id
-            ORDER BY r.created_at,rv.created_at DESC
+        const recipes = db.prepare(`
+            SELECT id,title, created_at 
+            FROM recipes 
+            WHERE user_id = ?
+            ORDER BY created_at DESC 
         `).all(userId);
 
-        const recipes = {};
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
+        const recipeIds = recipes.map(r => r.id);
+        if (recipeIds.length === 0) {
+            return [];
+        }
 
-            let tags = [];
-            if (row.tags) {
-                tags = row.tags.split(",").map((tag) => {
-                    const [id, name, color] = tag.split(':');
-                    return { id, name, color };
-                })
-            }
+        const versions = db.prepare(`
+            SELECT *
+            FROM recipe_versions
+            WHERE recipe_id IN (${recipeIds.map(() => '?').join(',')})
+            ORDER BY created_at ASC 
+        `).all(...recipeIds);
 
-            if (!recipes[row.recipe_id]) {
-                recipes[row.recipe_id] = {
-                    id: row.recipe_id,
-                    title: row.title,
-                    created_at: row.created_at,
-                    tags: tags,
-                    versions: [],
+        const tags = db.prepare(`
+            SELECT rt.recipe_id, t.id, t.name, t.color
+            FROM recipe_tags rt 
+            JOIN tags t ON t.id = rt.tag_id
+            WHERE rt.recipe_id IN  (${recipeIds.map(() => '?').join(',')})
+        `).all(...recipeIds);
+
+        const recipeArray = [];
+        for (let i = 0; i < recipes.length; i++) {
+            let versionsArray = [];
+            for (let j = 0; j < versions.length; j++) {
+                if (recipes[i].id === versions[j].recipe_id) {
+                    const versionsObject = {
+                        id: versions[j].id,
+                        description: versions[j].description,
+                        instructions: safeParse(versions[j].instructions),
+                        ingredients: safeParse(versions[j].ingredients),
+                        source_prompt: versions[j].source_prompt,
+                        calories: versions[j].calories,
+                        servings: versions[j].servings,
+                        total_time: versions[j].total_time
+                    }
+                    versionsArray.push(versionsObject);
                 }
             }
 
-            recipes[row.recipe_id].versions.push({
-                id: row.version_id,
-                description: row.description,
-                instructions: safeParse(row.instructions),
-                ingredients: safeParse(row.ingredients),
-                source_prompt: row.source_prompt,
-                calories: row.calories,
-                servings: row.servings,
-                total_time: row.total_time
-            })
+            let tagsArray = [];
+            for (let z = 0; z < tags.length; z++) {
+                if (recipes[i].id === tags[z].recipe_id) {
+                    tagsArray.push(tags[z]);
+                }
+            }
+            const recipeObject = { ...recipes[i], versions: versionsArray, tags: tagsArray };
+
+            recipeArray.push(recipeObject);
         }
 
-        return res.json(Object.values(recipes));
+        return res.json(recipeArray);
     }
     catch (error) {
         console.error("DB error:", error);
@@ -346,7 +345,6 @@ router.put("/:id", authMiddleware, async (req, res) => {
         const newTagIds = newRecipe.tags.map(t => t.id);
         const tagsToRemove = existingTags.filter(t => !newTagIds.includes((t.tag_id).toString()));
         for (const tag of tagsToRemove) {
-            console.log(tag);
             db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(id, tag.tag_id);
         }
     })

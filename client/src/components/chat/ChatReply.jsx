@@ -95,7 +95,7 @@ function ChatReply({
           </ol>
         </section>
       )}
-      {source_prompt && !isReplyLoading && (
+      {source_prompt && (
         <div className="flex gap-4 justify-between text-secondary text-sm">
           <div className="flex flex-col items-start gap-2 py-2">
             <button

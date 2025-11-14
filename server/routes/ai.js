@@ -142,6 +142,7 @@ function validateAiResponse(response, recipeId, req, res) {
             reply.created_at = insertedRecipe.created_at;
         }
 
+        console.log("adding new version");
         const versionResult = db.prepare(`
             INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -165,7 +166,6 @@ function validateAiResponse(response, recipeId, req, res) {
 
         reply.id = newRecipeId;
         reply.versionId = versionResult.lastInsertRowid;
-
     });
 
     try {
@@ -192,9 +192,8 @@ function saveAiError(userId, recipeId, error) {
         created_at: inserted.created_at,
         ...parsed,
     };
-
-
 }
+
 function createPrompt(currentVersion, message) {
     return (`
 You are a recipe extraction and transformation assistant.
