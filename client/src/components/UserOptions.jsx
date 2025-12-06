@@ -40,9 +40,9 @@ function UserOptions({ user }) {
   }
 
   return (
-    <div className="" ref={menuRef}>
+    <div ref={menuRef}>
       <button
-        className={`relative rounded-full border-5 ${
+        className={`relative rounded-full border-5  cursor-pointer ${
           isUserOptionsOpen ? " border-gray-400/30" : "border-base"
         }`}
         onClick={() => {

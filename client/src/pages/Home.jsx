@@ -84,9 +84,7 @@ function Home() {
     <div className="text-primary bg-base p-5 lg:p-10 flex flex-col min-h-screen gap-5">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-medium font-lora">Recipes</h1>
-        <div>
-          <UserOptions user={user} />
-        </div>
+        <UserOptions user={user} />
       </div>
       <div>
         <HomeTags
@@ -104,7 +102,7 @@ function Home() {
           <div className="font-semibold">Items({recipes?.length ?? "..."})</div>
           <Link
             to="/chat"
-            className="items-center text-sm cursor-pointer rounded-2xl border-black/30 border-1 px-2 py-1"
+            className="items-center bg-base hover:bg-base-hover text-sm cursor-pointer rounded-2xl border-black/30 border-1 px-2 py-1"
           >
             + Add
           </Link>
@@ -115,10 +113,10 @@ function Home() {
               <Link
                 to={`/chat/${item.id}`}
                 key={item.id}
-                className="group relative  w-[250px] h-[250px] cursor-pointer"
+                className="group relative w-[240px] h-[250px] lg:h-[275px] cursor-pointer"
               >
-                <div className="z-200 relative w-full h-full">
-                  <div className="absolute flex flex-col justify-between inset-0 border bg-mantle rounded-xl p-4 border-black/30 transform transition-transform duration-200 origin-left group-hover:-rotate-y-15 z-20">
+                <div className="relative w-full h-full">
+                  <div className="absolute flex flex-col justify-between inset-0 border bg-mantle rounded-l-xl rounded-r-2xl p-4 border-black/30 transform transition-transform duration-200 origin-left group-hover:-rotate-y-15 z-20">
                     <h3 className="font-medium font-lora text-xl">
                       {item.title}
                     </h3>
@@ -127,7 +125,7 @@ function Home() {
                     </p>
                   </div>
 
-                  <div className="absolute inset-0 bg-primary/20 border border-black/30 rounded-xl p-4 z-10"></div>
+                  <div className="absolute inset-0 bg-primary/40 rounded-r-2xl rounded-l-xl p-4 z-10"></div>
                 </div>
               </Link>
             );

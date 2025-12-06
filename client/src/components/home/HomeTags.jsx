@@ -65,7 +65,7 @@ function HomeTags({
               onClick={() => {
                 setIsEditTags(true);
               }}
-              className="text-sm text-secondary underline rounded-lg py-1 px-2"
+              className="text-sm text-secondary cursor-pointer underline rounded-lg py-1 px-2"
             >
               Edit
             </button>
@@ -82,7 +82,7 @@ function HomeTags({
                     onClick={() => {
                       handleTagClick(tag);
                     }}
-                    className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border border-mantle rounded-full cursor-pointer ${
+                    className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border hover:bg-tag-hover border-mantle rounded-full cursor-pointer ${
                       isSelected
                         ? "bg-tag-selected text-base"
                         : "bg-tag text-primary"
@@ -119,7 +119,7 @@ function HomeTags({
                   setIsEditTags(false);
                   setEditTagId({ id: null, field: null });
                 }}
-                className="text-sm text-white bg-accent rounded-lg py-1 px-2"
+                className="text-sm cursor-pointer text-white bg-accent rounded-lg py-1 px-2"
               >
                 Done
               </button>
@@ -131,7 +131,7 @@ function HomeTags({
                 return (
                   <div key={tag.id} className="gap-1 flex items-center w-fit">
                     <div
-                      className={`inline-flex w-fit gap-2 items-center px-2 py-0.5 border border-mantle rounded-full cursor-pointer bg-tag text-primary text-sm`}
+                      className={`inline-flex w-fit gap-2 items-center px-2 py-0.5 border border-mantle  rounded-full cursor-pointer bg-tag text-primary text-sm`}
                     >
                       <button
                         ref={(el) => (tagRefs.current[tag.id] = el)}
@@ -185,6 +185,7 @@ function HomeTags({
                       onClick={() => {
                         handleTagDelete(tag);
                       }}
+                      className="cursor-pointer"
                     >
                       <X
                         size={12}

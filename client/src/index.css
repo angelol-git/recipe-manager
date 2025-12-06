@@ -34,8 +34,11 @@ body,
   --color-crust: #EAE2DC;
   --color-modal: #E8E3DD;
 
+  --color-base-hover: #F1ECE5;
+
   --color-tag: #EDE6DE;
   --color-tag-selected: #C6B9AD;
+  --color-tag-hover: #E3D9CF;
 
   /* Text */
   --color-icon: #5A4634;
