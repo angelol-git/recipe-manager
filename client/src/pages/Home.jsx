@@ -81,7 +81,7 @@ function Home() {
   }
 
   return (
-    <div className="text-primary bg-base p-5 lg:p-15 flex flex-col min-h-screen gap-5">
+    <div className="text-primary bg-base p-5 lg:p-10 flex flex-col min-h-screen gap-5">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-medium font-lora">Recipes</h1>
         <div>
@@ -104,7 +104,7 @@ function Home() {
           <div className="font-semibold">Items({recipes?.length ?? "..."})</div>
           <Link
             to="/chat"
-            className="items-center cursor-pointer rounded-2xl border-black/30 border-1 px-2 py-1"
+            className="items-center text-sm cursor-pointer rounded-2xl border-black/30 border-1 px-2 py-1"
           >
             + Add
           </Link>
@@ -115,19 +115,20 @@ function Home() {
               <Link
                 to={`/chat/${item.id}`}
                 key={item.id}
-                className="justify-between border-primary/30 border-1 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-sm p-3 flex flex-col gap-3 md:max-w-[250px] h-[250px] cursor-pointer"
+                className="group relative  w-[250px] h-[250px] cursor-pointer"
               >
-                <div>
-                  <h3 className="font-medium font-lora text-xl">
-                    {item.title}
-                  </h3>
-                  {/* <p className="text-text-secondary">
-                    {formatDescription(item.versions[0].description)}
-                  </p> */}
+                <div className="z-200 relative w-full h-full">
+                  <div className="absolute flex flex-col justify-between inset-0 border bg-mantle rounded-xl p-4 border-black/30 transform transition-transform duration-200 origin-left group-hover:-rotate-y-15 z-20">
+                    <h3 className="font-medium font-lora text-xl">
+                      {item.title}
+                    </h3>
+                    <p className="text-secondary mt-auto">
+                      {formatDate(item.created_at)}
+                    </p>
+                  </div>
+
+                  <div className="absolute inset-0 bg-primary/20 border border-black/30 rounded-xl p-4 z-10"></div>
                 </div>
-                <p className="text-secondary/60">
-                  {formatDate(item.created_at)}
-                </p>
               </Link>
             );
           })}
