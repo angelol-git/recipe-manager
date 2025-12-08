@@ -30,16 +30,22 @@ function ChatReply({
   }, [isPromptModalOpen]);
 
   if (!versions) return null;
+
   return (
     <div
       role="log"
       aria-live="polite"
-      className="flex flex-col gap-4 py-4 text-primary"
+      // CHANGE 1: Switched from flex-col to columns-1 (default) and lg:columns-2.
+      // 'gap-8' adds space between the two columns.
+      // 'block' is used instead of flex to allow column flow.
+      className="block columns-1 lg:columns-2  py-2 text-primary w-full"
     >
+      {/* SECTION 1: METADATA */}
+      {/* 'break-inside-avoid' ensures this block stays together and doesn't split across columns */}
       <div
         role="group"
         aria-label="Recipe details"
-        className="flex gap-5 text-secondary"
+        className="flex gap-5 text-secondary break-inside-avoid mb-4"
       >
         <div className="flex gap-1 items-center">
           <Flame size={"20"} strokeWidth={1.5} className="stroke-secondary" />
@@ -61,9 +67,18 @@ function ChatReply({
           servings
         </div>
       </div>
-      <p>{description}</p>
+
+      {/* SECTION 2: DESCRIPTION */}
+      <p className="break-inside-avoid mb-4">{description}</p>
+
+      {/* SECTION 3: INGREDIENTS */}
+      {/* Removed the wrapper div that held Ingredients/Instructions together.
+          They are now direct children of the column container so they can flow independently. */}
       {ingredients && (
-        <section aria-labelledby="ingredients-heading">
+        <section
+          aria-labelledby="ingredients-heading"
+          className="w-full break-inside-avoid mb-4"
+        >
           <h3
             id="ingredients-heading"
             className="font-medium font-lora text-lg"
@@ -77,8 +92,13 @@ function ChatReply({
           </ul>
         </section>
       )}
+
+      {/* SECTION 4: INSTRUCTIONS */}
       {instructions && (
-        <section aria-labelledby="instructions-heading">
+        <section
+          aria-labelledby="instructions-heading"
+          className="w-full  mb-4"
+        >
           <h3
             id="instructions-heading"
             className="font-lora font-medium text-lg"
@@ -95,8 +115,10 @@ function ChatReply({
           </ol>
         </section>
       )}
+
+      {/* SECTION 5: PROMPT / FOOTER */}
       {source_prompt && (
-        <div className="flex gap-4 justify-between text-secondary text-sm">
+        <div className="flex gap-4 justify-between text-secondary text-sm break-inside-avoid mt-4">
           <div className="flex flex-col items-start gap-2 py-2">
             <button
               aria-expanded={isPromptModalOpen}
