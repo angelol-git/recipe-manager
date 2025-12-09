@@ -22,7 +22,23 @@ function ChatReply({
   }, [isPromptModalOpen]);
 
   if (!current) {
-    return <div className="flex flex-1 flex-col py-2">No recipe added.</div>;
+    return (
+      <div className="flex flex-1 flex-col gap-4 py-2 items-center justify-center pb-20 text-center">
+        <h2 className="text-primary text-2xl font-medium font-lora pb-5">
+          What recipe can I help you with?
+        </h2>
+        <div className="text-secondary">
+          Paste a link to any recipe, and I’ll extract the ingredients and
+          steps.
+        </div>
+        <div className="text-secondary">
+          Ask me to improve a recipe — healthier, quicker, or more flavorful.
+        </div>
+        <div className="text-secondary">
+          Ask to double, halve, or scale the recipe for any number of servings.
+        </div>
+      </div>
+    );
   }
 
   const {

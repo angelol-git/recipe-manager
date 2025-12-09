@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 function ChatInput({
+  recipe,
   isChatOpen,
   setIsChatOpen,
   message,
@@ -75,7 +76,9 @@ function ChatInput({
       onClick={() => {
         setIsExpanded(true);
       }}
-      className="absolute bottom-0 right-0 lg:flex rounded-2xl lg:justify-end w-full  lg:py-4"
+      className={`absolute bottom-0 right-0 lg:flex rounded-2xl w-full  lg:py-4 ${
+        !recipe ? "lg:justify-center" : "lg:justify-end"
+      }`}
     >
       <div className="bg-base border-crust border-8 relative p-2 lg:w-1/2 rounded-2xl">
         <textarea

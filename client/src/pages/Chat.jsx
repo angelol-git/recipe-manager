@@ -70,7 +70,7 @@ function Chat() {
   }
 
   return (
-    <div className="bg-base relative flex max-h-screen h-screen flex-col lg:flex-row  text-primary lg:p-0  w-full overflow-y-auto">
+    <div className="bg-base relative flex max-h-screen h-screen text-primary lg:p-0  w-full overflow-y-auto">
       <ChatSideBar
         recipes={recipes}
         currentRecipe={recipe}
@@ -134,6 +134,7 @@ function Chat() {
               />
             )}
             <ChatInput
+              recipe={recipe}
               isChatOpen={isChatOpen}
               setIsChatOpen={setIsChatOpen}
               message={message}
