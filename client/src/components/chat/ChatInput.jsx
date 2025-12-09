@@ -1,8 +1,9 @@
 import { useRef, useEffect, useState } from "react";
-import { ArrowUp, LoaderCircle } from "lucide-react";
 import {
+  ArrowUp,
   ArrowLeft,
   ArrowRight,
+  LoaderCircle,
   History,
   MessageCircleMore,
   Minimize2,
@@ -74,9 +75,9 @@ function ChatInput({
       onClick={() => {
         setIsExpanded(true);
       }}
-      className="absolute bottom-0 w-full flex-col p-4 left-0"
+      className="absolute bottom-0 right-0 lg:flex rounded-2xl lg:justify-end w-full  lg:py-4"
     >
-      <div className="bg-mantle relative p-2 rounded-2xl">
+      <div className="bg-base border-crust border-8 relative p-2 lg:w-1/2 rounded-2xl">
         <textarea
           rows={1}
           ref={textAreaRef}
@@ -94,7 +95,7 @@ function ChatInput({
         />
         <button
           onClick={() => setIsChatOpen(false)}
-          className="absolute top-1 right-1 p-1 rounded-full hover:bg-overlay0"
+          className="cursor-pointer absolute top-1 right-1 p-1 rounded-full hover:bg-overlay0"
           aria-label="Minimize chat"
         >
           <Minimize2
@@ -173,9 +174,9 @@ function ChatInput({
       </div>
     </div>
   ) : (
-    <div className="absolute bottom-0 right-0 flex p-6">
+    <div className="absolute bottom-0 right-0 flex p-4 lg:py-8 px-4">
       <button
-        className="bg-accent rounded-full p-2"
+        className="bg-accent rounded-full flex items-center justify-center w-9 h-9  cursor-pointer"
         onClick={() => {
           setIsChatOpen(true);
         }}
