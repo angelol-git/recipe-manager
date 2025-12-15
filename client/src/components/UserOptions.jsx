@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { CircleUserRound } from "lucide-react";
 
-function UserOptions({ user }) {
+function UserOptions({ user, logout }) {
   const [isUserOptionsOpen, setIsUserOptionsOpen] = useState(false);
   const navigate = useNavigate();
   const menuRef = useRef(null);
@@ -22,52 +22,44 @@ function UserOptions({ user }) {
     };
   }, [isUserOptionsOpen]);
 
-  async function handleLogout() {
-    try {
-      const result = await fetch("http://localhost:8080/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+  if (user) {
+    return (
+      <div ref={menuRef}>
+        <button
+          className={`relative rounded-full border-5  cursor-pointer ${
+            isUserOptionsOpen ? " border-gray-400/30" : "border-base"
+          }`}
+          onClick={() => {
+            setIsUserOptionsOpen((prev) => !prev);
+          }}
+        >
+          <CircleUserRound
+            size={28}
+            strokeWidth={1.5}
+            className="stroke-icon"
+          />
+        </button>
 
-      if (!result.ok) {
-        console.error(`Failed to log out: ${result.error}`);
-      }
-      console.log("Logging out");
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-    }
-  }
+        {isUserOptionsOpen && (
+          <div className="absolute right-5 z-50 bg-crust  p-4 rounded-lg shadow-lg flex flex-col gap-3">
+            <div className="flex gap-5 justify-between items-center">
+              <p>{user.email}</p>
+            </div>
 
-  return (
-    <div ref={menuRef}>
-      <button
-        className={`relative rounded-full border-5  cursor-pointer ${
-          isUserOptionsOpen ? " border-gray-400/30" : "border-base"
-        }`}
-        onClick={() => {
-          setIsUserOptionsOpen((prev) => !prev);
-        }}
-      >
-        <CircleUserRound size={28} strokeWidth={1.5} className="stroke-icon" />
-      </button>
-
-      {isUserOptionsOpen && (
-        <div className="absolute right-5 z-50 bg-crust  p-4 rounded-lg shadow-lg flex flex-col gap-3">
-          <div className="flex gap-5 justify-between items-center">
-            <p>{user?.email}</p>
+            <button
+              onClick={() => {
+                logout.mutate();
+                navigate("/");
+              }}
+              className="rounded-md bg-accent text-white p-2"
+            >
+              Logout
+            </button>
           </div>
-
-          <button
-            onClick={handleLogout}
-            className="rounded-md bg-accent text-white p-2"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  }
 }
 
 export default UserOptions;

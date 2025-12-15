@@ -10,7 +10,9 @@ const router = express.Router();
 const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
 router.post("/create", authMiddleware, async (req, res) => {
-    const { message, currentRecipeVersion, recipeId } = req.body;
+    const { message, currentRecipeVersion } = req.body;
+    console.log(currentRecipeVersion);
+    const recipeId = currentRecipeVersion.id;
     try {
         console.log("Creating a recipe...");
         db.prepare(`

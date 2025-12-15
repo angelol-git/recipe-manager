@@ -61,13 +61,13 @@ function ChatTags({ recipeId }) {
               setNewTag({ id: "", name: "", color: "#FFB86C" });
               setIsAddingTag(false);
             }}
-            className="rounded-full border border-gray-300 px-2 flex items-center justify-center"
+            className="rounded-full border border-gray-300 px-2 flex items-center justify-center cursor-pointer"
           >
             <X size={14} strokeWidth={1.5} className="stroke-icon-muted" />
           </button>
           <button
             onClick={handleAddTag}
-            className="rounded-full border border-gray-300 px-2 flex items-center justify-center"
+            className="rounded-full border border-gray-300 px-2 flex items-center justify-center cursor-pointer"
           >
             <Check
               size={"14"}

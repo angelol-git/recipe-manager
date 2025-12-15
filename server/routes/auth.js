@@ -53,7 +53,7 @@ router.get("/check", authMiddleware, (req, res) => {
 })
 
 router.get("/me", authMiddleware, (req, res) => {
-    res.json({ user: req.user });
+    res.json(req.user);
 })
 
 function createSession(userId, res) {

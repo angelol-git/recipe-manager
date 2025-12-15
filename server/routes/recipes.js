@@ -62,7 +62,6 @@ router.get("/", authMiddleware, async (req, res) => {
 
             recipeArray.push(recipeObject);
         }
-
         return res.json(recipeArray);
     }
     catch (error) {
@@ -275,11 +274,11 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
 router.put("/:id", authMiddleware, async (req, res) => {
 
     const { id } = req.params;
-    const userId = req.user.id;
-    const { recipe: newRecipe, version } = req.body.payload;
-
-    const updateRecipeTransaction = db.transaction((recipe) => {
-
+    // const userId = req.user.id;
+    const newRecipe = req.body.updatedRecipe;
+    const updatedVersionId = newRecipe.updatedVersionIndex;
+    const updatedVersion = newRecipe.versions.find((version) => version.id === updatedVersionId);
+    const updateRecipeTransaction = db.transaction(() => {
         const updateRecipe = db.prepare(`
             UPDATE recipes
             SET title = ? 
@@ -300,64 +299,64 @@ router.put("/:id", authMiddleware, async (req, res) => {
                 ingredients = ?
             WHERE id = ?
         `).run(
-            version.servings,
-            version.total_time,
-            version.calories,
-            version.description,
-            JSON.stringify(version.instructions),
-            JSON.stringify(version.ingredients),
-            version.id,
+            updatedVersion.servings,
+            updatedVersion.total_time,
+            updatedVersion.calories,
+            updatedVersion.description,
+            JSON.stringify(updatedVersion.instructions),
+            JSON.stringify(updatedVersion.ingredients),
+            updatedVersion.id,
         );
 
         if (updateRecipeVersion.changes === 0) {
             return res.status(404).json({ error: "Recipe version not found" });
         }
 
-        for (const tag of newRecipe.tags) {
-            let tagRow = db.prepare(`
-                SELECT * FROM tags 
-                WHERE user_id = ? AND id = ?
-                `).get(userId, tag.id);
+        // for (const tag of newRecipe.tags) {
+        //     let tagRow = db.prepare(`
+        //         SELECT * FROM tags 
+        //         WHERE user_id = ? AND id = ?
+        //         `).get(userId, tag.id);
 
-            if (tagRow) {
-                if (tagRow.color !== tag.color) {
-                    db.prepare(`
-                        UPDATE tags 
-                        SET color = ? 
-                        WHERE id = ? 
-                        `).run(tag.color, tag.id);
-                }
-                if (tagRow.name !== tag.name) {
-                    db.prepare(`
-                        UPDATE tags 
-                        SET name = ? 
-                        WHERE id = ? 
-                        `).run(tag.name, tag.id);
-                }
+        //     if (tagRow) {
+        //         if (tagRow.color !== tag.color) {
+        //             db.prepare(`
+        //                 UPDATE tags 
+        //                 SET color = ? 
+        //                 WHERE id = ? 
+        //                 `).run(tag.color, tag.id);
+        //         }
+        //         if (tagRow.name !== tag.name) {
+        //             db.prepare(`
+        //                 UPDATE tags 
+        //                 SET name = ? 
+        //                 WHERE id = ? 
+        //                 `).run(tag.name, tag.id);
+        //         }
 
-                tagRow.id = tagRow.id.toString();
-            }
-        }
+        //         tagRow.id = tagRow.id.toString();
+        //     }
+        // }
 
-        const existingTags = db.prepare(`
-            SELECT tag_id FROM recipe_tags 
-            WHERE recipe_id = ?
-        `).all(id);
+        // const existingTags = db.prepare(`
+        //     SELECT tag_id FROM recipe_tags 
+        //     WHERE recipe_id = ?
+        // `).all(id);
 
-        const newTagIds = newRecipe.tags.map(t => t.id);
-        const tagsToRemove = existingTags.filter(t => !newTagIds.includes((t.tag_id).toString()));
-        // console.log("current tags:", newTagIds);
-        // console.log("existing tags:", existingTags);
-        // console.log("removing tags:", tagsToRemove);
-        for (const tag of tagsToRemove) {
-            db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(id, tag.tag_id);
+        // const newTagIds = newRecipe.tags.map(t => t.id);
+        // const tagsToRemove = existingTags.filter(t => !newTagIds.includes((t.tag_id).toString()));
+        // // console.log("current tags:", newTagIds);
+        // // console.log("existing tags:", existingTags);
+        // // console.log("removing tags:", tagsToRemove);
+        // for (const tag of tagsToRemove) {
+        //     db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(id, tag.tag_id);
 
-            const usage = db.prepare(`SELECT COUNT (*) as count FROM recipe_tags WHERE tag_id = ?`).get(tag.tag_id);
+        //     const usage = db.prepare(`SELECT COUNT (*) as count FROM recipe_tags WHERE tag_id = ?`).get(tag.tag_id);
 
-            if (usage.count === 0) {
-                db.prepare(`DELETE FROM tags WHERE id = ?`).run(tag.tag_id);
-            }
-        }
+        //     if (usage.count === 0) {
+        //         db.prepare(`DELETE FROM tags WHERE id = ?`).run(tag.tag_id);
+        //     }
+        // }
 
 
     })

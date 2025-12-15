@@ -4,38 +4,8 @@ const RecipesContext = createContext();
 const API_BASE = "http://localhost:8080/api";
 
 export function RecipesProvider({ children }) {
-  const [user, setUser] = useState({});
   const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(true);
-    async function getData() {
-      try {
-        console.log("Fetching data");
-        const result = await fetch(`${API_BASE}/auth/me`, {
-          credentials: "include",
-        });
-
-        const data = await result.json();
-        setUser(data.user);
-
-        const recipesRes = await fetch(`${API_BASE}/recipes/`, {
-          credentials: "include",
-        });
-
-        const recipesData = await recipesRes.json();
-        // console.log(recipesData);
-        setRecipes(recipesData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    getData();
-  }, []);
 
   function addRecipeVersion(recipe, newVersion) {
     setRecipes((prev) => {
@@ -62,124 +32,122 @@ export function RecipesProvider({ children }) {
     });
   }
 
-  async function deleteRecipeVersion(recipeId, recipeVersionId) {
-    const prevRecipe = recipes;
-    const index = recipes.findIndex((r) => r.id === recipeId);
+  // async function deleteRecipeVersion(recipeId, recipeVersionId) {
+  //   const prevRecipe = recipes;
+  //   const index = recipes.findIndex((r) => r.id === recipeId);
 
-    if (index === -1) return;
+  //   if (index === -1) return;
 
-    const updatedVersions = recipes[index].versions.filter((item) => {
-      return item.id !== recipeVersionId;
-    });
+  //   const updatedVersions = recipes[index].versions.filter((item) => {
+  //     return item.id !== recipeVersionId;
+  //   });
 
-    setRecipes((prev) => {
-      const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        versions: updatedVersions,
-      };
-      return updated;
-    });
+  //   setRecipes((prev) => {
+  //     const updated = [...prev];
+  //     updated[index] = {
+  //       ...updated[index],
+  //       versions: updatedVersions,
+  //     };
+  //     return updated;
+  //   });
 
-    try {
-      const result = await fetch(
-        `${API_BASE}/recipes/version/${recipeVersionId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-      if (!result.ok) {
-        const errorText = await result.text();
-        throw new Error(`Server returned ${result.status}: ${errorText}`);
-      }
-    } catch (error) {
-      console.log(error);
-      setRecipes(prevRecipe);
-    }
-  }
+  //   try {
+  //     const result = await fetch(
+  //       `${API_BASE}/recipes/version/${recipeVersionId}`,
+  //       {
+  //         method: "DELETE",
+  //         credentials: "include",
+  //       }
+  //     );
+  //     if (!result.ok) {
+  //       const errorText = await result.text();
+  //       throw new Error(`Server returned ${result.status}: ${errorText}`);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setRecipes(prevRecipe);
+  //   }
+  // }
 
-  async function deleteRecipe(recipeId) {
-    const prevRecipes = recipes;
-    // const prevTags = tags;
-    const index = recipes.findIndex((r) => r.id === recipeId);
+  // async function deleteRecipe(recipeId) {
+  //   const prevRecipes = recipes;
+  //   // const prevTags = tags;
+  //   const index = recipes.findIndex((r) => r.id === recipeId);
 
-    if (index === -1) return;
-    setRecipes((prev) => {
-      return prev.filter((item) => {
-        if (item.id !== recipeId) {
-          return item;
-        }
-      });
-    });
+  //   if (index === -1) return;
+  //   setRecipes((prev) => {
+  //     return prev.filter((item) => {
+  //       if (item.id !== recipeId) {
+  //         return item;
+  //       }
+  //     });
+  //   });
 
-    try {
-      const result = await fetch(`${API_BASE}/recipes/${recipeId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+  //   try {
+  //     const result = await fetch(`${API_BASE}/recipes/${recipeId}`, {
+  //       method: "DELETE",
+  //       credentials: "include",
+  //     });
 
-      if (!result.ok) {
-        const errorText = await result.text();
-        throw new Error(`Server returned ${result.status}: ${errorText}`);
-      }
-      return result;
-    } catch (error) {
-      setRecipes(prevRecipes);
-      console.log(error);
-    }
-  }
+  //     if (!result.ok) {
+  //       const errorText = await result.text();
+  //       throw new Error(`Server returned ${result.status}: ${errorText}`);
+  //     }
+  //     return result;
+  //   } catch (error) {
+  //     setRecipes(prevRecipes);
+  //     console.log(error);
+  //   }
+  // }
 
-  async function updateRecipe(updatedRecipe, currentVersion) {
-    const prevRecipes = recipes;
-    setRecipes((prev) => {
-      return prev.map((item) => {
-        if (item.id === updatedRecipe.id) {
-          return updatedRecipe;
-        } else {
-          return item;
-        }
-      });
-    });
-    try {
-      const updatedVersion = updatedRecipe.versions[currentVersion];
-      const payload = {
-        recipe: {
-          title: updatedRecipe.title,
-          tags: updatedRecipe.tags,
-        },
+  // async function updateRecipe(updatedRecipe, currentVersion) {
+  //   const prevRecipes = recipes;
+  //   setRecipes((prev) => {
+  //     return prev.map((item) => {
+  //       if (item.id === updatedRecipe.id) {
+  //         return updatedRecipe;
+  //       } else {
+  //         return item;
+  //       }
+  //     });
+  //   });
+  //   try {
+  //     const updatedVersion = updatedRecipe.versions[currentVersion];
+  //     const payload = {
+  //       recipe: {
+  //         title: updatedRecipe.title,
+  //         tags: updatedRecipe.tags,
+  //       },
 
-        version: {
-          id: updatedVersion.id,
-          description: updatedVersion.description,
-          servings: updatedVersion.servings,
-          total_time: updatedVersion.total_time,
-          calories: updatedVersion.calories,
-          instructions: updatedVersion.instructions,
-          ingredients: updatedVersion.ingredients,
-        },
-      };
+  //       version: {
+  //         id: updatedVersion.id,
+  //         description: updatedVersion.description,
+  //         servings: updatedVersion.servings,
+  //         total_time: updatedVersion.total_time,
+  //         calories: updatedVersion.calories,
+  //         instructions: updatedVersion.instructions,
+  //         ingredients: updatedVersion.ingredients,
+  //       },
+  //     };
 
-      console.log(payload);
+  //     const result = await fetch(`${API_BASE}/recipes/${updatedRecipe.id}`, {
+  //       method: "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //       credentials: "include",
+  //       body: JSON.stringify({ payload }),
+  //     });
 
-      const result = await fetch(`${API_BASE}/recipes/${updatedRecipe.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ payload }),
-      });
-
-      if (!result.ok) {
-        const errorText = await result.text();
-        throw new Error(`Server returned ${result.status}: ${errorText}`);
-      }
-      const data = await result.json();
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-      setRecipes(prevRecipes);
-    }
-  }
+  //     if (!result.ok) {
+  //       const errorText = await result.text();
+  //       throw new Error(`Server returned ${result.status}: ${errorText}`);
+  //     }
+  //     const data = await result.json();
+  //     console.log(data);
+  //   } catch (error) {
+  //     console.error(error);
+  //     setRecipes(prevRecipes);
+  //   }
+  // }
 
   async function addRecipeTag(id, newTag) {
     const prevRecipes = recipes;
@@ -379,7 +347,6 @@ export function RecipesProvider({ children }) {
   return (
     <RecipesContext.Provider
       value={{
-        user,
         recipes,
         isLoading,
         addRecipeVersion,

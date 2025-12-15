@@ -21,26 +21,6 @@ function ChatReply({
     }
   }, [isPromptModalOpen]);
 
-  if (!current) {
-    return (
-      <div className="flex flex-col gap-4 h-full py-2 items-center justify-center pb-50 text-center">
-        <h2 className="text-primary text-2xl font-medium font-lora pb-5">
-          What recipe can I help you with?
-        </h2>
-        <div className="text-secondary">
-          Paste a link to any recipe, and I’ll extract the ingredients and
-          steps.
-        </div>
-        <div className="text-secondary">
-          Ask me to improve a recipe — healthier, quicker, or more flavorful.
-        </div>
-        <div className="text-secondary">
-          Ask to double, halve, or scale the recipe for any number of servings.
-        </div>
-      </div>
-    );
-  }
-
   const {
     calories,
     total_time,
@@ -50,8 +30,9 @@ function ChatReply({
     instructions,
     source_prompt,
   } = current;
+
   return (
-    <div className="py-2 pb-25  h-full w-full lg:overflow-x-auto lg:overflow-y-hidden">
+    <div className="py-2 pb-25  h-full w-full overflow-y-auto">
       <div
         role="log"
         aria-live="polite"
@@ -106,7 +87,7 @@ function ChatReply({
         {instructions && (
           <section
             aria-labelledby="instructions-heading"
-            className="w-full mb-4"
+            className="w-full mb-4 "
           >
             <h3
               id="instructions-heading"

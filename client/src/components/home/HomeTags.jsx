@@ -82,10 +82,8 @@ function HomeTags({
                     onClick={() => {
                       handleTagClick(tag);
                     }}
-                    className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border hover:bg-tag-hover border-mantle rounded-full cursor-pointer ${
-                      isSelected
-                        ? "bg-tag-selected text-base"
-                        : "bg-tag text-primary"
+                    className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border  border-mantle rounded-full cursor-pointer ${
+                      isSelected ? "bg-tag-selected" : "bg-tag text-primary"
                     }`}
                     key={tag.name}
                   >
