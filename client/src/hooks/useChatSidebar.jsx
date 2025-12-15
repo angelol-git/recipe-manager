@@ -16,7 +16,7 @@ export function useChatSidebar(user) {
   useEffect(() => {
     if (!user?.id) return;
     localStorage.setItem(
-      `tagsSelected_${user.id}`,
+      `isSideBarOpen_${user.id}`,
       JSON.stringify(isSideBarOpen)
     );
   }, [isSideBarOpen, user?.id]);
