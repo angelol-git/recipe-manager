@@ -17,14 +17,13 @@ function Chat() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [message, setMessage] = useState("");
   const [chatInputMode, setChatInputMode] = useState("Create");
-
   const {
     sendCreateMessage,
-    // isReplyLoading,
+    isPendingCreateMessage,
     // errors,
     // askMessages,
     // sendAskMessage,
@@ -37,21 +36,27 @@ function Chat() {
 
   function showToast(message, type = "error") {
     setToast({ message, type });
-
     setTimeout(() => {
       setToast(null);
     }, 5000);
   }
 
   function handleSendMessage() {
-    if (message.trim().length === 0) return;
+    console.log("clicked!", { message, chatInputMode });
+    if (!message.trim()) return;
+
     if (chatInputMode === "Create") {
-      sendCreateMessage(message, currentVersion, currentRecipe);
+      sendCreateMessage({
+        message,
+        recipe: currentRecipe,
+        currentVersion,
+      });
     }
+
     if (chatInputMode === "Ask") {
-      // sendAskMessage(message);
       setIsAskModalOpen(true);
     }
+
     setMessage("");
   }
 
@@ -77,7 +82,7 @@ function Chat() {
                   recipe={currentRecipe}
                   setIsErrorModalOpen={setIsErrorModalOpen}
                   currentVersion={currentVersion}
-                  totalVersion={currentRecipe?.versions.length}
+                  setCurrentVersion={setCurrentVersion}
                 />
               </div>
               {/* <ChatEditModal
@@ -108,15 +113,12 @@ function Chat() {
                 />
               )}
               <ChatInput
-                recipe={currentRecipe}
                 isChatOpen={isChatOpen}
                 setIsChatOpen={setIsChatOpen}
                 message={message}
                 setMessage={setMessage}
                 handleSendMessage={handleSendMessage}
-                recipeVersions={currentRecipe?.versions}
-                currentVersion={currentVersion}
-                setCurrentVersion={setCurrentVersion}
+                isPendingCreateMessage={isPendingCreateMessage}
                 chatInputMode={chatInputMode}
                 setChatInputMode={setChatInputMode}
                 isAskModalOpen={isAskModalOpen}

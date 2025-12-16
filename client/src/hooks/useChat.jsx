@@ -196,7 +196,8 @@ export function useChat(recipe, currentVersion, setCurrentVersion, showToast) {
   }
 
   return {
-    sendCreateMessage: sendCreateMessageMutation,
+    sendCreateMessage: sendCreateMessageMutation.mutate,
+    isPendingCreateMessage: sendCreateMessageMutation.isPending,
     // isReplyLoading,
     // errors,
     // askMessages,

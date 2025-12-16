@@ -1,8 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import {
   ArrowUp,
-  ArrowLeft,
-  ArrowRight,
   LoaderCircle,
   History,
   MessageCircleMore,
@@ -15,10 +13,7 @@ function ChatInput({
   message,
   setMessage,
   handleSendMessage,
-  isReplyLoading,
-  recipeVersions,
-  currentVersion,
-  setCurrentVersion,
+  isPendingCreateMessage,
   chatInputMode,
   setChatInputMode,
   isAskModalOpen,
@@ -56,26 +51,12 @@ function ChatInput({
     }
   }, [message]);
 
-  function handleNextVersion(event) {
-    event.stopPropagation();
-    if (recipeVersions?.length > currentVersion + 1) {
-      setCurrentVersion((prev) => prev + 1);
-    }
-  }
-
-  function handlePrevVersion(event) {
-    event.stopPropagation();
-    if (currentVersion > 0) {
-      setCurrentVersion((prev) => prev - 1);
-    }
-  }
-
   return isChatOpen ? (
     <div
       onClick={() => {
         setIsExpanded(true);
       }}
-      className={`absolute bottom-0 right-0 lg:flex rounded-2xl w-full  lg:py-4 justify-center`}
+      className={`fixed bottom-0 right-0 lg:flex rounded-2xl w-full  lg:py-4 justify-center`}
     >
       <div className="bg-base border-crust border-8 relative p-2 lg:w-1/2 rounded-2xl">
         <textarea
@@ -107,30 +88,6 @@ function ChatInput({
 
         <div className={`flex bg-gap-3 items-center justify-between`}>
           <div className="flex gap-2">
-            <div className="flex gap-3">
-              <button onClick={handlePrevVersion} className="cursor-pointer">
-                <ArrowLeft
-                  size={20}
-                  strokeWidth={2}
-                  className={
-                    currentVersion === 0
-                      ? "stroke-icon-disabled"
-                      : "stroke-icon"
-                  }
-                />
-              </button>
-              <button onClick={handleNextVersion} className="cursor-pointer">
-                <ArrowRight
-                  size={20}
-                  strokeWidth={2}
-                  className={
-                    currentVersion === recipeVersions?.length - 1
-                      ? "stroke-icon-disabled"
-                      : "-icon"
-                  }
-                />
-              </button>
-            </div>
             <select
               value={chatInputMode}
               onChange={(event) => {
@@ -160,7 +117,7 @@ function ChatInput({
             className="cursor-pointer flex items-center justify-center w-9 h-9 p-0 text-white bg-accent hover:bg-accent-dark rounded-full shrink-0"
             onClick={handleSendMessage}
           >
-            {isReplyLoading ? (
+            {isPendingCreateMessage ? (
               <LoaderCircle
                 size={20}
                 strokeWidth={1.5}
@@ -174,7 +131,7 @@ function ChatInput({
       </div>
     </div>
   ) : (
-    <div className="absolute bottom-0 right-0 lg:w-full flex p-4 lg:py-8  lg:px-7 lg:justify-center">
+    <div className="fixed bottom-0 right-0 lg:w-full flex p-4 lg:py-8  lg:px-7 lg:justify-center">
       <div className="lg:w-1/2 flex justify-end">
         <button
           className="bg-accent rounded-full flex items-center justify-center w-9 h-9  cursor-pointer"

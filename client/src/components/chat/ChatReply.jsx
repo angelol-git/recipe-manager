@@ -1,13 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { Flame, Clock, Utensils } from "lucide-react";
+import {
+  Flame,
+  Clock,
+  Utensils,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 
 function ChatReply({
   recipe,
-  errors,
-  isReplyLoading,
   setIsErrorModalOpen,
   currentVersion,
-  totalVersion,
+  setCurrentVersion,
 }) {
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const sourcePromptRef = useRef(null);
@@ -31,6 +35,19 @@ function ChatReply({
     source_prompt,
   } = current;
 
+  function handleNext(event) {
+    event.stopPropagation();
+    if (recipe?.versions.length > currentVersion + 1) {
+      setCurrentVersion((prev) => prev + 1);
+    }
+  }
+
+  function handlePrevious(event) {
+    event.stopPropagation();
+    if (currentVersion > 0) {
+      setCurrentVersion((prev) => prev - 1);
+    }
+  }
   return (
     <div className="py-2 pb-25  h-full w-full overflow-y-auto">
       <div
@@ -124,7 +141,7 @@ function ChatReply({
                   {source_prompt}
                 </div>
               )}
-              {errors?.length > 0 ? (
+              {/* {errors?.length > 0 ? (
                 <button
                   onClick={() => setIsErrorModalOpen(true)}
                   className="underline text-rose cursor-pointer"
@@ -133,14 +150,40 @@ function ChatReply({
                 >
                   Errors {`(${errors.length})`}
                 </button>
-              ) : null}
+              ) : null} */}
             </div>
-            <p
+            {recipe.versions.length > 1 && (
+              <div className="flex items-center gap-3 bg-overlay0 rounded-full px-2 py-1">
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentVersion === 0}
+                  className="p-1 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-overlay2 rounded-full transition-colors"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <span className="text-sm font-medium tabular-nums text-secondary">
+                  {currentVersion + 1}
+                  <span className="text-icon-muted">
+                    / {recipe.versions.length}
+                  </span>
+                </span>
+
+                <button
+                  onClick={handleNext}
+                  disabled={currentVersion === recipe.versions.length - 1}
+                  className="p-1 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-overlay2 rounded-full transition-colors"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
+            {/* <p
               className="whitespace-nowrap"
               aria-label={`Version ${currentVersion + 1} of ${totalVersion}`}
             >
               {currentVersion + 1} of {totalVersion}
-            </p>
+            </p> */}
           </div>
         )}
       </div>
