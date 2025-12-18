@@ -58,13 +58,8 @@ function ChatInput({
   }, [message]);
 
   return isChatOpen ? (
-    <div
-      // onClick={() => {
-      //   setIsExpanded(true);
-      // }}
-      className={`fixed bottom-0 z-50 right-0 lg:flex rounded-2xl w-full  lg:py-4 justify-center`}
-    >
-      <div className="bg-base border-crust border-8 relative p-2 lg:w-1/2 rounded-2xl">
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 rounded-2xl w-full max-w-screen-xl lg:py-4 flex justify-center">
+      <div className="bg-base border-crust border-8 relative p-2 rounded-2xl w-full lg:w-2/3">
         <textarea
           rows={1}
           ref={textAreaRef}

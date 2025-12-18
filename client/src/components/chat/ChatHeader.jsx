@@ -12,7 +12,7 @@ function ChatHeader({
     <div
       className={`p-2 gap-3 top-0 bg-base  border-b-1 border-gray-300  z-10 sticky flex w-full justify-between`}
     >
-      <div className={`flex  ${isMobile ? "items-center w-8 h-8" : ""}`}>
+      <div className={`flex  ${isMobile ? "items-center w-8 h-8" : "h-8"}`}>
         {!isSideBarOpen && (
           // show icon only when sidebar is closed on ALL devices
           <button

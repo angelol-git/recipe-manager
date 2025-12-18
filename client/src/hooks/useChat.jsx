@@ -1,38 +1,20 @@
 // hooks/useRecipeApi.js
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { useRecipes } from "../hooks/useRecipes";
 import { sendCreateMessage } from "../api/chat";
-const API_BASE = "http://localhost:8080/api";
 
-export function useChat(recipe, showToast) {
+export function useChat(showToast) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { deleteRecipeVersion, deleteRecipe, updateRecipe } = useRecipes();
   const sendCreateMessageMutation = useMutation({
     mutationFn: async (payload) => {
       return sendCreateMessage(payload);
     },
 
     onError: (err, variables, context) => {
-      showToast("Recipe could not be generated from this input");
+      showToast(err.error);
       queryClient.setQueryData(["recipes"], context.previousRecipes);
-
-      //Create a new error
-      //am i doing this client side or server already ?
-      //   const newError = {
-      //   id: data.error.id,
-      //   status: data.error.status,
-      //   created_at: data.error.created_at,
-      //   ai_model: data.error.ai_model,
-      //   source_prompt: data.error.source_prompt,
-      //   error: data.error.error,
-      //   errorMessage:
-      //     data.error.errorMessage || "Recipe could not be generated",
-      //   raw: data.error.ra
-      // setErrors((prev) => [newError, ...prev]);
-      // };
     },
 
     onSuccess: (data, variables) => {
@@ -162,20 +144,20 @@ export function useChat(recipe, showToast) {
   //   }
   // }
 
-  async function handleDeleteRecipeVersion() {
-    if (!recipe.id) return;
+  // async function handleDeleteRecipeVersion() {
+  //   if (!recipe.id) return;
 
-    deleteRecipeVersion(recipe.id, recipe.versions[currentVersion].id);
+  //   deleteRecipeVersion(recipe.id, recipe.versions[currentVersion].id);
 
-    if (currentVersion === recipe.versions.length - 1) {
-      setCurrentVersion((prev) => prev - 1);
-    }
-  }
+  //   if (currentVersion === recipe.versions.length - 1) {
+  //     setCurrentVersion((prev) => prev - 1);
+  //   }
+  // }
 
-  async function handleRename(newTitle) {
-    const updatedRecipe = { ...recipe, title: newTitle };
-    updateRecipe(updatedRecipe);
-  }
+  // async function handleRename(newTitle) {
+  //   const updatedRecipe = { ...recipe, title: newTitle };
+  //   updateRecipe(updatedRecipe);
+  // }
 
   return {
     sendCreateMessage: sendCreateMessageMutation.mutate,

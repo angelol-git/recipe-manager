@@ -9,7 +9,8 @@ export async function sendCreateMessage(payload) {
     });
 
     if (!res.ok) {
-        throw new Error("Failed to retrieve all recipes");
+        const data = await res.json();
+        throw data;
     }
 
     return res.json();

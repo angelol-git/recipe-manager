@@ -1,26 +1,23 @@
-import { useState } from "react";
 import { useChat } from "../../hooks/useChat.jsx";
 import ChatInput from "../../components/chat/ChatInput.jsx";
 import ChatHeader from "../../components/chat/ChatHeader.jsx";
-import ChatErrorModal from "../../components/chat/ChatErrorModal.jsx";
 import Toast from "../../components/Toast.jsx";
 import { useOutletContext } from "react-router";
 
 function NewChat() {
-  const [isSideBarOpen, setIsSideBarOpen, isMobile] = useOutletContext();
-  // const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-  const [toast, setToast] = useState(null);
-  const [message, setMessage] = useState("");
+  const [
+    isSideBarOpen,
+    setIsSideBarOpen,
+    currentRecipe,
+    isMobile,
+    message,
+    setMessage,
+    toast,
+    setToast,
+    showToast,
+  ] = useOutletContext();
 
   const { sendCreateMessage, isPendingCreateMessage } = useChat(showToast);
-
-  function showToast(message, type = "error") {
-    setToast({ message, type });
-
-    setTimeout(() => {
-      setToast(null);
-    }, 5000);
-  }
 
   function handleSendMessage() {
     if (message.trim().length === 0) return;
@@ -30,7 +27,7 @@ function NewChat() {
   }
 
   return (
-    <div className="w-full h-full items-center flex flex-col">
+    <div className="relative w-full h-full items-center flex flex-col">
       <ChatHeader
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
@@ -50,13 +47,6 @@ function NewChat() {
         <div className="text-secondary">
           Ask to double, halve, or scale the recipe for any number of servings.
         </div>
-        {/* <ChatErrorModal
-              isErrorModalOpen={isErrorModalOpen}
-              setIsErrorModalOpen={setIsErrorModalOpen}
-              errors={errors}
-              handleDeleteError={handleDeleteError}
-            /> */}
-
         {toast && (
           <Toast
             message={toast.message}

@@ -1,17 +1,15 @@
 import { createPortal } from "react-dom";
-function Toast({ message, type = "error", onClose }) {
+function Toast({ message, onClose }) {
   return createPortal(
     <div
-      className={`fixed top-25 z-50 m-3 p-3 rounded shadow-lg text-white ${
-        type === "error" ? "bg-rose" : "bg-green-500"
-      }`}
+      className={`fixed top-15 left-1/2 transform -translate-x-1/2
+                w-[calc(100%-2rem)] sm:w-auto max-w-screen-md bg-rose text-white 
+                p-4 rounded-lg shadow-lg flex gap-2 justify-between center z-[200] text-sm`}
     >
-      <div className="flex items-center gap-2">
-        <span>{message}</span>
-        <button className="underline" onClick={onClose}>
-          Close
-        </button>
-      </div>
+      <span>{message}</span>
+      <button className="underline cursor-pointer" onClick={onClose}>
+        Close
+      </button>
     </div>,
     document.body
   );

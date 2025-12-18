@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import dotenv from "dotenv";
 import db from "../db.js"
 import authMiddleware from "../middleware.js";
@@ -11,24 +11,33 @@ const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
 router.post("/create", authMiddleware, async (req, res) => {
     const { message, recipeId, recipeVersion } = req.body;
+
+    if (!message?.trim()) return res.status(400).json({ error: "Message is required" });
+
     try {
-        console.log("Creating a recipe...");
+        const recipeIdValue = recipeId || null;
         db.prepare(`
             INSERT INTO messages (user_id, recipe_id, role, content,status)
             VALUES (?, ?, 'user', ?,'create')
-        `).run(req.user.id, recipeId || null, message);
+        `).run(req.user.id, recipeIdValue, message);
 
         const prompt = createPrompt(message, recipeVersion || null);
 
         const response = await genAI.models.generateContent({
             model: "gemini-2.5-flash",
             contents: [{ type: "text", text: prompt }],
+            generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.7
+                // responseSchema: recipeSchema,
+            }
         });
+
         validateAiResponse(response, recipeId || null, req, res);
     }
 
     catch (err) {
-        console.error(err);
+        console.error("Error creating recipe:", err);
         res.status(500).json({ error: "Something went wrong" })
     }
 })
@@ -95,9 +104,11 @@ function validateAiResponse(response, recipeId, req, res) {
             ai_model: "gemini-2.5-flash",
         };
 
-        console.log(error);
         const formatted = saveAiError(req.user.id, recipeId, error);
-        return res.status(400).json({ error: formatted });
+        console.error("AI JSON parsing error");
+        return res.status(400).json({
+            error: "The AI returned an invalid response. Please try again."
+        });
     }
 
     // Check for empty recipe content, ai returns empty object if any error
@@ -119,7 +130,10 @@ function validateAiResponse(response, recipeId, req, res) {
         };
 
         const formatted = saveAiError(req.user.id, recipeId, error);
-        return res.status(400).json({ error: formatted });
+        console.error("AI JSON parsing error");
+        return res.status(400).json({
+            error: "Invalid Recipe input. Please try again."
+        });
     }
 
     //Add new recipe and or version
@@ -169,6 +183,7 @@ function validateAiResponse(response, recipeId, req, res) {
 
     try {
         newRecipeTransaction();
+        console.log("Saving a new recipe...")
         return res.json({ reply });
     } catch (err) {
         console.error(err);
@@ -194,6 +209,36 @@ function saveAiError(userId, recipeId, error) {
 }
 
 function createPrompt(message, recipeVersion = {}) {
+    return (`
+        Role: Recipe extractor/transformer. 
+        Input: URL, text, or modification request. Return {} if unrelated.
+        Constraint: Output ONLY raw valid JSON. No markdown, backticks, or explanations.
+
+        Rules:
+        - ingredients: string array.
+        - instructions: array of single-action strings (no numbers/bullets).
+        - servings, calories, total_time: integers only (estimate if unknown).
+        - Scaling: Adjust quantities/servings proportionally; keep calories per serving constant.
+
+        Schema:
+        {
+        "title": "string",
+        "description": "string",
+        "ingredients": [],
+        "instructions": [],
+        "servings": 0,
+        "calories": 0,
+        "total_time": 0,
+        "source_prompt": "",
+        "ai_model": "gemini-2.5-flash"
+        }
+
+        New User input: ${message}
+
+        The user previously received this recipe from you: ${JSON.stringify(recipeVersion)}
+    `)
+}
+function createPromptOld(message, recipeVersion = {}) {
     return (`
 You are a recipe extraction and transformation assistant.
 
@@ -285,3 +330,30 @@ function askPrompt(currentVersion, message) {
 }
 
 export default router;
+
+const recipeSchema = {
+    type: "object",
+    properties: {
+        title: { type: "string" },
+        description: { type: "string" },
+        ingredients: {
+            type: "array",
+            items: { type: "string" },
+            description: "List of ingredients with quantities"
+        },
+        instructions: {
+            type: "array",
+            items: { type: "string" },
+            description: "Step-by-step cooking actions without numbers"
+        },
+        servings: { type: "integer" },
+        calories: { type: "integer" },
+        total_time: {
+            type: "integer",
+            description: "Total time in minutes"
+        },
+        source_prompt: { type: "string" },
+        ai_model: { type: "string" }
+    },
+    required: ["title", "ingredients", "instructions", "servings", "calories", "total_time"]
+};
