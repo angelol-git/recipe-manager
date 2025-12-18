@@ -1,9 +1,17 @@
-import express, { response } from "express";
+import express from "express";
 import dotenv from "dotenv";
 import db from "../db.js"
 import authMiddleware from "../middleware.js";
 import { v7 as uuidv7 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
+
+class AiValidationError extends Error {
+    constructor(message, meta = {}) {
+        super(message);
+        this.name = "AiValidationError";
+        this.meta = meta;
+    }
+}
 
 dotenv.config();
 const router = express.Router();
@@ -11,19 +19,15 @@ const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
 router.post("/create", authMiddleware, async (req, res) => {
     const { message, recipeId, recipeVersion } = req.body;
-
     if (!message?.trim()) return res.status(400).json({ error: "Message is required" });
-
     try {
-        const recipeIdValue = recipeId || null;
         db.prepare(`
             INSERT INTO messages (user_id, recipe_id, role, content,status)
             VALUES (?, ?, 'user', ?,'create')
-        `).run(req.user.id, recipeIdValue, message);
+        `).run(req.user.id, recipeId ?? null, message);
 
         const prompt = createPrompt(message, recipeVersion || null);
-
-        const response = await genAI.models.generateContent({
+        const aiResponse = await genAI.models.generateContent({
             model: "gemini-2.5-flash",
             contents: [{ type: "text", text: prompt }],
             generationConfig: {
@@ -33,127 +37,94 @@ router.post("/create", authMiddleware, async (req, res) => {
             }
         });
 
-        validateAiResponse(response, recipeId || null, req, res);
-    }
-
-    catch (err) {
-        console.error("Error creating recipe:", err);
-        res.status(500).json({ error: "Something went wrong" })
-    }
-})
-
-router.post("/ask", authMiddleware, async (req, res) => {
-    const { message, currentVersion, recipeId } = req.body;
-
-    try {
-        db.prepare(`
-            INSERT INTO messages (user_id, recipe_id, role, content,status)
-            VALUES (?, ?, 'user', ?,'ask')
-        `).run(req.user.id, recipeId || null, message);
-
-        const prompt = askPrompt(currentVersion, message);
-        const response = await genAI.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: [{ type: "text", text: prompt }],
+        const reply = validateAiResponse({
+            response: aiResponse,
+            recipeId: recipeId ?? null,
+            userId: req.user.id,
+            message
         });
 
-        let reply = response.candidates[0].content.parts[0].text.trim();
-
-        const result = db.prepare(`
-            INSERT INTO messages (user_id, recipe_id, role, content,status)
-            VALUES (?, ?, 'assistant', ?,'ask')
-        `).run(req.user.id, recipeId || null, reply);
-        const inserted = db.prepare(`SELECT * FROM messages WHERE id = ?`).get(result.lastInsertRowid);
-        const formatted = {
-            id: inserted.id,
-            content: inserted.content,
-            created_at: inserted.created_at,
-            user_id: inserted.user_id,
-            status: inserted.status,
-            role: inserted.role,
-        };
-
-        return res.json({ reply: formatted });
+        return res.json({ reply });
     }
 
     catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Something went wrong" })
+        const now = new Date();
+        if (err instanceof AiValidationError) {
+            console.error(`[${now.toISOString()}] AI validation failed`, err.meta);
+            return res.status(400).json({ error: err.message });
+        }
+
+        console.error(`[${now.toISOString()}] Create recipe failed`, err);
+        return res.status(500).json({ error: "Something went wrong" });
     }
 })
 
-function validateAiResponse(response, recipeId, req, res) {
+
+function validateAiResponse({ response, recipeId, userId, message }) {
     let rawResponse = response.candidates[0].content.parts[0].text.trim();
+
+    if (!rawResponse) {
+        saveAiError(userId, recipeId, {
+            type: "empty_response",
+            message: "AI return no content",
+            source_prompt: message,
+        });
+
+        throw new AiValidationError("The AI returned an empty response,", { type: "empty_response" });
+    }
 
     // Strip code fences if present
     if (rawResponse.startsWith("```")) {
         rawResponse = rawResponse.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "").trim();
     }
 
-    let reply;
-    // Check for invalid JSON
+    let parsedRecipe;
     try {
-        reply = JSON.parse(rawResponse);
+        parsedRecipe = JSON.parse(rawResponse);
     } catch (err) {
-        const error = {
+        saveAiError(userId, recipeId, {
             type: "invalid_json",
-            error: "Invalid JSON from AI",
-            errorMessage: "The recipe could not be generated because the AI’s response was incomplete. Please try again.",
-            raw: rawResponse,
-            source_prompt: req.body.message,
-            ai_model: "gemini-2.5-flash",
-        };
-
-        const formatted = saveAiError(req.user.id, recipeId, error);
-        console.error("AI JSON parsing error");
-        return res.status(400).json({
-            error: "The AI returned an invalid response. Please try again."
-        });
+            rawResponse,
+            source_prompt: message,
+            ai_model: "gemini-2.5-flash"
+        })
+        throw new AiValidationError("Invalid JSON from AI", {
+            rawResponse,
+            message,
+        })
     }
 
-    // Check for empty recipe content, ai returns empty object if any error
-    if (
-        !reply.title?.trim() &&
-        (!reply.ingredients || reply.ingredients.length === 0) &&
-        (!reply.instructions || reply.instructions.length === 0) &&
-        (!reply.servings || reply.servings === 0) &&
-        (!reply.calories || reply.calories === 0) &&
-        (!reply.total_time || reply.total_time === 0)
-    ) {
-        const error = {
+    // Check for incomplete recipe
+    if (!parsedRecipe.title?.trim() ||
+        (!parsedRecipe.ingredients?.length) ||
+        (!parsedRecipe.instructions?.length)) {
+        saveAiError(userId, recipeId, {
             type: "empty_recipe",
-            error: "Invalid input",
-            errorMessage: "Recipe could not be generated from this input. Please try again.",
-            raw: rawResponse,
-            source_prompt: req.body.message,
-            ai_model: "gemini-2.5-flash",
-        };
-
-        const formatted = saveAiError(req.user.id, recipeId, error);
-        console.error("AI JSON parsing error");
-        return res.status(400).json({
-            error: "Invalid Recipe input. Please try again."
+            rawResponse,
+            source_prompt: message,
         });
+
+        throw new AiValidationError(
+            "Recipe could not be generated from this input.",
+            { type: "empty_recipe" }
+        );
     }
 
-    //Add new recipe and or version
-    const newRecipeTransaction = db.transaction(() => {
-        let newRecipeId = recipeId;
+    const savedReply = db.transaction(() => {
+        let newRecipeId = recipeId ?? uuidv7();
 
         if (!recipeId) {
-            newRecipeId = uuidv7();
             db.prepare(`
                 INSERT INTO recipes (id,user_id, title)
                 VALUES (?,?,?)
-            `).run(newRecipeId, req.user.id, reply.title);
+            `).run(newRecipeId, userId, reply.title);
 
             const insertedRecipe = db
                 .prepare(`SELECT id, user_id, title, created_at FROM recipes WHERE id = ?`)
                 .get(newRecipeId);
 
-            reply.tags = [];
-            reply.id = insertedRecipe.id;
-            reply.created_at = insertedRecipe.created_at;
+            parsedRecipe.created_at = insertedRecipe.created_at;
+            parsedRecipe.tags = [];
         }
 
         const versionResult = db.prepare(`
@@ -161,51 +132,35 @@ function validateAiResponse(response, recipeId, req, res) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             newRecipeId,
-            reply.servings,
-            reply.total_time,
-            reply.calories,
-            reply.description,
-            JSON.stringify(Array.isArray(reply.instructions) ? reply.instructions : [reply.instructions]),
-            JSON.stringify(Array.isArray(reply.ingredients) ? reply.ingredients : [reply.ingredients]),
-            reply.source_prompt,
-            reply.ai_model,
-            reply.relation
+            parsedRecipe.servings,
+            parsedRecipe.total_time,
+            parsedRecipe.calories,
+            parsedRecipe.description,
+            JSON.stringify(Array.isArray(parsedRecipe.instructions) ? parsedRecipe.instructions : [parsedRecipe.instructions]),
+            JSON.stringify(Array.isArray(parsedRecipe.ingredients) ? parsedRecipe.ingredients : [parsedRecipe.ingredients]),
+            parsedRecipe.source_prompt,
+            parsedRecipe.ai_model,
+            parsedRecipe.relation
         );
 
         db.prepare(`
             INSERT INTO messages (user_id, recipe_id, role, content, status)
             VALUES (?, ?, 'assistant', ?, 'recipe')
-        `).run(req.user.id, newRecipeId, JSON.stringify(reply));
+        `).run(userId, newRecipeId, JSON.stringify(parsedRecipe));
 
-        reply.id = newRecipeId;
-        reply.versionId = versionResult.lastInsertRowid;
-    });
+        parsedRecipe.versionId = versionResult.lastInsertRowid;
+        return parsedRecipe;
 
-    try {
-        newRecipeTransaction();
-        console.log("Saving a new recipe...")
-        return res.json({ reply });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Something went wrong while saving the recipe" });
-    }
+    })();
+
+    return savedReply;
 }
 
 function saveAiError(userId, recipeId, error) {
-    const result = db.prepare(`
-            INSERT INTO messages (user_id, recipe_id, role, content, status)
-            VALUES (?, ?, 'assistant', ?, 'error')
-        `).run(userId, recipeId || null, JSON.stringify(error));
-
-    const inserted = db.prepare(`SELECT id, status, content, created_at FROM messages WHERE id = ?`).get(result.lastInsertRowid);
-    const parsed = JSON.parse(inserted.content);
-
-    return {
-        status: "error",
-        id: inserted.id,
-        created_at: inserted.created_at,
-        ...parsed,
-    };
+    db.prepare(`
+        INSERT INTO messages (user_id, recipe_id, role, content, status)
+        VALUES (?, ?, 'assistant', ?, 'error')
+    `).run(userId, recipeId || null, JSON.stringify(error));
 }
 
 function createPrompt(message, recipeVersion = {}) {
@@ -238,6 +193,7 @@ function createPrompt(message, recipeVersion = {}) {
         The user previously received this recipe from you: ${JSON.stringify(recipeVersion)}
     `)
 }
+
 function createPromptOld(message, recipeVersion = {}) {
     return (`
 You are a recipe extraction and transformation assistant.
@@ -357,3 +313,44 @@ const recipeSchema = {
     },
     required: ["title", "ingredients", "instructions", "servings", "calories", "total_time"]
 };
+
+
+// router.post("/ask", authMiddleware, async (req, res) => {
+//     const { message, currentVersion, recipeId } = req.body;
+
+//     try {
+//         db.prepare(`
+//             INSERT INTO messages (user_id, recipe_id, role, content,status)
+//             VALUES (?, ?, 'user', ?,'ask')
+//         `).run(req.user.id, recipeId || null, message);
+
+//         const prompt = askPrompt(currentVersion, message);
+//         const response = await genAI.models.generateContent({
+//             model: "gemini-2.5-flash",
+//             contents: [{ type: "text", text: prompt }],
+//         });
+
+//         let reply = response.candidates[0].content.parts[0].text.trim();
+
+//         const result = db.prepare(`
+//             INSERT INTO messages (user_id, recipe_id, role, content,status)
+//             VALUES (?, ?, 'assistant', ?,'ask')
+//         `).run(req.user.id, recipeId || null, reply);
+//         const inserted = db.prepare(`SELECT * FROM messages WHERE id = ?`).get(result.lastInsertRowid);
+//         const formatted = {
+//             id: inserted.id,
+//             content: inserted.content,
+//             created_at: inserted.created_at,
+//             user_id: inserted.user_id,
+//             status: inserted.status,
+//             role: inserted.role,
+//         };
+
+//         return res.json({ reply: formatted });
+//     }
+
+//     catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: "Something went wrong" })
+//     }
+// })

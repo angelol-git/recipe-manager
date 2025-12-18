@@ -44,14 +44,13 @@ function Chat() {
   }
 
   function handleSendMessage() {
-    console.log("clicked!", { message, chatInputMode });
     if (!message.trim()) return;
 
     if (chatInputMode === "Create") {
       sendCreateMessage({
         message,
-        recipe: currentRecipe,
-        currentVersion,
+        recipeId: currentRecipe.id,
+        recipeVersion: currentRecipe.versions[currentVersion],
       });
     }
 
