@@ -21,14 +21,16 @@ export function useChat(showToast) {
       const newRecipe = data.reply;
       const isNewRecipe = !variables.recipeId;
 
-      //Creating a new recipe
-      queryClient.setQueryData(["recipes"], (old) => {
-        if (!old) return [newRecipe];
+      //I do not think this work 100% yet
+      if (!isNewRecipe) {
+        queryClient.setQueryData(["recipes"], (old) => {
+          if (!old) return [newRecipe];
 
-        return isNewRecipe
-          ? [...old, newRecipe]
-          : old.map((r) => (r.id === newRecipe.id ? newRecipe : r));
-      });
+          return isNewRecipe
+            ? [...old, newRecipe]
+            : old.map((r) => (r.id === newRecipe.id ? newRecipe : r));
+        });
+      }
 
       if (isNewRecipe) {
         navigate(`/chat/${newRecipe.id}`);
