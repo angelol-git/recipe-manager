@@ -69,7 +69,7 @@ function Chat() {
             isMobile={isMobile}
           />
           <div className="items-center flex flex-col justify-center flex-1 w-full lg:min-h-0 ">
-            <div className="relative max-w-screen-xl flex flex-col flex-1 py-2 px-4 w-full h-full">
+            <div className="max-w-screen-xl flex flex-col flex-1 py-2 px-4 w-full h-full">
               {/* <ChatTags recipeId={recipe?.id} /> */}
               <div className="flex-1 lg:min-h-0 w-full">
                 <ChatReply
@@ -106,8 +106,12 @@ function Chat() {
                   onClose={() => setToast(null)}
                 />
               )}
-              <div className="fixed bottom-0 right-0 p-2 py-4 w-full flex lg:justify-center">
-                <div className="relative lg:max-w-screen-sm w-full flex justify-between ">
+              <div
+                className={`${
+                  isMobile ? "fixed" : "block"
+                } bottom-0 p-2 py-4 w-full flex lg:justify-center`}
+              >
+                <div className="relative lg:max-w-screen-sm w-full flex justify-between">
                   <ChatNavigation
                     recipe={currentRecipe}
                     currentVersion={currentVersion}
