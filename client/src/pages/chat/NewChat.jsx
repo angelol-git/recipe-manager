@@ -59,6 +59,7 @@ function NewChat() {
           setMessage={setMessage}
           handleSendMessage={handleSendMessage}
           isPendingCreateMessage={isPendingCreateMessage}
+          variant="new-chat"
         />
       </div>
     </div>

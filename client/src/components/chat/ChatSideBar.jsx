@@ -75,12 +75,12 @@ function ChatSideBar({
                     setIsSideBarOpen(false);
                   }
                 }}
-                className={`px-2 py-1 flex justify-between rounded-lg hover:bg-mantle-hover ${
+                className={`px-2 py-1 flex justify-between cursor-pointer rounded-lg hover:bg-mantle-hover ${
                   currentRecipe?.id === item.id ? "bg-overlay0" : null
                 }`}
               >
-                <p className="cursor-pointer">{formattedTitle(item.title)}</p>
-                <button>
+                <p>{formattedTitle(item.title)}</p>
+                <button className="cursor-pointer">
                   <Ellipsis
                     size={20}
                     strokeWidth={1.5}

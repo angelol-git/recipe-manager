@@ -20,18 +20,15 @@ function ChatInput({
   setChatInputMode,
   isAskModalOpen,
   setIsAskModalOpen,
+  variant = "new-chat",
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandedRef = useRef();
   const textAreaRef = useRef(null);
   const minHeight = 24;
   const maxHeight = 160;
-  const isNewChat =
-    chatInputMode &&
-    setChatInputMode &&
-    isAskModalOpen !== undefined &&
-    setIsAskModalOpen;
-
+  const isNewChat = variant === "new-chat";
+  console.log(isNewChat);
   useEffect(() => {
     if (!isExpanded) return;
 
