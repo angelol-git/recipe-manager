@@ -25,7 +25,7 @@ function ChatInput({
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandedRef = useRef();
   const textAreaRef = useRef(null);
-  const minHeight = 24;
+  const minHeight = 30;
   const maxHeight = 160;
   const isNewChat = variant === "new-chat";
   console.log(isNewChat);

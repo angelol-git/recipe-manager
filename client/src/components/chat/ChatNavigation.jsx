@@ -23,7 +23,7 @@ function ChatNavigation({
   if (recipe.versions.length > 1) {
     return (
       <div
-        className={`flex items-center gap-3 bg-overlay0 rounded-full px-1 py-1 ${
+        className={`flex items-center gap-3 bg-overlay0 rounded-full p-1 ${
           isChatOpen ? "absolute bottom-5 left-5 z-10" : null
         }`}
       >
