@@ -73,7 +73,7 @@ function ChatInput({
         placeholder="Enter any recipe or changes..."
       />
 
-      {isNewChat && (
+      {!isNewChat && (
         <button
           onClick={() => setIsChatOpen(false)}
           className="cursor-pointer absolute top-1 right-1 p-1 rounded-full hover:bg-overlay0"
@@ -88,10 +88,10 @@ function ChatInput({
       )}
       <div
         className={`flex bg-gap-3 items-center ${
-          isNewChat ? "justify-between" : "justify-end"
+          !isNewChat ? "justify-between" : "justify-end"
         }`}
       >
-        {isNewChat && (
+        {!isNewChat && (
           <div
             className={`flex gap-2 ${
               hasRecipeNavigation ? "translate-x-30" : null
@@ -146,7 +146,7 @@ function ChatInput({
     </div>
   ) : (
     <button
-      className="bg-accent rounded-full flex items-center justify-center w-9 h-9 cursor-pointer"
+      className="bg-accent rounded-full flex items-center justify-center w-9 h-9 cursor-pointer h20"
       onClick={() => {
         setIsChatOpen(true);
       }}

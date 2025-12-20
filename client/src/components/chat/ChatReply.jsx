@@ -36,7 +36,7 @@ function ChatReply({
   } = current;
 
   return (
-    <div className="py-2 pb-25  h-full w-full overflow-y-auto">
+    <div className="py-2 pb-25 h-full w-full overflow-y-auto">
       <div
         role="log"
         aria-live="polite"

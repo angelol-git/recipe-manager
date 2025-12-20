@@ -30,7 +30,8 @@ function Chat() {
     // sendAskMessage,
     // setAskMessages,
   } = useChat(currentRecipe, showToast);
-  const hasRecipeNavigation = currentRecipe.versions.length > 1;
+  const hasRecipeNavigation = currentRecipe?.versions.length > 1;
+
   function showToast(message, type = "error") {
     setToast({ message, type });
     setTimeout(() => {
@@ -109,12 +110,12 @@ function Chat() {
               <div
                 className={`${
                   isMobile ? "fixed" : "block"
-                } bottom-0 p-2 py-4 w-full flex lg:justify-center`}
+                } bottom-0 right-0 p-2 py-4 w-full flex lg:justify-center`}
               >
                 <div
-                  className={`relative lg:max-w-screen-sm w-full flex ${
+                  className={`relative lg:max-w-screen-sm w-full items-end flex ${
                     hasRecipeNavigation ? "justify-between" : "justify-end"
-                  }`}
+                  } ${!isChatOpen && "lg:h-[98px]"}`}
                 >
                   <ChatNavigation
                     recipe={currentRecipe}
@@ -135,7 +136,7 @@ function Chat() {
                     setChatInputMode={setChatInputMode}
                     isAskModalOpen={isAskModalOpen}
                     setIsAskModalOpen={setIsAskModalOpen}
-                    variant="chat"
+                    variant="existing"
                   />
                 </div>
               </div>
