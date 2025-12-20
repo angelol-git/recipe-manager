@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router";
 import { useChat } from "../../hooks/useChat.jsx";
 import ChatHeader from "../../components/chat/ChatHeader.jsx";
@@ -31,6 +31,10 @@ function Chat() {
     // setAskMessages,
   } = useChat(currentRecipe, showToast);
   const hasRecipeNavigation = currentRecipe?.versions.length > 1;
+
+  useEffect(() => {
+    document.title = `${currentRecipe?.title}`;
+  }, [currentRecipe]);
 
   function showToast(message, type = "error") {
     setToast({ message, type });

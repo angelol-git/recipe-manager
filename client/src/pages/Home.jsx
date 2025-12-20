@@ -1,8 +1,8 @@
 import { Link } from "react-router";
-import HomeTags from "../components/home/HomeTags";
 import UserOptions from "../components/UserOptions";
 import { useUser } from "../hooks/useUser";
 import { useRecipes } from "../hooks/useRecipes";
+import { useEffect } from "react";
 // import { useTags } from "../hooks/useTags";
 
 function Home() {
@@ -23,6 +23,9 @@ function Home() {
   //     );
   //   });
   // });
+  useEffect(() => {
+    document.title = `Recipes`;
+  }, []);
 
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -59,13 +62,13 @@ function Home() {
               + Add
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:flex gap-4 ">
+          <div className="grid grid-cols-4 md:flex md:flex-wrap gap-4 lg:gap-6">
             {recipes?.map((recipe) => {
               return (
                 <Link
                   to={`/chat/${recipe.id}`}
                   key={recipe.id}
-                  className="group relative w-full md:w-[240px] h-[250px] md:h-[275px] cursor-pointer"
+                  className="group relative w-full md:w-[230px] h-[250px] md:h-[275px] cursor-pointer"
                 >
                   <div className="relative w-full h-full">
                     <div className="absolute flex flex-col justify-between inset-0 border bg-mantle rounded-l-xl rounded-r-2xl p-4 border-black/30 transform transition-transform duration-200 origin-left group-hover:-rotate-y-15 z-20">

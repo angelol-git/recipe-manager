@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import dotenv, { parse } from "dotenv";
 import db from "../db.js"
 import authMiddleware from "../middleware.js";
 import { v7 as uuidv7 } from "uuid";
@@ -117,7 +117,7 @@ function validateAiResponse({ response, recipeId, userId, message }) {
             db.prepare(`
                 INSERT INTO recipes (id,user_id, title)
                 VALUES (?,?,?)
-            `).run(newRecipeId, userId, reply.title);
+            `).run(newRecipeId, userId, parsedRecipe.title);
 
             const insertedRecipe = db
                 .prepare(`SELECT id, user_id, title, created_at FROM recipes WHERE id = ?`)
@@ -150,7 +150,6 @@ function validateAiResponse({ response, recipeId, userId, message }) {
 
         parsedRecipe.versionId = versionResult.lastInsertRowid;
         return parsedRecipe;
-
     })();
 
     return savedReply;
@@ -193,70 +192,6 @@ function createPrompt(message, recipeVersion = {}) {
         The user previously received this recipe from you: ${JSON.stringify(recipeVersion)}
     `)
 }
-
-function createPromptOld(message, recipeVersion = {}) {
-    return (`
-You are a recipe extraction and transformation assistant.
-
-The user previously received this recipe from you:
-${JSON.stringify(recipeVersion)}
-
-The user will send you either:
-- A URL to a recipe webpage,
-- A block of recipe text,
-- Or a modification request about an existing recipe.
-
-Your task:
-1. If the message is a URL, fetch and extract the recipe.
-2. If the message contains recipe text, parse and structure it.
-3. If the message is unrelated to a recipe, return an empty JSON object: {}.
-
-You must reply **ONLY** with raw, valid JSON.
-- No markdown.
-- No backticks.
-- No explanations.
-- The entire response must be valid JSON.
-
-Formatting Rules:
-- "ingredients" must **always** be an array of strings.
-  Example: ["1 cup flour", "2 eggs", "1 tsp salt"]
-- "instructions" must be an array of short, unnumbered step strings.
-- Each string should describe a single cooking action in order.
-- Do not include step numbers or bullet points — just plain text.
-- Example: ["Preheat oven to 350°F", "Mix flour and sugar in a bowl"]
-- Do not return ingredients or instructions as a single string or block of text.
-- For "servings", "calories", and "total_time", return **integers only**.
-  (Example: 12, not "12 servings")
-- If a value is unknown, make a reasonable numeric estimate.
-
-Scaling Rules:
-- If the user asks to double or halve the recipe:
-  - Adjust ingredient **quantities** proportionally.
-  - Adjust **servings** proportionally.
-  - Keep **calories per serving (calories)** the same — do not multiply or divide it.
-  - Example:
-    - Original: 6 servings, 200 calories each.
-    - “Half the recipe” → 3 servings, 200 calories each.
-    - “Double the recipe” → 12 servings, 200 calories each.
-
-Output format (strict JSON):
-{
-  "title": "string",
-  "description": "string",
-  "ingredients": ["string", "string", "..."],
-  "instructions": ["string", "string", "..."],
-  "servings": <integer>,
-  "calories": <integer>,
-  "total_time": <integer>,
-  "source_prompt": "<copy of user message>",
-  "ai_model": "gemini-2.5-flash"
-}
-
-Here is the user's message:
-"${message}"
-`);
-}
-
 
 function askPrompt(currentVersion, message) {
     return (`

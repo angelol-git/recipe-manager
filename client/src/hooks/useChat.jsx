@@ -18,6 +18,7 @@ export function useChat(showToast) {
     },
 
     onSuccess: (data, variables) => {
+      console.log(data.reply);
       const newRecipe = data.reply;
       const isNewRecipe = !variables.recipeId;
 

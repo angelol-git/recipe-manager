@@ -28,7 +28,7 @@ function ChatInput({
   const minHeight = 30;
   const maxHeight = 160;
   const isNewChat = variant === "new-chat";
-  console.log(isNewChat);
+
   useEffect(() => {
     if (!isExpanded) return;
 
@@ -56,7 +56,7 @@ function ChatInput({
   }, [message]);
 
   return isChatOpen ? (
-    <div className="relative bg-base p-2 border-crust border-8 rounded-2xl w-full">
+    <div className="relative bg-base p-2 border-crust border-8 rounded-2xl w-full ">
       <textarea
         rows={1}
         ref={textAreaRef}
