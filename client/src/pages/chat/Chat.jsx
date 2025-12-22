@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useOutletContext } from "react-router";
 import { useChat } from "../../hooks/useChat.jsx";
 import ChatHeader from "../../components/chat/ChatHeader.jsx";
@@ -12,7 +12,7 @@ import Toast from "../../components/Toast.jsx";
 import ChatTags from "../../components/chat/ChatTags.jsx";
 
 function Chat() {
-  const [
+  const {
     recipe,
     recipeVersion,
     setRecipeVersion,
@@ -24,7 +24,7 @@ function Chat() {
     toast,
     setToast,
     showToast,
-  ] = useOutletContext();
+  } = useOutletContext();
   const {
     sendCreateMessage,
     isPendingCreateMessage,

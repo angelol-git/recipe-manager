@@ -5,17 +5,16 @@ import Toast from "../../components/Toast.jsx";
 import { useOutletContext } from "react-router";
 
 function NewChat() {
-  const [
-    isSideBarOpen,
-    setIsSideBarOpen,
-    currentRecipe,
-    isMobile,
+  const {
     message,
     setMessage,
+    isMobile,
+    isSideBarOpen,
+    setIsSideBarOpen,
     toast,
     setToast,
     showToast,
-  ] = useOutletContext();
+  } = useOutletContext();
 
   const { sendCreateMessage, isPendingCreateMessage } = useChat(showToast);
 

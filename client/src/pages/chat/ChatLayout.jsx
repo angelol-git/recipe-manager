@@ -58,7 +58,7 @@ const ChatLayout = () => {
 
       <main className="w-full flex flex-col">
         <Outlet
-          context={[
+          context={{
             recipe,
             recipeVersion,
             setRecipeVersion,
@@ -70,7 +70,7 @@ const ChatLayout = () => {
             toast,
             setToast,
             showToast,
-          ]}
+          }}
         />
       </main>
     </div>
