@@ -62,7 +62,7 @@ function Home() {
               + Add
             </Link>
           </div>
-          <div className="grid grid-cols-4 md:flex md:flex-wrap gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 md:flex md:flex-wrap gap-4 lg:gap-6">
             {recipes?.map((recipe) => {
               return (
                 <Link

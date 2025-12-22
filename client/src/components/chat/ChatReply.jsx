@@ -23,7 +23,7 @@ function ChatReply({ recipe, setIsErrorModalOpen, recipeVersion }) {
   }, [isPromptModalOpen]);
 
   return (
-    <div className="py-2 pb-25 lg:pb-2 h-full w-full overflow-y-auto">
+    <div className="pb-25 lg:p-2  h-full w-full overflow-y-auto">
       <div
         role="log"
         aria-live="polite"

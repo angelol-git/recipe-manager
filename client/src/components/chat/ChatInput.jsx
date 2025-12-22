@@ -94,7 +94,7 @@ function ChatInput({
         {!isNewChat && (
           <div
             className={`flex gap-2 ${
-              hasRecipeNavigation ? "translate-x-30" : null
+              hasRecipeNavigation ? "translate-x-28" : null
             }`}
           >
             <select

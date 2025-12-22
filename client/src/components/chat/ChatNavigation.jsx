@@ -2,20 +2,20 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 
 function ChatNavigation({
   recipe,
-  currentRecipe,
+  recipeVersion,
   setRecipeVersion,
   isChatOpen,
 }) {
   function handleNext(event) {
     event.stopPropagation();
-    if (recipe?.versions.length > currentRecipe + 1) {
+    if (recipe?.versions.length > recipeVersion + 1) {
       setRecipeVersion((prev) => prev + 1);
     }
   }
 
   function handlePrevious(event) {
     event.stopPropagation();
-    if (currentRecipe > 0) {
+    if (recipeVersion > 0) {
       setRecipeVersion((prev) => prev - 1);
     }
   }
@@ -23,26 +23,26 @@ function ChatNavigation({
   if (recipe.versions.length > 1) {
     return (
       <div
-        className={`flex items-center gap-3 bg-overlay0 rounded-full p-1 ${
-          isChatOpen ? "absolute bottom-5 left-5 z-10" : null
+        className={`flex items-center gap-3 bg-overlay0 rounded-full m-4 p-1 ${
+          isChatOpen ? "absolute z-10" : null
         }`}
       >
         <button
           onClick={handlePrevious}
-          disabled={currentRecipe === 0}
+          disabled={recipeVersion === 0}
           className="cursor-pointer p-1 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-overlay2 rounded-full transition-colors"
         >
           <ChevronLeft size={18} />
         </button>
 
         <span className="text-sm font-medium tabular-nums text-secondary">
-          {currentRecipe + 1}
+          {recipeVersion + 1}
           <span className="text-icon-muted">/ {recipe.versions.length}</span>
         </span>
 
         <button
           onClick={handleNext}
-          disabled={currentRecipe === recipe.versions.length - 1}
+          disabled={recipeVersion === recipe.versions.length - 1}
           className="cursor-pointer p-1 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-overlay2 rounded-full transition-colors"
         >
           <ChevronRight size={18} />
