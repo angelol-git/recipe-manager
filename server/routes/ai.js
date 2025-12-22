@@ -44,6 +44,7 @@ router.post("/create", authMiddleware, async (req, res) => {
             message
         });
 
+        console.log(reply);
         return res.json({ reply });
     }
 
@@ -112,12 +113,14 @@ function validateAiResponse({ response, recipeId, userId, message }) {
 
     const savedReply = db.transaction(() => {
         let newRecipeId = recipeId ?? uuidv7();
+        let recipe = null;
 
         if (!recipeId) {
-            db.prepare(`
+            recipe = db.prepare(`
                 INSERT INTO recipes (id,user_id, title)
                 VALUES (?,?,?)
-            `).run(newRecipeId, userId, parsedRecipe.title);
+                RETURNING id, user_id, title, created_at
+            `).get(newRecipeId, userId, parsedRecipe.title);
 
             const insertedRecipe = db
                 .prepare(`SELECT id, user_id, title, created_at FROM recipes WHERE id = ?`)
@@ -127,10 +130,15 @@ function validateAiResponse({ response, recipeId, userId, message }) {
             parsedRecipe.tags = [];
         }
 
-        const versionResult = db.prepare(`
-            INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, description, instructions, ingredients, source_prompt, ai_model, relation)
+        const version = db.prepare(`
+            INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, 
+                description, instructions, ingredients, 
+                source_prompt, ai_model, relation)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
+            RETURNING id, recipe_id, servings, total_time, calories,
+                    description, instructions, ingredients,
+                    source_prompt, ai_model, relation, created_at
+        `).get(
             newRecipeId,
             parsedRecipe.servings,
             parsedRecipe.total_time,
@@ -148,8 +156,22 @@ function validateAiResponse({ response, recipeId, userId, message }) {
             VALUES (?, ?, 'assistant', ?, 'recipe')
         `).run(userId, newRecipeId, JSON.stringify(parsedRecipe));
 
-        parsedRecipe.versionId = versionResult.lastInsertRowid;
-        return parsedRecipe;
+        parsedRecipe.versionId = version.lastInsertRowid;
+
+        //Return the full object if a new recipe or partial if new recipe version
+        if (!recipeId) {
+            return {
+                id: recipe.id,
+                title: recipe.title,
+                created_at: recipe.created_at,
+                tags: [],
+                versions: [version]
+            }
+        }
+
+        return version;
+
+
     })();
 
     return savedReply;

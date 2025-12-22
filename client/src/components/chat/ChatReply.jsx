@@ -1,30 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  Flame,
-  Clock,
-  Utensils,
-  ChevronRight,
-  ChevronLeft,
-} from "lucide-react";
+import { Flame, Clock, Utensils } from "lucide-react";
 
-function ChatReply({
-  recipe,
-  setIsErrorModalOpen,
-  currentVersion,
-  setCurrentVersion,
-}) {
+function ChatReply({ recipe, setIsErrorModalOpen, recipeVersion }) {
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const sourcePromptRef = useRef(null);
-  const current = recipe?.versions?.[currentVersion];
-
-  useEffect(() => {
-    if (isPromptModalOpen && sourcePromptRef.current) {
-      setTimeout(() => {
-        sourcePromptRef.current.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  }, [isPromptModalOpen]);
-
+  const current = recipe?.versions?.[recipeVersion];
   const {
     calories,
     total_time,
@@ -34,9 +14,16 @@ function ChatReply({
     instructions,
     source_prompt,
   } = current;
+  useEffect(() => {
+    if (isPromptModalOpen && sourcePromptRef.current) {
+      setTimeout(() => {
+        sourcePromptRef.current.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [isPromptModalOpen]);
 
   return (
-    <div className="py-2 pb-25 h-full w-full overflow-y-auto">
+    <div className="py-2 pb-25 lg:pb-2 h-full w-full overflow-y-auto">
       <div
         role="log"
         aria-live="polite"
@@ -142,11 +129,11 @@ function ChatReply({
             {recipe.versions.length > 1 && (
               <p
                 className="whitespace-nowrap"
-                aria-label={`Version ${currentVersion + 1} of ${
+                aria-label={`Version ${recipeVersion + 1} of ${
                   recipe.versions.length - 1
                 }`}
               >
-                {currentVersion + 1} of {recipe.versions.length}
+                {recipeVersion + 1} of {recipe.versions.length}
               </p>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router";
 import { useUser } from "../../hooks/useUser";
 import { useRecipes } from "../../hooks/useRecipes";
@@ -10,12 +10,11 @@ const ChatLayout = () => {
   const { id } = useParams();
   const { data: user } = useUser();
   const { data: recipes } = useRecipes();
-  const currentRecipe = recipes?.find((r) => r.id === id) || null;
   const { isSideBarOpen, setIsSideBarOpen } = useChatSidebar(user);
-
   const [message, setMessage] = useState("");
   const [toast, setToast] = useState(null);
-
+  const [recipe, setRecipe] = useState(null);
+  const [recipeVersion, setRecipeVersion] = useState(null);
   const isMobile = useIsMobile();
 
   function showToast(message, type = "error") {
@@ -25,12 +24,28 @@ const ChatLayout = () => {
       setToast(null);
     }, 5000);
   }
+
+  useEffect(() => {
+    if (!recipes) return;
+
+    const recipe = recipes?.find((r) => r.id === id) || null;
+    setRecipe(recipe);
+
+    if (recipe?.versions?.length) {
+      setRecipeVersion(recipe.versions.length - 1);
+    }
+
+    if (recipe?.title) {
+      document.title = recipe.title;
+    }
+  }, [recipes, id]);
+
   return (
     <div className="bg-base relative flex min-h-screen lg:h-screen text-primary w-full">
       <ChatSideBar
         recipes={recipes}
+        recipe={recipe}
         isMobile={isMobile}
-        currentRecipe={currentRecipe}
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
       />
@@ -44,12 +59,14 @@ const ChatLayout = () => {
       <main className="w-full flex flex-col">
         <Outlet
           context={[
-            isSideBarOpen,
-            setIsSideBarOpen,
-            currentRecipe,
-            isMobile,
+            recipe,
+            recipeVersion,
+            setRecipeVersion,
             message,
             setMessage,
+            isMobile,
+            isSideBarOpen,
+            setIsSideBarOpen,
             toast,
             setToast,
             showToast,

@@ -1,6 +1,7 @@
 const backendUrl = "http://localhost:8080/api"
 
 export async function fetchAllRecipes() {
+    console.log("Fetching all recipes");
     const res = await fetch(`${backendUrl}/recipes/`, {
         method: "GET",
         credentials: "include",
