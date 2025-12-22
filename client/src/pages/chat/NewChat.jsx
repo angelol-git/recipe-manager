@@ -32,7 +32,7 @@ function NewChat() {
         setIsSideBarOpen={setIsSideBarOpen}
         isMobile={isMobile}
       />
-      <div className="text-center relative  p-6 max-w-screen-xl flex flex-col w-full h-full justify-center pb-50">
+      <div className="text-center relative  p-6 max-w-screen-xl flex flex-col w-full h-full justify-center">
         <div className="flex flex-col gap-4">
           <h2 className="text-primary text-2xl font-medium font-lora pb-5">
             What recipe can I help you with?
@@ -56,19 +56,16 @@ function NewChat() {
             onClose={() => setToast(null)}
           />
         )}
-
-        <div
-          className={`fixed bottom-0 right-0 p-2 py-4 w-full flex lg:justify-center`}
-        >
-          <div className={`relative lg:max-w-screen-sm w-full items-end flex`}>
-            <ChatInput
-              message={message}
-              setMessage={setMessage}
-              handleSendMessage={handleSendMessage}
-              isPendingCreateMessage={isPendingCreateMessage}
-              variant="new-chat"
-            />
-          </div>
+      </div>
+      <div className={`lg:p-4 w-full flex justify-center`}>
+        <div className={`relative lg:max-w-screen-sm w-full items-end flex`}>
+          <ChatInput
+            message={message}
+            setMessage={setMessage}
+            handleSendMessage={handleSendMessage}
+            isPendingCreateMessage={isPendingCreateMessage}
+            variant="new-chat"
+          />
         </div>
       </div>
     </div>
