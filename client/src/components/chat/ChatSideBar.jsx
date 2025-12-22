@@ -8,7 +8,7 @@ function ChatSideBar({
   setIsSideBarOpen,
 }) {
   function formattedTitle(title) {
-    return title.length > 30 ? title.slice(0, 27) + "..." : title;
+    return title.length > 27 ? title.slice(0, 24) + "..." : title;
   }
   return (
     <nav
@@ -44,23 +44,22 @@ function ChatSideBar({
           )}
         </button>
       </div>
-      <div>
-        <button
-          onClick={() => {
-            if (isMobile) {
-              setIsSideBarOpen(false);
-            }
-          }}
+      <button
+        className="w-full"
+        onClick={() => {
+          if (isMobile) {
+            setIsSideBarOpen(false);
+          }
+        }}
+      >
+        <Link
+          to="/chat"
+          className="flex gap-2 p-1 pl-2 rounded-lg items-center hover:bg-mantle-hover"
         >
-          <Link
-            to="/chat"
-            className="flex gap-2 p-1 pl-2  rounded-lg items-center hover:bg-mantle-hover"
-          >
-            <CirclePlus size={18} strokeWidth={1.5} className="stroke-icon" />
-            New Chat
-          </Link>
-        </button>
-      </div>
+          <CirclePlus size={18} strokeWidth={1.5} className="stroke-icon" />
+          New Chat
+        </Link>
+      </button>
       <div className="flex flex-col gap-1">
         <h2 className="text-secondary">Recipes</h2>
         <div className="flex w-full flex-col gap-2">

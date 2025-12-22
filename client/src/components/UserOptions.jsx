@@ -24,9 +24,9 @@ function UserOptions({ user, logout }) {
 
   if (user) {
     return (
-      <div ref={menuRef}>
+      <div ref={menuRef} className="relative">
         <button
-          className={`relative rounded-full border-5  cursor-pointer ${
+          className={`rounded-full border-5  cursor-pointer ${
             isUserOptionsOpen ? " border-gray-400/30" : "border-base"
           }`}
           onClick={() => {
@@ -41,7 +41,7 @@ function UserOptions({ user, logout }) {
         </button>
 
         {isUserOptionsOpen && (
-          <div className="absolute right-5 z-50 bg-crust  p-4 rounded-lg shadow-lg flex flex-col gap-3">
+          <div className="absolute right-0 z-50 bg-crust  p-4 rounded-lg shadow-lg flex flex-col gap-3">
             <div className="flex gap-5 justify-between items-center">
               <p>{user.email}</p>
             </div>
