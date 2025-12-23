@@ -12,7 +12,7 @@ function ChatSideBar({
   }
   return (
     <nav
-      className={`z-100 gap-4 text-sm lg:border-r-gray-300 lg:border-r-1 p-2 fixed top-0 left-0 h-full w-70 lg:w-75 bg-mantle transition-transform duration-300 ease-in-out flex-col flex ${
+      className={`z-100 gap-4 text-sm lg:border-r-gray-300 lg:border-r-1 p-2 fixed top-0 left-0 h-full w-70 lg:w-75 bg-mantle flex-col flex ${
         isSideBarOpen ? "translate-x-0 lg:static" : "-translate-x-full "
       }`}
     >
