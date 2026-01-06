@@ -23,13 +23,29 @@ export function useTags(user, recipes = []) {
   const deleteTagsAllMutation = useMutation({
     mutationFn: async (tagIds) => deleteTagsAll(tagIds),
 
-    // onError: (err, variables, context) => {
-    //   if (context?.previousRecipes) {
-    //     queryClient.setQueryData(["recipes"], context.previousRecipes);
-    //   }
-    // },
+    onMutate: async (tagIds) => {
+      await queryClient.cancelQueries(["recipes"]);
 
-    onSettled: () => {
+      const previousRecipes = queryClient.getQueryData(["recipes"]);
+      queryClient.setQueryData(["recipes"], (old) => {
+        if (!old) return old;
+        return old.map((recipe) => {
+          return {
+            ...recipe,
+            tags: recipe.tags.filter((t) => !tagIds.includes(t.id)),
+          };
+        });
+      });
+
+      return { previousRecipes };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousRecipes) {
+        queryClient.setQueryData(["recipes"], context.previousRecipes);
+      }
+    },
+
+    onSuccess: () => {
       queryClient.invalidateQueries(["recipes"]);
     },
   });
@@ -80,5 +96,6 @@ export function useTags(user, recipes = []) {
   return {
     uniqueTags,
     deleteTagsAll: deleteTagsAllMutation.mutate,
+    isDeletingTags: deleteTagsAllMutation.isPending,
   };
 }

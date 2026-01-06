@@ -8,6 +8,7 @@ function HomeTags({
   // handleTagClick,
   // editRecipeTagAll,
   deleteTagsAll,
+  isDeletingTags,
 }) {
   const tagsToBeDeleted = useRef([]);
   const [draftTags, setDraftTags] = useState([]);
@@ -54,13 +55,17 @@ function HomeTags({
 
   function handleTagDelete() {
     if (tagsToBeDeleted.current.length > 0) {
-      // console.log(tagsToBeDeleted.current.map((t) => t.id));
       deleteTagsAll(tagsToBeDeleted.current.map((t) => t.id));
     }
-    setIsEditTags(false);
-    setEditTagId({ id: null, field: null });
-    tagsToBeDeleted.current = [];
   }
+
+  useEffect(() => {
+    if (!isDeletingTags && isEditTags) {
+      setIsEditTags(false);
+      setEditTagId({ id: null, field: null });
+      tagsToBeDeleted.current = [];
+    }
+  }, [isDeletingTags]);
 
   return (
     <div>
@@ -90,7 +95,7 @@ function HomeTags({
                       // handleTagClick(tag);
                     }}
                     className={`inline-flex gap-2 items-center px-2 py-0.5 text-sm border  bg-tag text-primary border-mantle rounded-full cursor-pointer`}
-                    key={tag.name}
+                    key={tag.id}
                   >
                     <div
                       className={`w-4 h-4 rounded-full`}
