@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteTagsAll } from "../api/tags.js";
+import { deleteTagsAll, editTagsAll } from "../api/tags.js";
 
 export function useTags(user, recipes = []) {
   const queryClient = useQueryClient();
@@ -39,6 +38,37 @@ export function useTags(user, recipes = []) {
 
       return { previousRecipes };
     },
+    onError: (err, variables, context) => {
+      if (context?.previousRecipes) {
+        queryClient.setQueryData(["recipes"], context.previousRecipes);
+      }
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries(["recipes"]);
+    },
+  });
+
+  const editTagsAllMutation = useMutation({
+    mutationFn: async (updatedTags) => editTagsAll(updatedTags),
+
+    // onMutate: async (tags) => {
+    //   await queryClient.cancelQueries(["recipes"]);
+
+    //   const previousRecipes = queryClient.getQueryData(["recipes"]);
+    //   queryClient.setQueryData(["recipes"], (old) => {
+    //     if (!old) return old;
+    //     return old.map((recipe) => {
+    //       return {
+    //         ...recipe,
+    //         tags: recipe.tags.filter((t) => !tagIds.includes(t.id)),
+    //       };
+    //     });
+    //   });
+
+    //   return { previousRecipes };
+    // },
+
     onError: (err, variables, context) => {
       if (context?.previousRecipes) {
         queryClient.setQueryData(["recipes"], context.previousRecipes);
@@ -97,5 +127,7 @@ export function useTags(user, recipes = []) {
     uniqueTags,
     deleteTagsAll: deleteTagsAllMutation.mutate,
     isDeletingTags: deleteTagsAllMutation.isPending,
+    editTagsAll: editTagsAllMutation.mutate,
+    isEditingTags: editTagsAllMutation.mutate,
   };
 }

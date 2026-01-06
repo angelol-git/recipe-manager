@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import ColorPickerPortal from "./ColorPickerPortal.jsx";
 import { X } from "lucide-react";
+import ColorPickerPortal from "./ColorPickerPortal.jsx";
+import useDraftTags from "../../hooks/useDraftTags.jsx";
+import { editTagsAll } from "../../api/tags.js";
 function HomeTags({
   tags,
   // tagsSelected,
@@ -8,16 +10,21 @@ function HomeTags({
   // handleTagClick,
   // editRecipeTagAll,
   deleteTagsAll,
-  isDeletingTags,
+  editTagsAll,
 }) {
   const tagsToBeDeleted = useRef([]);
-  const [draftTags, setDraftTags] = useState([]);
+  const tagRefs = useRef({});
   const [isEditTags, setIsEditTags] = useState(false);
   const [editTagId, setEditTagId] = useState({
     id: null,
     field: null,
   });
-  const tagRefs = useRef({});
+  const {
+    draftTags,
+    handleDraftTagDelete,
+    handleEditDraftTagName,
+    handleEditDraftTagColor,
+  } = useDraftTags({ tags, isEditTags, tagsToBeDeleted });
   const tagCount = tags.reduce((acc, tag) => {
     if (acc[tag.id]) {
       acc[tag.id] += 1;
@@ -27,45 +34,31 @@ function HomeTags({
     return acc;
   }, {});
 
-  useEffect(() => {
-    if (isEditTags && tags) {
-      setDraftTags(tags);
-    }
-  }, [tags, isEditTags]);
-
-  function editDraftTagName(event, tagId) {
-    const newName = event.target.value;
-    setDraftTags((prevTag) => {
-      return prevTag.map((t) => {
-        if (t.id === tagId) {
-          return { ...t, name: newName };
-        } else {
-          return t;
-        }
-      });
+  function handleTagDone() {
+    const tagsToUpdate = draftTags.filter((tag) => {
+      const original = tags.find((t) => t.id === tag.id);
+      return (
+        original && (original.name !== tag.name || original.color !== tag.color)
+      );
     });
-  }
 
-  function handleDraftTagDelete(tag) {
-    tagsToBeDeleted.current.push(tag);
-    setDraftTags((prev) => {
-      return prev.filter((t) => t.id !== tag.id);
-    });
-  }
-
-  function handleTagDelete() {
-    if (tagsToBeDeleted.current.length > 0) {
+    if (tagsToBeDeleted.current.length) {
       deleteTagsAll(tagsToBeDeleted.current.map((t) => t.id));
     }
+    if (tagsToUpdate.length) {
+      editTagsAll(tagsToUpdate);
+    }
+
+    setIsEditTags(false);
+    setEditTagId({ id: null, field: null });
+    tagsToBeDeleted.current = [];
   }
 
-  useEffect(() => {
-    if (!isDeletingTags && isEditTags) {
-      setIsEditTags(false);
-      setEditTagId({ id: null, field: null });
-      tagsToBeDeleted.current = [];
-    }
-  }, [isDeletingTags]);
+  // useEffect(() => {
+  //   if (!isDeletingTags && isEditTags) {
+
+  //   }
+  // }, [isDeletingTags]);
 
   return (
     <div>
@@ -121,9 +114,7 @@ function HomeTags({
             <h2 className="font-semibold">Edit Tags</h2>
             <div className="flex gap-2">
               <button
-                onClick={() => {
-                  handleTagDelete();
-                }}
+                onClick={handleTagDone}
                 className="text-sm cursor-pointer text-white bg-accent rounded-lg py-1 px-2"
               >
                 Done
@@ -153,16 +144,16 @@ function HomeTags({
                         value={tag.name}
                         size={tag.name.length || 1}
                         onChange={(event) => {
-                          editDraftTagName(event, tag.id);
+                          handleEditDraftTagName(event, tag.id);
                         }}
-                        onBlur={(event) => {
-                          const newName = event.target.value.trim();
-                          const originalTag = tags.find((t) => t.id === tag.id);
-                          if (newName && newName !== originalTag.name) {
-                            const newTag = { ...tag, name: newName };
-                            editRecipeTagAll(newTag);
-                          }
-                        }}
+                        // onBlur={(event) => {
+                        //   const newName = event.target.value.trim();
+                        //   const originalTag = tags.find((t) => t.id === tag.id);
+                        //   if (newName && newName !== originalTag.name) {
+                        //     const newTag = { ...tag, name: newName };
+                        //     editRecipeTagAll(newTag);
+                        //   }
+                        // }}
                       />
                       {editTagId.id === tag.id &&
                         editTagId.field === "Color" && (
@@ -170,15 +161,7 @@ function HomeTags({
                             anchorRef={{ current: tagRefs.current[tag.id] }}
                             color={tag.color}
                             onChange={(color) => {
-                              const newColor = color.hex;
-                              const originalTag = tags.find(
-                                (t) => t.id === tag.id
-                              );
-
-                              if (newColor && newColor !== originalTag.color) {
-                                const newTag = { ...tag, color: newColor };
-                                editRecipeTagAll(newTag);
-                              }
+                              handleEditDraftTagColor(color, tag);
                             }}
                             onClose={() => {
                               setEditTagId({ id: null, field: null });

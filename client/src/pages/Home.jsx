@@ -8,7 +8,10 @@ import UserOptions from "../components/UserOptions";
 function Home() {
   const { data: user, logout } = useUser();
   const { data: recipes } = useRecipes();
-  const { uniqueTags, deleteTagsAll, isDeletingTags } = useTags(user, recipes);
+  const { uniqueTags, deleteTagsAll, isDeletingTags, editTagsAll } = useTags(
+    user,
+    recipes
+  );
   // console.log(recipes);
 
   // const filteredRecipes = recipes?.filter((recipe) => {
@@ -45,6 +48,7 @@ function Home() {
             // editRecipeTagAll={editRecipeTagAll}
             deleteTagsAll={deleteTagsAll}
             isDeletingTags={isDeletingTags}
+            editTagsAll={editTagsAll}
           />
         </div>
 

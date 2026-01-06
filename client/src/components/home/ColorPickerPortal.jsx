@@ -34,7 +34,7 @@ function ColorPickerPortal({ anchorRef, color, onChange, onClose }) {
       }}
       className="absolute shadow-lg rounded-xl border bg-white"
     >
-      <div className="absolute top-8">
+      <div className="absolute pt-2">
         <SketchPicker
           color={color}
           onChangeComplete={onChange}

@@ -2,26 +2,7 @@ import express from "express";
 import db from "../db.js";
 import authMiddleware from "../middleware.js";
 const router = express.Router();
-// router.get("/tags", authMiddleware, async (req, res) => {
-//     const userId = req.user.id;
-//     try {
-//         const rows = db.prepare(`
-//            SELECT DISTINCT t.name
-//            FROM tags t
-//            JOIN recipe_tags rt ON rt.tag_id = t.id
-//            JOIN recipes r ON r.id = rt.recipe_id
-//            WHERE r.user_id = ?
-//         `).all(userId);
-
-//         const tags = rows.map(row => row.name);
-
-//         return res.json(tags);
-//     }
-//     catch (error) {
-//         console.error("DB error:", error);
-//         return res.status(500).json({ error: `DB error: ${error}` });
-//     }
-// })
+/* This route is used updating tags for all recipes */
 
 router.delete("/", authMiddleware, async (req, res) => {
     const { tagIds } = req.body;
@@ -47,4 +28,55 @@ router.delete("/", authMiddleware, async (req, res) => {
 
 });
 
+router.patch("/", authMiddleware, async (req, res) => {
+    const { tags } = req.body;
+    const userId = req.user.id;
+
+    if (!Array.isArray(tags) || tags.length === 0) {
+        return res.status(400).json({ error: "No tags provided" });
+    }
+
+    try {
+        const updateStatement = db.prepare(`
+            UPDATE tags 
+            SET name = COALESCE (?,name),
+                color = COALESCE (?,color)
+            WHERE id = ? AND user_id = ?
+            `);
+
+        const transaction = db.transaction((tags) => {
+            tags.forEach((tag) => {
+                updateStatement.run(tag.name ?? null, tag.color ?? null, tag.id, userId);
+            })
+        })
+
+        transaction(tags);
+        res.json({ success: true, updated: tags.length });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to update tag" });
+    }
+})
+
 export default router;
+
+// router.get("/tags", authMiddleware, async (req, res) => {
+//     const userId = req.user.id;
+//     try {
+//         const rows = db.prepare(`
+//            SELECT DISTINCT t.name
+//            FROM tags t
+//            JOIN recipe_tags rt ON rt.tag_id = t.id
+//            JOIN recipes r ON r.id = rt.recipe_id
+//            WHERE r.user_id = ?
+//         `).all(userId);
+
+//         const tags = rows.map(row => row.name);
+
+//         return res.json(tags);
+//     }
+//     catch (error) {
+//         console.error("DB error:", error);
+//         return res.status(500).json({ error: `DB error: ${error}` });
+//     }
+// })
