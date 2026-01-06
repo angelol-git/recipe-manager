@@ -1,6 +1,10 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteTagsAll } from "../api/tags.js";
 
 export function useTags(user, recipes = []) {
+  const queryClient = useQueryClient();
   const uniqueTags = useMemo(() => {
     if (!recipes.length) return [];
 
@@ -16,6 +20,19 @@ export function useTags(user, recipes = []) {
     return Array.from(map.values());
   }, [recipes]);
 
+  const deleteTagsAllMutation = useMutation({
+    mutationFn: async (tagIds) => deleteTagsAll(tagIds),
+
+    // onError: (err, variables, context) => {
+    //   if (context?.previousRecipes) {
+    //     queryClient.setQueryData(["recipes"], context.previousRecipes);
+    //   }
+    // },
+
+    onSettled: () => {
+      queryClient.invalidateQueries(["recipes"]);
+    },
+  });
   // const [tagsSelected, setTagsSelected] = useState(() => {
   //   if (!user?.id) return [];
   //   //Initialize react state when using react router actions, otherwise it will be empty.
@@ -62,5 +79,6 @@ export function useTags(user, recipes = []) {
 
   return {
     uniqueTags,
+    deleteTagsAll: deleteTagsAllMutation.mutate,
   };
 }

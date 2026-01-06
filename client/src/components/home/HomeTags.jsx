@@ -7,15 +7,16 @@ function HomeTags({
   // setTagsSelected,
   // handleTagClick,
   // editRecipeTagAll,
-  // deleteRecipeTagAll,
+  deleteTagsAll,
 }) {
+  const tagsToBeDeleted = useRef([]);
+  const [draftTags, setDraftTags] = useState([]);
   const [isEditTags, setIsEditTags] = useState(false);
   const [editTagId, setEditTagId] = useState({
     id: null,
     field: null,
   });
   const tagRefs = useRef({});
-
   const tagCount = tags.reduce((acc, tag) => {
     if (acc[tag.id]) {
       acc[tag.id] += 1;
@@ -25,16 +26,14 @@ function HomeTags({
     return acc;
   }, {});
 
-  const [draftTags, setDraftTags] = useState([]);
   useEffect(() => {
     if (isEditTags && tags) {
-      setDraftTags([...tags]);
+      setDraftTags(tags);
     }
   }, [tags, isEditTags]);
 
   function editDraftTagName(event, tagId) {
     const newName = event.target.value;
-
     setDraftTags((prevTag) => {
       return prevTag.map((t) => {
         if (t.id === tagId) {
@@ -46,14 +45,22 @@ function HomeTags({
     });
   }
 
-  // function handleTagDelete(tag) {
-  //   setTagsSelected((prev) => {
-  //     return prev.filter((t) => {
-  //       t.id !== tag.id;
-  //     });
-  //   });
-  //   deleteRecipeTagAll(tag);
-  // }
+  function handleDraftTagDelete(tag) {
+    tagsToBeDeleted.current.push(tag);
+    setDraftTags((prev) => {
+      return prev.filter((t) => t.id !== tag.id);
+    });
+  }
+
+  function handleTagDelete() {
+    if (tagsToBeDeleted.current.length > 0) {
+      // console.log(tagsToBeDeleted.current.map((t) => t.id));
+      deleteTagsAll(tagsToBeDeleted.current.map((t) => t.id));
+    }
+    setIsEditTags(false);
+    setEditTagId({ id: null, field: null });
+    tagsToBeDeleted.current = [];
+  }
 
   return (
     <div>
@@ -93,8 +100,6 @@ function HomeTags({
                       {tag.name}{" "}
                       <span className="text-secondary">({count})</span>
                     </div>
-
-                    {/* <div>{tagCount.find((t) => t.id === tag.id)}</div> */}
                   </button>
                 );
               })
@@ -112,8 +117,7 @@ function HomeTags({
             <div className="flex gap-2">
               <button
                 onClick={() => {
-                  setIsEditTags(false);
-                  setEditTagId({ id: null, field: null });
+                  handleTagDelete();
                 }}
                 className="text-sm cursor-pointer text-white bg-accent rounded-lg py-1 px-2"
               >
@@ -121,7 +125,7 @@ function HomeTags({
               </button>
             </div>
           </div>
-          {/* <div className="flex gap-3 py-2 flex-wrap">
+          <div className="flex gap-3 py-2 flex-wrap">
             {draftTags.length > 0 ? (
               draftTags.map((tag) => {
                 return (
@@ -179,7 +183,7 @@ function HomeTags({
                     </div>
                     <button
                       onClick={() => {
-                        handleTagDelete(tag);
+                        handleDraftTagDelete(tag);
                       }}
                       className="cursor-pointer"
                     >
@@ -197,7 +201,7 @@ function HomeTags({
                 No tags created yet.
               </div>
             )}
-          </div> */}
+          </div>
         </div>
       )}
     </div>

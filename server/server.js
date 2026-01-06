@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import authRoutes from "./routes/auth.js";
 import aiRoutes from "./routes/ai.js";
 import recipeRoutes from "./routes/recipes.js";
+import tagRoutes from "./routes/tags.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/recipes", recipeRoutes);
+app.use("/api/tags", tagRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on ${port}`);

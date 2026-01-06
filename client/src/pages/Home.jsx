@@ -8,7 +8,7 @@ import UserOptions from "../components/UserOptions";
 function Home() {
   const { data: user, logout } = useUser();
   const { data: recipes } = useRecipes();
-  const { uniqueTags } = useTags(user, recipes);
+  const { uniqueTags, deleteTagsAll } = useTags(user, recipes);
   // console.log(recipes);
 
   // const filteredRecipes = recipes?.filter((recipe) => {
@@ -43,14 +43,14 @@ function Home() {
             // setTagsSelected={setTagsSelected}
             // handleTagClick={handleTagClick}
             // editRecipeTagAll={editRecipeTagAll}
-            // deleteRecipeTagAll={deleteRecipeTagAll}
+            deleteTagsAll={deleteTagsAll}
           />
         </div>
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="font-semibold">
-              {/* Items({recipes?.length ?? "..."}) */}
+              Items({recipes?.length ?? "..."})
             </div>
             <Link
               to="/chat"

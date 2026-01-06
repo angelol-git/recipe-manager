@@ -124,6 +124,7 @@ export function useRecipes() {
       queryClient.invalidateQueries(["recipes"]);
     },
   });
+
   return {
     ...allRecipesQuery,
     deleteRecipeVersion: deleteRecipeVersionMutation.mutate,

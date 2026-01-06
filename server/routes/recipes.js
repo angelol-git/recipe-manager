@@ -72,27 +72,6 @@ router.get("/", authMiddleware, async (req, res) => {
     }
 })
 
-router.get("/tags", authMiddleware, async (req, res) => {
-    const userId = req.user.id;
-    try {
-        const rows = db.prepare(`
-           SELECT DISTINCT t.name
-           FROM tags t
-           JOIN recipe_tags rt ON rt.tag_id = t.id
-           JOIN recipes r ON r.id = rt.recipe_id
-           WHERE r.user_id = ?
-        `).all(userId);
-
-        const tags = rows.map(row => row.name);
-
-        return res.json(tags);
-    }
-    catch (error) {
-        console.error("DB error:", error);
-        return res.status(500).json({ error: `DB error: ${error}` });
-    }
-})
-
 router.get("/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
     try {
@@ -449,8 +428,6 @@ router.patch("/tag/:id", authMiddleware, async (req, res) => {
     }
 })
 
-
-
 router.delete("/:id/tag/:tagId", authMiddleware, async (req, res) => {
     const { id, tagId } = req.params;
     try {
@@ -466,28 +443,6 @@ router.delete("/:id/tag/:tagId", authMiddleware, async (req, res) => {
     }
 
 });
-
-
-router.delete("/tag/:id", authMiddleware, async (req, res) => {
-    const { id } = req.params;
-    try {
-        db.prepare(`
-            DELETE FROM recipe_tags WHERE tag_id = ?
-        `).run(id);
-
-        db.prepare(`
-            DELETE FROM tags WHERE id = ?
-        `).run(id);
-
-        return res.status(204).send();
-    }
-    catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to add tag" });
-    }
-
-});
-
 
 function safeParse(jsonString) {
     try {
