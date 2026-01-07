@@ -159,6 +159,7 @@ function HomeTags({
                           <ColorPickerPortal
                             anchorRef={{ current: tagRefs.current[tag.id] }}
                             color={tag.color}
+                            tagName={tag.name}
                             onChange={(color) => {
                               handleEditDraftTagColor(color, tag);
                             }}
