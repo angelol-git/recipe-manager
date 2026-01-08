@@ -30,7 +30,7 @@ function ChatHeader({
         {/* mobile only: placeholder to prevent shift */}
         {isSideBarOpen && isMobile && <div className="h-8 w-8" />}
       </div>
-      <h1 className="text-2xl font-semibold max-w-screen-xl font-lora w-full">
+      <h1 className="text-2xl font-semibold max-w-screen-md font-lora w-full px-4">
         {recipe?.title}
       </h1>
       {recipe && (

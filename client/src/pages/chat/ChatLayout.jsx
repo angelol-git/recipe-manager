@@ -41,7 +41,7 @@ const ChatLayout = () => {
   }, [recipes, id]);
 
   return (
-    <div className="bg-base relative flex min-h-screen lg:h-screen text-primary w-full">
+    <div className="bg-base relative flex min-h-screen text-primary w-full">
       <ChatSideBar
         recipes={recipes}
         recipe={recipe}
@@ -56,23 +56,21 @@ const ChatLayout = () => {
         />
       )}
 
-      <main className="w-full flex flex-col">
-        <Outlet
-          context={{
-            recipe,
-            recipeVersion,
-            setRecipeVersion,
-            message,
-            setMessage,
-            isMobile,
-            isSideBarOpen,
-            setIsSideBarOpen,
-            toast,
-            setToast,
-            showToast,
-          }}
-        />
-      </main>
+      <Outlet
+        context={{
+          recipe,
+          recipeVersion,
+          setRecipeVersion,
+          message,
+          setMessage,
+          isMobile,
+          isSideBarOpen,
+          setIsSideBarOpen,
+          toast,
+          setToast,
+          showToast,
+        }}
+      />
     </div>
   );
 };

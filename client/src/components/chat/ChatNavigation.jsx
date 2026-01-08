@@ -24,7 +24,7 @@ function ChatNavigation({
     return (
       <div
         className={`flex items-center gap-3 bg-overlay0 rounded-full m-4 p-1 ${
-          isChatOpen ? "absolute z-10" : null
+          isChatOpen ? "absolute bottom-0 z-10" : null
         }`}
       >
         <button

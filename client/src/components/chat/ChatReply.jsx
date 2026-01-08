@@ -23,12 +23,8 @@ function ChatReply({ recipe, setIsErrorModalOpen, recipeVersion }) {
   }, [isPromptModalOpen]);
 
   return (
-    <div className="pb-25 lg:p-2  h-full w-full overflow-y-auto">
-      <div
-        role="log"
-        aria-live="polite"
-        className="h-full columns-1 lg:columns-2 gap-8 chat-reply-columns pr-4"
-      >
+    <div className="flex flex-1 flex-col">
+      <div role="log" aria-live="polite" className="h-full  gap-8">
         <div
           role="group"
           aria-label="Recipe details"

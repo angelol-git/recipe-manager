@@ -61,33 +61,32 @@ function Chat() {
   }
 
   return (
-    <div className="bg-base relative flex min-h-screen lg:max-h-screen lg:h-screen text-primary lg:p-0 w-full ">
-      <div className="w-full flex flex-col">
-        <ChatHeader
-          recipe={recipe}
-          recipeVersion={recipeVersion}
-          isSideBarOpen={isSideBarOpen}
-          setIsSideBarOpen={setIsSideBarOpen}
-          setIsEditModalOpen={setIsEditModalOpen}
-          isMobile={isMobile}
-        />
-        <div className="items-center flex flex-col justify-center flex-1 w-full lg:min-h-0 ">
-          <div className="max-w-screen-xl flex flex-col flex-1 py-2 px-4  w-full h-full">
+    <div className="flex flex-col w-full">
+      <ChatHeader
+        recipe={recipe}
+        recipeVersion={recipeVersion}
+        isSideBarOpen={isSideBarOpen}
+        setIsSideBarOpen={setIsSideBarOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        isMobile={isMobile}
+      />
+      <div className="flex-1 items-center flex flex-col w-full">
+        <div className="flex-1 max-w-screen-md flex flex-col w-full">
+          <div className="flex-1 flex flex-col p-4">
             <ChatTags recipe={recipe} />
-            <div className="flex-1 lg:min-h-0 w-full">
-              <ChatReply
-                recipe={recipe}
-                setIsErrorModalOpen={setIsErrorModalOpen}
-                recipeVersion={recipeVersion}
-              />
-            </div>
-            {/* <ChatEditModal
+            <ChatReply
+              recipe={recipe}
+              setIsErrorModalOpen={setIsErrorModalOpen}
+              recipeVersion={recipeVersion}
+            />
+          </div>
+          {/* <ChatEditModal
                 isEditModalOpen={isEditModalOpen}
                 setIsEditModalOpen={setIsEditModalOpen}
                 recipe={recipe}
                 recipeVersion={recipeVersion}
               /> */}
-            {/* <ChatErrorModal
+          {/* <ChatErrorModal
                 isErrorModalOpen={isErrorModalOpen}
                 setIsErrorModalOpen={setIsErrorModalOpen}
                 errors={errors}
@@ -101,46 +100,39 @@ function Chat() {
                 sendAskMessage={sendAskMessage}
                 isReplyLoading={isReplyLoading}
               /> */}
-            {toast && (
-              <Toast
-                message={toast.message}
-                type={toast.type}
-                onClose={() => setToast(null)}
-              />
-            )}
-            <div
-              className={`${
-                isMobile ? "fixed" : "block"
-              } bottom-0 right-0 w-full flex lg:justify-center`}
-            >
-              <div
-                className={`relative lg:max-w-screen-sm w-full items-end flex ${
-                  hasRecipeNavigation ? "justify-between" : "justify-end"
-                } ${!isChatOpen && "lg:h-[104px]"}`}
-              >
-                <ChatNavigation
-                  recipe={recipe}
-                  recipeVersion={recipeVersion}
-                  setRecipeVersion={setRecipeVersion}
-                  isChatOpen={isChatOpen}
-                />
-                <ChatInput
-                  message={message}
-                  setMessage={setMessage}
-                  handleSendMessage={handleSendMessage}
-                  isPendingCreateMessage={isPendingCreateMessage}
-                  //Optional
-                  hasRecipeNavigation={hasRecipeNavigation}
-                  isChatOpen={isChatOpen}
-                  setIsChatOpen={setIsChatOpen}
-                  chatInputMode={chatInputMode}
-                  setChatInputMode={setChatInputMode}
-                  isAskModalOpen={isAskModalOpen}
-                  setIsAskModalOpen={setIsAskModalOpen}
-                  variant="existing"
-                />
-              </div>
-            </div>
+          {toast && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          )}
+          <div
+            className={`sticky bottom-0 flex ${
+              hasRecipeNavigation ? "justify-between" : "justify-end"
+            }`}
+          >
+            <ChatNavigation
+              recipe={recipe}
+              recipeVersion={recipeVersion}
+              setRecipeVersion={setRecipeVersion}
+              isChatOpen={isChatOpen}
+            />
+            <ChatInput
+              message={message}
+              setMessage={setMessage}
+              handleSendMessage={handleSendMessage}
+              isPendingCreateMessage={isPendingCreateMessage}
+              //Optional
+              hasRecipeNavigation={hasRecipeNavigation}
+              isChatOpen={isChatOpen}
+              setIsChatOpen={setIsChatOpen}
+              chatInputMode={chatInputMode}
+              setChatInputMode={setChatInputMode}
+              isAskModalOpen={isAskModalOpen}
+              setIsAskModalOpen={setIsAskModalOpen}
+              variant="existing"
+            />
           </div>
         </div>
       </div>
