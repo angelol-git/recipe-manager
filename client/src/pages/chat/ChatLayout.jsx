@@ -41,7 +41,7 @@ const ChatLayout = () => {
   }, [recipes, id]);
 
   return (
-    <div className="bg-base relative flex min-h-screen text-primary w-full">
+    <div className="bg-base relative h-full flex min-h-screen text-primary w-full">
       <ChatSideBar
         recipes={recipes}
         recipe={recipe}
