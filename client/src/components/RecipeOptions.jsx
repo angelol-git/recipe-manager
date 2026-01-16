@@ -4,19 +4,19 @@ import { CircleX, Share, Ellipsis } from "lucide-react";
 import { useRecipes } from "../hooks/useRecipes";
 
 function RecipeOptions({ recipe }) {
-  const menuRef = useRef(null);
+  const buttonRef = useRef(null);
   const portalRef = useRef(null);
 
-  //   console.log(menuRef.current?.getBoundingClientRect());
+  //   console.log(buttonRef.current?.getBoundingClientRect());
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const { deleteRecipe } = useRecipes();
 
   useEffect(() => {
     if (!isOptionsOpen) return;
-    function handleClickOutside(e) {
+    function handleClickOutside(event) {
       if (
-        menuRef.current &&
-        !menuRef.current.contains(e.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target) &&
         portalRef.current &&
         !portalRef.current.contains(event.target)
       ) {
@@ -31,7 +31,7 @@ function RecipeOptions({ recipe }) {
   }, [isOptionsOpen, setIsOptionsOpen]);
 
   return (
-    <div ref={menuRef} className="relative">
+    <div className="relative">
       <button
         onClick={(event) => {
           event.preventDefault();
@@ -44,6 +44,7 @@ function RecipeOptions({ recipe }) {
         className={`cursor-pointer font-bold px-2 py-1 color-black hover:bg-mantle-hover rounded-md ${
           isOptionsOpen ? "bg-crust" : ""
         }`}
+        ref={buttonRef}
       >
         <Ellipsis size={24} strokeWidth={1.5} className="stroke-icon" />
       </button>
@@ -51,10 +52,12 @@ function RecipeOptions({ recipe }) {
       {isOptionsOpen &&
         createPortal(
           <div
+            ref={portalRef}
             style={{
               position: "fixed",
-              top: menuRef.current?.getBoundingClientRect().bottom + "px",
-              left: menuRef.current?.getBoundingClientRect().left - 100 + "px",
+              top: buttonRef.current?.getBoundingClientRect().bottom + "px",
+              left:
+                buttonRef.current?.getBoundingClientRect().left - 100 + "px",
             }}
             className="z-1000 bg-mantle w-42 rounded-lg shadow-xl border border-secondary/60"
             role="menu"
