@@ -13,7 +13,6 @@ function ChatSideBar({
     <nav
       className={`
         fixed inset-y-0 left-0 z-100 
- 
         lg:relative lg:z-0 
         h-screen duration-200 ease-out transition-translate flex-col flex bg-mantle
         p-2 gap-4 text-sm lg:border-r-gray-300 lg:border-r-1 

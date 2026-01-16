@@ -5,6 +5,7 @@ import { useRecipes } from "../hooks/useRecipes";
 
 function RecipeOptions({ recipe }) {
   const menuRef = useRef(null);
+  const portalRef = useRef(null);
 
   //   console.log(menuRef.current?.getBoundingClientRect());
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -13,7 +14,12 @@ function RecipeOptions({ recipe }) {
   useEffect(() => {
     if (!isOptionsOpen) return;
     function handleClickOutside(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target) &&
+        portalRef.current &&
+        !portalRef.current.contains(event.target)
+      ) {
         setIsOptionsOpen(false);
       }
     }
@@ -56,7 +62,12 @@ function RecipeOptions({ recipe }) {
             <ul className="flex flex-col text-primary p-1">
               <li className="w-full">
                 <button
-                  onClick={() => setIsOptionsOpen(false)}
+                  onClick={(event) => {
+                    console.log("here");
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setIsOptionsOpen(false);
+                  }}
                   className="w-full px-3 py-3 flex justify-between items-center cursor-pointer rounded-lg hover:bg-mantle-hover transition-colors"
                 >
                   <div className="text-sm font-medium">Share</div>
@@ -72,9 +83,11 @@ function RecipeOptions({ recipe }) {
 
               <li className="w-full">
                 <button
-                  onClick={() => {
-                    setIsOptionsOpen(false);
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
                     deleteRecipe(recipe.id);
+                    setIsOptionsOpen(false);
                   }}
                   className="w-full px-3 py-3 flex justify-between items-center cursor-pointer rounded-lg hover:bg-rose/10 text-rose transition-colors"
                 >
