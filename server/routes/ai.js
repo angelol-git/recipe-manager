@@ -5,6 +5,7 @@ import authMiddleware from "../middleware.js";
 import { v7 as uuidv7 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 
+const model = "gemini-3-flash-preview"
 class AiValidationError extends Error {
     constructor(message, meta = {}) {
         super(message);
@@ -28,7 +29,7 @@ router.post("/create", authMiddleware, async (req, res) => {
 
         const prompt = createPrompt(message, recipeVersion || null);
         const aiResponse = await genAI.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: model,
             contents: [{ type: "text", text: prompt }],
             generationConfig: {
                 responseMimeType: "application/json",
@@ -86,7 +87,7 @@ function validateAiResponse({ response, recipeId, userId, message }) {
             type: "invalid_json",
             rawResponse,
             source_prompt: message,
-            ai_model: "gemini-2.5-flash"
+            ai_model: model
         })
         throw new AiValidationError("Invalid JSON from AI", {
             rawResponse,
@@ -184,33 +185,46 @@ function saveAiError(userId, recipeId, error) {
 }
 
 function createPrompt(message, recipeVersion = {}) {
+    //- Scaling: Adjust quantities/servings proportionally; keep calories per serving constant.
     return (`
-        Role: Recipe extractor/transformer. 
-        Input: URL, text, or modification request. Return {} if unrelated.
-        Constraint: Output ONLY raw valid JSON. No markdown, backticks, or explanations.
+       Role: Expert Culinary Data Engineer.
+        Goal: Parse the provided input into a structured JSON object with 100% fidelity to the source material.
 
-        Rules:
-        - ingredients: string array.
-        - instructions: array of single-action strings (no numbers/bullets).
-        - servings, calories, total_time: integers only (estimate if unknown).
-        - Scaling: Adjust quantities/servings proportionally; keep calories per serving constant.
+        ### Extraction Rules:
+        1. **Source Priority**: If a URL is provided, prioritize content within recipe schema containers (WPRM, Tasty Recipes, EasyRecipe).
+        2. **Ingredient Integrity**: 
+           - Capture the exact quantity, unit, and preparation (e.g., "115g (1/2 cup) unsalted butter, melted and cooled").
+        3. **Numerical Accuracy**: Do not round numbers. Do not convert units unless explicitly asked.
+        4. **Instruction Fidelity**: Extract every step. If steps are numbered, maintain that sequence. Include "Notes" if they contain crucial baking tips.
+        5. **Handling Updates**: If "recipeVersion" is populated, the user is asking for an iteration or correction. Compare the new input against the version provided below and output the updated state.
 
+      
         Schema:
         {
-        "title": "string",
-        "description": "string",
-        "ingredients": [],
-        "instructions": [],
-        "servings": 0,
-        "calories": 0,
-        "total_time": 0,
-        "source_prompt": "",
-        "ai_model": "gemini-2.5-flash"
+            "title": "string",
+
+            "description": "string",
+
+            "ingredients": [],
+
+            "instructions": [],
+
+            "servings": 0,
+
+            "calories": 0,
+
+            "total_time": 0,
+
+            "source_prompt": "",
+
+            "ai_model": ${model}
+
         }
 
-        New User input: ${message}
-
-        The user previously received this recipe from you: ${JSON.stringify(recipeVersion)}
+        Input to Process: ${message}
+        Current State (if any): ${JSON.stringify(recipeVersion)}
+        
+        Return ONLY valid JSON.
     `)
 }
 
@@ -240,6 +254,7 @@ function askPrompt(currentVersion, message) {
     User message: "${message}"
     `)
 }
+
 
 export default router;
 

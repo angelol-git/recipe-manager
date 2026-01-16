@@ -40,37 +40,27 @@ function ChatOptions({ recipe, setIsEditModalOpen }) {
 
       {isOptionsOpen && (
         <div
-          className="absolute right-0 z-50 bg-mantle w-42 py-0 px-3 rounded-lg shadow-xl border border-secondary/60"
+          className="absolute right-0 z-50 bg-mantle w-42 p-2 rounded-lg shadow-xl border border-secondary/60"
           role="menu"
         >
-          <ul className="flex flex-col divide-y divide-secondary/60 text-primary">
-            {/* <li>
-              <button
-                onClick={() => setIsOptionsOpen(false)}
-                className="w-full flex justify-between items-center py-2"
-              >
-                <CloneSvg />
-                <div>Clone</div>
-              </button>
-            </li> */}
-
+          <ul className="flex flex-col text-primary">
             <li>
               <button
                 onClick={() => setIsOptionsOpen(false)}
-                className="w-full flex justify-between items-center py-3 cursor-pointer"
+                className="w-full flex justify-between items-center py-3 cursor-pointer hover:bg-mantle-hover px-2 rounded-lg"
               >
                 <Share size={22} strokeWidth={1.25} className="stroke-icon" />
                 <div className="text-sm">Share</div>
               </button>
             </li>
-
+            <div className="h-[1px] bg-secondary/60 my-1" />
             <li>
               <button
                 onClick={() => {
                   setIsOptionsOpen(false);
                   setIsEditModalOpen(true);
                 }}
-                className="w-full flex justify-between items-center py-3 cursor-pointer"
+                className="w-full flex justify-between items-center py-3 cursor-pointer hover:bg-mantle-hover px-2 rounded-lg"
               >
                 <SquarePen
                   size={22}
@@ -80,6 +70,8 @@ function ChatOptions({ recipe, setIsEditModalOpen }) {
                 <div className="text-sm">Edit</div>
               </button>
             </li>
+
+            <div className="h-[1px] bg-secondary/60 my-1" />
 
             <li>
               <button
@@ -92,13 +84,14 @@ function ChatOptions({ recipe, setIsEditModalOpen }) {
                   }
                   navigate("/home");
                 }}
-                className="w-full flex justify-between items-center py-3 cursor-pointer"
+                className="w-full flex justify-between items-center py-3 cursor-pointer hover:bg-mantle-hover px-2 rounded-lg"
               >
                 <Trash2 size={22} strokeWidth={1.25} className="stroke-icon" />
                 <div className="text-sm">Delete Current</div>
               </button>
             </li>
 
+            <div className="h-[1px] bg-secondary/60 my-1" />
             <li>
               <button
                 onClick={() => {
@@ -107,7 +100,7 @@ function ChatOptions({ recipe, setIsEditModalOpen }) {
                   deleteRecipe(recipeId);
                   navigate("/home");
                 }}
-                className="w-full flex justify-between items-center py-3 text-rose"
+                className="w-full flex justify-between items-center py-3 text-rose cursor-pointer px-2 hover:bg-rose/10 rounded-lg"
               >
                 <CircleX size={22} strokeWidth={1.5} className="stroke-rose" />
                 <div className="text-sm font-medium">

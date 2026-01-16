@@ -44,10 +44,10 @@ const ChatLayout = () => {
     <div className="bg-base relative flex min-h-screen text-primary w-full">
       <ChatSideBar
         recipes={recipes}
-        recipe={recipe}
         isMobile={isMobile}
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
+        currentRecipe={recipe}
       />
       {isMobile && isSideBarOpen && (
         <div

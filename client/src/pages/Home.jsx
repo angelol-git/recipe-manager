@@ -3,8 +3,10 @@ import { useUser } from "../hooks/useUser";
 import { useRecipes } from "../hooks/useRecipes";
 import { useTags } from "../hooks/useTags";
 import { useEffect } from "react";
-import HomeTags from "../components/home/HomeTags";
 import UserOptions from "../components/UserOptions";
+import HomeTags from "../components/home/HomeTags";
+import HomeRecipeCard from "../components/home/HomeRecipeCard";
+
 function Home() {
   const { data: user, logout } = useUser();
   const { data: recipes } = useRecipes();
@@ -32,11 +34,6 @@ function Home() {
       );
     });
   });
-
-  function formatDate(dateString) {
-    const options = { year: "numeric", month: "short", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  }
 
   return (
     <div className="text-primary items-center bg-base p-5 lg:p-10 flex flex-col min-h-screen">
@@ -73,26 +70,7 @@ function Home() {
           </div>
           <div className="grid grid-cols-2 md:flex md:flex-wrap gap-4 lg:gap-6">
             {filteredRecipes?.map((recipe) => {
-              return (
-                <Link
-                  to={`/chat/${recipe.id}`}
-                  key={recipe.id}
-                  className="group relative w-full md:w-[230px] h-[250px] md:h-[275px] cursor-pointer"
-                >
-                  <div className="relative w-full h-full">
-                    <div className="absolute flex flex-col justify-between inset-0 border bg-mantle rounded-l-xl rounded-r-2xl p-4 border-black/30 transform transition-transform duration-200 origin-left group-hover:-rotate-y-15 z-20">
-                      <h3 className="font-medium font-lora text-xl">
-                        {recipe.title}
-                      </h3>
-                      <p className="text-secondary mt-auto">
-                        {formatDate(recipe.created_at)}
-                      </p>
-                    </div>
-
-                    <div className="absolute inset-0 bg-primary/40 rounded-r-2xl rounded-l-xl p-4 z-10"></div>
-                  </div>
-                </Link>
-              );
+              return <HomeRecipeCard key={recipe.id} recipe={recipe} />;
             })}
           </div>
         </div>

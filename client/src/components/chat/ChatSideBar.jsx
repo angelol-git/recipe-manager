@@ -1,20 +1,28 @@
 import { Link } from "react-router";
 import { Ellipsis, X, PanelLeftClose, CirclePlus } from "lucide-react";
+import RecipeOptions from "../recipeOptions";
+
 function ChatSideBar({
   recipes,
   isMobile,
-  currentRecipe,
   isSideBarOpen,
   setIsSideBarOpen,
+  currentRecipe,
 }) {
-  function formattedTitle(title) {
-    return title.length > 27 ? title.slice(0, 24) + "..." : title;
-  }
   return (
     <nav
-      className={`fixed top-0 left-0 duration-200 transform ease-out transition-transform z-100 gap-4 text-sm lg:border-r-gray-300 lg:border-r-1 p-2 h-full w-70 lg:w-75 bg-mantle flex-col flex ${
-        isSideBarOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      className={`
+        fixed inset-y-0 left-0 z-100 
+ 
+        lg:relative lg:z-0 
+        h-screen duration-200 ease-out transition-translate flex-col flex bg-mantle
+        p-2 gap-4 text-sm lg:border-r-gray-300 lg:border-r-1 
+        ${
+          isSideBarOpen
+            ? "translate-x-0 w-70 lg:w-75"
+            : "-translate-x-full lg:translate-x-0 lg:w-0 lg:p-0 overflow-hidden"
+        }
+      `}
     >
       <div className="flex justify-between items-center">
         <Link
@@ -63,29 +71,24 @@ function ChatSideBar({
       <div className="flex flex-col gap-1">
         <h2 className="text-secondary">Recipes</h2>
         <div className="flex w-full flex-col gap-2">
-          {recipes?.map((item) => {
+          {recipes?.map((recipe) => {
             return (
               <Link
-                to={`/chat/${item.id}`}
-                state={{ recipe: item }}
-                key={item.id}
+                to={`/chat/${recipe.id}`}
+                state={{ recipe }}
+                key={recipe.id}
                 onClick={() => {
                   if (isMobile) {
                     setIsSideBarOpen(false);
                   }
                 }}
-                className={`px-2 py-1 flex justify-between cursor-pointer rounded-lg hover:bg-mantle-hover ${
-                  currentRecipe?.id === item.id ? "bg-overlay0" : null
+                className={`items-center px-2 py-1 flex justify-between cursor-pointer rounded-lg hover:bg-mantle-hover ${
+                  currentRecipe?.id === recipe.id ? "bg-overlay0" : null
                 }`}
               >
-                <p>{formattedTitle(item.title)}</p>
-                <button className="cursor-pointer">
-                  <Ellipsis
-                    size={20}
-                    strokeWidth={1.5}
-                    className="stroke-icon"
-                  />
-                </button>
+                <p className="truncate">{recipe.title}</p>
+
+                <RecipeOptions recipe={recipe} />
               </Link>
             );
           })}
