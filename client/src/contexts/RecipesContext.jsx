@@ -100,35 +100,35 @@ export function RecipesProvider({ children }) {
   //   }
   // }
 
-  // async function updateRecipe(updatedRecipe, currentVersion) {
-  //   const prevRecipes = recipes;
-  //   setRecipes((prev) => {
-  //     return prev.map((item) => {
-  //       if (item.id === updatedRecipe.id) {
-  //         return updatedRecipe;
-  //       } else {
-  //         return item;
-  //       }
-  //     });
-  //   });
-  //   try {
-  //     const updatedVersion = updatedRecipe.versions[currentVersion];
-  //     const payload = {
-  //       recipe: {
-  //         title: updatedRecipe.title,
-  //         tags: updatedRecipe.tags,
-  //       },
+  async function updateRecipe(updatedRecipe, currentVersion) {
+    const prevRecipes = recipes;
+    setRecipes((prev) => {
+      return prev.map((item) => {
+        if (item.id === updatedRecipe.id) {
+          return updatedRecipe;
+        } else {
+          return item;
+        }
+      });
+    });
+    try {
+      const updatedVersion = updatedRecipe.versions[currentVersion];
+      const payload = {
+        recipe: {
+          title: updatedRecipe.title,
+          tags: updatedRecipe.tags,
+        },
 
-  //       version: {
-  //         id: updatedVersion.id,
-  //         description: updatedVersion.description,
-  //         servings: updatedVersion.servings,
-  //         total_time: updatedVersion.total_time,
-  //         calories: updatedVersion.calories,
-  //         instructions: updatedVersion.instructions,
-  //         ingredients: updatedVersion.ingredients,
-  //       },
-  //     };
+        version: {
+          id: updatedVersion.id,
+          description: updatedVersion.description,
+          servings: updatedVersion.servings,
+          total_time: updatedVersion.total_time,
+          calories: updatedVersion.calories,
+          instructions: updatedVersion.instructions,
+          ingredients: updatedVersion.ingredients,
+        },
+      };
 
   //     const result = await fetch(`${API_BASE}/recipes/${updatedRecipe.id}`, {
   //       method: "PUT",

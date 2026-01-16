@@ -80,9 +80,9 @@ export function useRecipes() {
   });
 
   const updateRecipeMutation = useMutation({
-    mutationFn: async ({ updatedRecipe }) => updateRecipe(updatedRecipe),
+    mutationFn: async (updatedRecipe) => updateRecipe(updatedRecipe),
 
-    onMutate: async ({ updatedRecipe }) => {
+    onMutate: async (updatedRecipe) => {
       await queryClient.cancelQueries(["recipes"]);
 
       const previousRecipes = queryClient.getQueryData(["recipes"]);
@@ -129,7 +129,7 @@ export function useRecipes() {
     ...allRecipesQuery,
     deleteRecipeVersion: deleteRecipeVersionMutation.mutate,
     deleteRecipe: deleteRecipeMutation.mutate,
-    updateRecipe: updateRecipeMutation,
+    updateRecipe: updateRecipeMutation.mutate,
     addRecipeTag: addRecipeTagMutation.mutate,
   };
 }

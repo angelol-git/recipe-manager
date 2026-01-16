@@ -45,6 +45,7 @@ function EditTagItem({
         )}
       </div>
       <button
+        type="button"
         onClick={() => {
           handleDelete(tag);
         }}

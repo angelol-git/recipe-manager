@@ -40,8 +40,8 @@ export async function deleteRecipe(recipeId) {
 }
 
 export async function updateRecipe(updatedRecipe) {
-    const res = await fetch(`${backendUrl}/recipes/${updatedRecipe.Id}`, {
-        method: "PUT",
+    const res = await fetch(`${backendUrl}/recipes/${updatedRecipe.recipe_id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ updatedRecipe }),
@@ -66,5 +66,4 @@ export async function addRecipeTag(recipeId, newTag) {
     }
     return true;
 }
-
 

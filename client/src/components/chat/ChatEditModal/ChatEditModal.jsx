@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { createPortal } from "react-dom";
+import { useRecipes } from "../../../hooks/useRecipes";
 import { useDraftRecipe } from "../../../hooks/useDraftRecipe";
 import EditTitle from "./EditTitle";
 import EditTags from "./EditTags";
@@ -15,6 +16,7 @@ function ChatEditModal({
   setIsEditModalOpen,
 }) {
   const modalRef = useRef(null);
+  const { updateRecipe } = useRecipes();
   const {
     draft,
     handleDraftString,
@@ -32,8 +34,8 @@ function ChatEditModal({
 
   function handleSave(event) {
     event.preventDefault();
+    updateRecipe(draft);
     setIsEditModalOpen(false);
-    // updateRecipe(draft, currentVersion);
   }
 
   if (!isEditModalOpen) return null;

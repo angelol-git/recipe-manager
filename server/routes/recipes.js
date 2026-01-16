@@ -255,18 +255,17 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
 })
 
 //Currently overrides the whole thing
-router.put("/:id", authMiddleware, async (req, res) => {
+router.patch("/:id", authMiddleware, async (req, res) => {
     const { id } = req.params;
-    // const userId = req.user.id;
-    const newRecipe = req.body.updatedRecipe;
-    const updatedVersionId = newRecipe.updatedVersionIndex;
-    const updatedVersion = newRecipe.versions.find((version) => version.id === updatedVersionId);
+    const userId = req.user.id;
+    const { updatedRecipe } = req.body;
+
     const updateRecipeTransaction = db.transaction(() => {
         const updateRecipe = db.prepare(`
             UPDATE recipes
             SET title = ? 
             WHERE id = ?
-        `).run(newRecipe.title, id);
+        `).run(updatedRecipe.title, id);
 
         if (updateRecipe.changes === 0) {
             return res.status(404).json({ error: "Recipe not found" });
@@ -280,68 +279,37 @@ router.put("/:id", authMiddleware, async (req, res) => {
                 description= ?, 
                 instructions = ?, 
                 ingredients = ?
-            WHERE id = ?
+            WHERE id = ? ANd recipe_id = ?
         `).run(
-            updatedVersion.servings,
-            updatedVersion.total_time,
-            updatedVersion.calories,
-            updatedVersion.description,
-            JSON.stringify(updatedVersion.instructions),
-            JSON.stringify(updatedVersion.ingredients),
-            updatedVersion.id,
+            updatedRecipe.recipeDetails.servings,
+            updatedRecipe.recipeDetails.total_time,
+            updatedRecipe.recipeDetails.calories,
+            updatedRecipe.description,
+            JSON.stringify(updatedRecipe.instructions),
+            JSON.stringify(updatedRecipe.ingredients),
+            updatedRecipe.id,
+            id,
         );
 
-        if (updateRecipeVersion.changes === 0) {
-            return res.status(404).json({ error: "Recipe version not found" });
+        const incomingTagIds = updatedRecipe.tags.map(t => t.id);
+
+        db.prepare(`
+            DELETE FROM recipe_tags 
+            WHERE recipe_id = ? AND tag_id NOT IN (${incomingTagIds.map(() => '?').join(',')})
+        `).run(id, ...incomingTagIds);
+
+        for (const tag of updatedRecipe.tags) {
+            db.prepare(`
+            UPDATE tags 
+            SET name = ?, color = ? 
+            WHERE id = ? AND user_id = ?
+        `).run(tag.name, tag.color, tag.id, userId);
         }
 
-        // for (const tag of newRecipe.tags) {
-        //     let tagRow = db.prepare(`
-        //         SELECT * FROM tags 
-        //         WHERE user_id = ? AND id = ?
-        //         `).get(userId, tag.id);
-
-        //     if (tagRow) {
-        //         if (tagRow.color !== tag.color) {
-        //             db.prepare(`
-        //                 UPDATE tags 
-        //                 SET color = ? 
-        //                 WHERE id = ? 
-        //                 `).run(tag.color, tag.id);
-        //         }
-        //         if (tagRow.name !== tag.name) {
-        //             db.prepare(`
-        //                 UPDATE tags 
-        //                 SET name = ? 
-        //                 WHERE id = ? 
-        //                 `).run(tag.name, tag.id);
-        //         }
-
-        //         tagRow.id = tagRow.id.toString();
-        //     }
-        // }
-
-        // const existingTags = db.prepare(`
-        //     SELECT tag_id FROM recipe_tags 
-        //     WHERE recipe_id = ?
-        // `).all(id);
-
-        // const newTagIds = newRecipe.tags.map(t => t.id);
-        // const tagsToRemove = existingTags.filter(t => !newTagIds.includes((t.tag_id).toString()));
-        // // console.log("current tags:", newTagIds);
-        // // console.log("existing tags:", existingTags);
-        // // console.log("removing tags:", tagsToRemove);
-        // for (const tag of tagsToRemove) {
-        //     db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(id, tag.tag_id);
-
-        //     const usage = db.prepare(`SELECT COUNT (*) as count FROM recipe_tags WHERE tag_id = ?`).get(tag.tag_id);
-
-        //     if (usage.count === 0) {
-        //         db.prepare(`DELETE FROM tags WHERE id = ?`).run(tag.tag_id);
-        //     }
-        // }
-
-
+        db.prepare(`
+            DELETE FROM tags 
+            WHERE id NOT IN (SELECT tag_id FROM recipe_tags)
+        `).run();
     })
     try {
         updateRecipeTransaction();

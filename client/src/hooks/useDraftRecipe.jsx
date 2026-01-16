@@ -108,6 +108,7 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
       };
     });
   }
+
   return {
     draft,
     handleDraftString,
