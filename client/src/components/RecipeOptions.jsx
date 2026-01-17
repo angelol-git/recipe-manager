@@ -1,14 +1,13 @@
 import { createPortal } from "react-dom";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { CircleX, Share, Ellipsis } from "lucide-react";
 import { useRecipes } from "../hooks/useRecipes";
 
-function RecipeOptions({ recipe }) {
+function RecipeOptions({ recipe, isOptionsOpen, setIsOptionsOpen }) {
   const buttonRef = useRef(null);
   const portalRef = useRef(null);
 
   //   console.log(buttonRef.current?.getBoundingClientRect());
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const { deleteRecipe } = useRecipes();
 
   useEffect(() => {

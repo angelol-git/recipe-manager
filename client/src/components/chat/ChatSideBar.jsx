@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router";
-import { Ellipsis, X, PanelLeftClose, CirclePlus } from "lucide-react";
+import { X, PanelLeftClose, CirclePlus } from "lucide-react";
 import RecipeOptions from "../recipeOptions";
 
 function ChatSideBar({
@@ -72,23 +73,13 @@ function ChatSideBar({
         <div className="flex w-full flex-col gap-2">
           {recipes?.map((recipe) => {
             return (
-              <Link
-                to={`/chat/${recipe.id}`}
-                state={{ recipe }}
+              <SideBarItem
                 key={recipe.id}
-                onClick={() => {
-                  if (isMobile) {
-                    setIsSideBarOpen(false);
-                  }
-                }}
-                className={`items-center px-2 py-1 flex justify-between cursor-pointer rounded-lg hover:bg-mantle-hover ${
-                  currentRecipe?.id === recipe.id ? "bg-overlay0" : null
-                }`}
-              >
-                <p className="truncate">{recipe.title}</p>
-
-                <RecipeOptions recipe={recipe} />
-              </Link>
+                recipe={recipe}
+                currentRecipe={currentRecipe}
+                isMobile={isMobile}
+                setIsSideBarOpen={setIsSideBarOpen}
+              />
             );
           })}
         </div>
@@ -98,3 +89,29 @@ function ChatSideBar({
 }
 
 export default ChatSideBar;
+
+function SideBarItem({ recipe, currentRecipe, isMobile, setIsSideBarOpen }) {
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  return (
+    <Link
+      to={`/chat/${recipe.id}`}
+      state={{ recipe }}
+      onClick={() => {
+        if (isMobile) {
+          setIsSideBarOpen(false);
+        }
+      }}
+      className={`items-center px-2 py-1 flex justify-between cursor-pointer rounded-lg hover:bg-mantle-hover ${
+        currentRecipe?.id === recipe.id ? "bg-overlay0" : null
+      }`}
+    >
+      <p className="truncate">{recipe.title}</p>
+
+      <RecipeOptions
+        recipe={recipe}
+        isOptionsOpen={isOptionsOpen}
+        setIsOptionsOpen={setIsOptionsOpen}
+      />
+    </Link>
+  );
+}
