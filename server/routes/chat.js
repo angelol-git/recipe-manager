@@ -1,11 +1,18 @@
 import express from "express";
 import db from "../db.js";
 import authMiddleware from "../middleware.js";
+import TurndownService from "turndown";
 import { Impit } from "impit";
-// import { writeFile } from "fs/promises";
+// import fs from "fs";
 import * as cheerio from "cheerio";
 import { generateResponse, validateAiResponse, createPrompt } from "./ai.js";
-
+class AiValidationError extends Error {
+  constructor(message, meta = {}) {
+    super(message);
+    this.name = "AiValidationError";
+    this.meta = meta;
+  }
+}
 const router = express.Router();
 router.post("/create", authMiddleware, async (req, res) => {
   const { message, recipeId, recipeVersion } = req.body;
@@ -17,12 +24,16 @@ router.post("/create", authMiddleware, async (req, res) => {
         VALUES (?, ?, 'user', ?,'create')`,
     ).run(req.user.id, recipeId ?? null, message);
 
-    //Check if message contains url
     let urlContent = await checkMessageURL(message);
+    const contextData =
+      typeof urlContent === "object"
+        ? JSON.stringify(urlContent, null, 2)
+        : urlContent;
+
     const prompt = createPrompt(
       message,
       recipeVersion || null,
-      JSON.stringify(urlContent) || null,
+      contextData || null,
     );
 
     const aiResponse = await generateResponse(prompt);
@@ -51,30 +62,32 @@ async function checkMessageURL(message) {
   const URL_REGEX = /(https?:\/\/[^\s]+)/i;
   const containsUrl = message.match(URL_REGEX);
   const url = containsUrl ? containsUrl[1] : null;
-  if (url) {
-    const impit = new Impit({
-      browser: "chrome",
-      ignoreTlsErrors: true,
-    });
-
-    const response = await impit.fetch(url);
-    const html = await response.text();
-
-    //#1: get information from application/db
-    const jsonLd = checkJsonLd(html);
-    return jsonLd;
-    // await writeFile("output.html", jsonLd, "utf8");
-    //#2: get information from html
-
-    // $(REMOVE_SELECTORS).remove();
-    // console.log(bodyInnerHtml)
+  if (!url) {
+    return null;
   }
+
+  const impit = new Impit({
+    browser: "chrome",
+    ignoreTlsErrors: true,
+  });
+
+  const response = await impit.fetch(url);
+  const html = await response.text();
+  const $ = cheerio.load(html);
+  //#1: get information from application/db
+  const jsonLd = checkJsonLd($);
+  if (jsonLd) {
+    return jsonLd;
+  }
+
+  //#2: if jsonLd does not exist get information from html
+  const bodyContent = checkHtml($);
+  return bodyContent;
+  // fs.writeFileSync("output.md", bodyContent, "utf8");
 }
 
-function checkJsonLd(html) {
-  const $ = cheerio.load(html);
+function checkJsonLd($) {
   const scripts = $('script[type="application/ld+json"]');
-
   let result = null;
   scripts.each((i, el) => {
     try {
@@ -94,28 +107,26 @@ function checkJsonLd(html) {
   return result;
 }
 
+function checkHtml($) {
+  $(REMOVE_SELECTORS).remove();
+  const bodyInnerHtml = $("body").html();
+  const turndownService = new TurndownService({
+    headingStyle: "atx",
+    hr: "---",
+    bulletListMarker: "-",
+    codeBlockStyle: "fenced",
+  });
+
+  const markdown = turndownService.turndown(bodyInnerHtml);
+  // fs.writeFileSync("output.html", bodyInnerHtml, "utf8");
+  return markdown.replace(/\n\s*\n\s*\n/g, "\n\n");
+}
 const REMOVE_SELECTORS = `
-  style,
-  nav,
-  footer,
-  header,
-  iframe,
-  img,
-  svg,
-  picture,
-  video,
-  audio,
-  canvas,
-  figure,
-  noscript,
-  button,
-  form,
-  input,
-  textarea,
-  select,
-  option,
-  aside,
-  ads
+  style, script, nav, footer, header, .drawer-nav, .site-header,
+  .social-menu, .jump-button-group, .post-disclosure, .skip-link,
+  .screen-reader-text, blockquote, .faq-section, .savetherecipe,
+  iframe, img, svg, picture, video, noscript, button, form, 
+  aside, .ads, .sidebar, .nav-menu
 `;
 
 export default router;
