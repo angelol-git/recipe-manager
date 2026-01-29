@@ -1,10 +1,9 @@
 import express from "express";
-import dotenv, { parse } from "dotenv";
+import dotenv from "dotenv";
 import db from "../db.js";
-import authMiddleware from "../middleware.js";
 import { v7 as uuidv7 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
-import { Impit } from "impit";
+
 const model = "gemini-3-flash-preview";
 class AiValidationError extends Error {
   constructor(message, meta = {}) {
@@ -18,57 +17,20 @@ dotenv.config();
 const router = express.Router();
 const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
-router.post("/create", authMiddleware, async (req, res) => {
-  const { message, recipeId, recipeVersion } = req.body;
-  if (!message?.trim())
-    return res.status(400).json({ error: "Message is required" });
-  try {
-    db.prepare(
-      `
-            INSERT INTO messages (user_id, recipe_id, role, content,status)
-            VALUES (?, ?, 'user', ?,'create')
-        `,
-    ).run(req.user.id, recipeId ?? null, message);
+export async function generateResponse(prompt) {
+  const aiResponse = await genAI.models.generateContent({
+    model: model,
+    contents: [{ type: "text", text: prompt }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.7,
+      // responseSchema: recipeSchema,
+    },
+  });
+  return aiResponse;
+}
 
-    //Check if message contains url
-    let htmlContent = checkMessageURL(message);
-    const prompt = createPrompt(
-      message,
-      recipeVersion || null,
-      htmlContent || null,
-    );
-
-    const aiResponse = await genAI.models.generateContent({
-      model: model,
-      contents: [{ type: "text", text: prompt }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.7,
-        // responseSchema: recipeSchema,
-      },
-    });
-
-    const reply = validateAiResponse({
-      response: aiResponse,
-      recipeId: recipeId ?? null,
-      userId: req.user.id,
-      message,
-    });
-
-    // return res.json({ reply });
-  } catch (err) {
-    const now = new Date();
-    if (err instanceof AiValidationError) {
-      console.error(`[${now.toISOString()}] AI validation failed`, err.meta);
-      return res.status(400).json({ error: err.message });
-    }
-
-    console.error(`[${now.toISOString()}] Create recipe failed`, err);
-    return res.status(500).json({ error: "Something went wrong" });
-  }
-});
-
-function validateAiResponse({ response, recipeId, userId, message }) {
+export function validateAiResponse({ response, recipeId, userId, message }) {
   let rawResponse = response.candidates[0].content.parts[0].text.trim();
 
   if (!rawResponse) {
@@ -218,51 +180,42 @@ function saveAiError(userId, recipeId, error) {
   ).run(userId, recipeId || null, JSON.stringify(error));
 }
 
-function createPrompt(message, recipeVersion = {}) {
+export function createPrompt(message, recipeVersion = {}, urlContent = {}) {
   //- Scaling: Adjust quantities/servings proportionally; keep calories per serving constant.
   return `
-       Role: Expert Culinary Data Engineer.
-        Goal: Parse the provided input into a structured JSON object with 100% fidelity to the source material.
-
-        ### Extraction Rules:
-        1. **Source Priority**: If a URL is provided, prioritize content within recipe schema containers (WPRM, Tasty Recipes, EasyRecipe).
-        2. **Ingredient Integrity**: 
-           - Capture the exact quantity, unit, and preparation (e.g., "115g (1/2 cup) unsalted butter, melted and cooled").
-        3. **Numerical Accuracy**: Do not round numbers. Do not convert units unless explicitly asked.
-        4. **Instruction Fidelity**: Extract every step. If steps are numbered, maintain that sequence. Include "Notes" if they contain crucial baking tips.
-        5. **Handling Updates**: If "recipeVersion" is populated, the user is asking for an iteration or correction. Compare the new input against the version provided below and output the updated state.
-
-      
-        Schema:
-        {
-            "title": "string",
-
-            "description": "string",
-
-            "ingredients": [],
-
-            "instructions": [],
-
-            "servings": 0,
-
-            "calories": 0,
-
-            "total_time": 0,
-
-            "source_prompt": "",
-
-            "ai_model": ${model}
-
-        }
-
-        Input to Process: ${message}
-        Current State (if any): ${JSON.stringify(recipeVersion)}
-        
-        Return ONLY valid JSON.
-    `;
+    TASK: Parse the following culinary input into a strict JSON object.
+    
+    RULES:
+    1. Accuracy: Maintain 100% fidelity to source measurements. Do not convert units.
+    2. Hierarchy: If a URL is provided, prioritize structured JSON-LD or Recipe Schema data.
+    3. Update Logic: If a Current State is provided, apply the User Message as a modification to that state.
+    4. Format: Return ONLY valid JSON. No markdown backticks. No conversational filler.
+  1. **Servings**: If missing, infer from ingredient volumes (e.g., a recipe using 2lbs of flour/meat usually serves 6-8). Fallback to 1 for drinks/single bowls.
+    2. **Total Time**: Sum all "active" and "passive" times mentioned in the steps (e.g., 10m prep + 30m bake = 40). If no times are mentioned, estimate based on industry standards for the dish type.
+    3. **Calories (Inference Required)**: If calorie data is missing, calculate a conservative estimate per serving. 
+       - Aggregate the standard caloric values of the major ingredients (proteins, fats, carbs).
+       - Ensure the estimate is realistic for the dish type (e.g., a salad shouldn't be 1000kcal, a burger shouldn't be 100kcal).
+       - **Constraint**: Provide a single integer representing calories per serving.
+    SCHEMA:
+     {
+      "title": "string",
+      "description": "string",
+      "ingredients": ["string"],
+      "instructions": ["string"],
+      "servings": number,
+      "calories": number (estimated if not provided),
+      "total_time": number in minutes (estimated if not provided),
+      "source_prompt": "${message}",
+      "ai_model": "${model}"
+    }
+    CONTEXT:
+    - User Message: "${message}"
+    - Extracted Web Data: ${urlContent || "None"}
+    - Current State: ${JSON.stringify(recipeVersion)}
+  `;
 }
 
-function askPrompt(currentVersion, message) {
+export function askPrompt(currentVersion, message) {
   return `
     You are a cooking and recipe assistant.
 
@@ -290,41 +243,6 @@ function askPrompt(currentVersion, message) {
 }
 
 export default router;
-
-function checkMessageURL(message) {
-  const URL_REGEX = /(https?:\/\/[^\s]+)/i;
-
-  const containsUrl = URL_REGEX.test(message);
-  if (containsUrl) {
-  }
-}
-
-// const recipeSchema = {
-//     type: "object",
-//     properties: {
-//         title: { type: "string" },
-//         description: { type: "string" },
-//         ingredients: {
-//             type: "array",
-//             items: { type: "string" },
-//             description: "List of ingredients with quantities"
-//         },
-//         instructions: {
-//             type: "array",
-//             items: { type: "string" },
-//             description: "Step-by-step cooking actions without numbers"
-//         },
-//         servings: { type: "integer" },
-//         calories: { type: "integer" },
-//         total_time: {
-//             type: "integer",
-//             description: "Total time in minutes"
-//         },
-//         source_prompt: { type: "string" },
-//         ai_model: { type: "string" }
-//     },
-//     required: ["title", "ingredients", "instructions", "servings", "calories", "total_time"]
-// };
 
 // router.post("/ask", authMiddleware, async (req, res) => {
 //     const { message, currentVersion, recipeId } = req.body;
