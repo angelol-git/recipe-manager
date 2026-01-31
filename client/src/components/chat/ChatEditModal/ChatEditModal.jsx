@@ -88,6 +88,8 @@ function ChatEditModal({
             draft={draft}
             handleDraftArrayUpdate={handleDraftArrayUpdate}
             handleDraftArrayDelete={handleDraftArrayDelete}
+            handleDraftArrayPush={handleDraftArrayPush}
+            handleDraftArrayReorder={handleDraftArrayReorder}
           />
           <EditInstructions
             draft={draft}

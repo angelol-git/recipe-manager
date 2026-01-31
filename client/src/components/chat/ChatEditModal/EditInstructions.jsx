@@ -1,6 +1,8 @@
-import { X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+
+import { X } from "lucide-react";
 import SortableInstruction from "./SortableInstruction";
+
 import {
   DndContext,
   closestCenter,
@@ -40,12 +42,10 @@ function EditInstructions({
 
   function handleDragEnd(event) {
     const { active, over } = event;
-
     if (!over) {
       console.log("No drop target");
       return;
     }
-    //Dropped on itself
     if (active.id === over.id) {
       console.log("Dropped on itself");
       return;
@@ -54,15 +54,12 @@ function EditInstructions({
     const oldIndex = draft?.instructions.findIndex((i) => i.id === active.id);
     const newIndex = draft?.instructions.findIndex((i) => i.id === over.id);
 
-    console.log("Indices:", { oldIndex, newIndex });
-
     if (oldIndex !== -1 && newIndex !== -1) {
       const reorderedInstructions = arrayMove(
         draft?.instructions,
         oldIndex,
         newIndex,
       );
-      console.log("Reordering to:", reorderedInstructions);
       handleDraftArrayReorder("instructions", reorderedInstructions);
     }
   }

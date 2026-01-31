@@ -14,6 +14,12 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
         text: text,
       })) || [];
 
+    const ingredientsWithIds =
+      currentVersion.ingredients?.map((text, index) => ({
+        id: `ingredient-${recipe.id}-${index}`,
+        text: text,
+      })) || [];
+
     let draftRecipe = {
       recipe_id: recipe.id,
       title: recipe.title,
@@ -21,6 +27,7 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
       tags: recipe.tags || [],
       ...currentVersion,
       instructions: instructionsWithIds,
+      ingredients: ingredientsWithIds,
     };
 
     setDraft(draftRecipe);
@@ -97,8 +104,7 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
         ...prev,
         [field]: prev[field].map((item, index) => {
           if (targetIndex === index) {
-            // If it's instructions field, update the text property
-            if (field === "instructions") {
+            if (field === "instructions" || field === "ingredients") {
               return { ...item, text: value };
             }
             return value;
@@ -121,9 +127,9 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
 
   function handleDraftArrayPush(field, newValue) {
     setDraft((prev) => {
-      if (field === "instructions") {
+      if (field === "instructions" || field === "ingredients") {
         const newItem = {
-          id: `instruction-${prev.recipe_id}-${Date.now()}`,
+          id: `${field.slice(0, -1)}-${prev.recipe_id}-${Date.now()}`,
           text: newValue,
         };
         return {

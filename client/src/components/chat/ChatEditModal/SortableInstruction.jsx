@@ -36,7 +36,7 @@ function SortableInstruction({
       }`}
     >
       <div className="flex gap-2 w-full">
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center ">
           <span className="font-semibold font-lora">{index + 1}. </span>
           <button
             type="button"
@@ -48,7 +48,7 @@ function SortableInstruction({
             aria-label={`Drag to reorder instruction ${index + 1}`}
           >
             <GripVertical
-              size={20}
+              size={16}
               className={`flex flex-col ${
                 isDragging ? "stroke-accent" : "stroke-secondary/50"
               }`}
