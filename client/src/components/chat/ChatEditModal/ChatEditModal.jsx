@@ -39,7 +39,7 @@ function ChatEditModal({
     // Convert instructions from objects back to strings for saving
     const recipeToSave = {
       ...draft,
-      instructions: draft.instructions.map(item => item.text),
+      instructions: draft.instructions.map((item) => item.text),
     };
     updateRecipe(recipeToSave);
     setIsEditModalOpen(false);
@@ -53,17 +53,17 @@ function ChatEditModal({
         ref={modalRef}
         className={`w-full lg:max-w-screen-md max-h-[95vh] px-3 pt-6 pb-10 flex flex-col bg-base rounded-t-xl shadow-lg transform transition-transform ease-out duration-300 overflow-hidden ${isEditModalOpen ? "translate-y-0" : "translate-y-full"}`}
       >
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-center">
           <button
             onClick={() => setIsEditModalOpen(false)}
-            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer"
+            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18 text-start"
           >
             Cancel
           </button>
-          <h2 className="font-bold pb-2">Edit Recipe</h2>
+          <h2 className="font-bold pb-2 py-1">Edit Recipe</h2>
           <button
             onClick={handleSave}
-            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer"
+            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18 text-end"
           >
             Save
           </button>
