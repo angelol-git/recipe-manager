@@ -24,17 +24,33 @@ router.post("/create", authMiddleware, async (req, res) => {
         VALUES (?, ?, 'user', ?,'create')`,
     ).run(req.user.id, recipeId ?? null, message);
 
-    let urlContent = await checkMessageURL(message);
+    const URL_REGEX = /(https?:\/\/[^\s]+)/i;
+    const containsUrl = message.match(URL_REGEX);
+    const url = containsUrl ? containsUrl[1] : null;
+
+    // if (url) {
+    //   //#1 check db if source url of recipe already exist
+    //   const sourceExists = db
+    //     .prepare(
+    //       `
+    //         SELECT source_url
+    //         FROM recipes
+    //         WHERE source_url = ?
+    //       `,
+    //     )
+    //     .get(source_url);
+
+    //   //existing recipe from url and message has no modifications
+    //   if (sourceExists && message === url) {
+    //     return;
+    //   }
+    // }
+    let urlContent = await checkMessageURL(url);
     const contextData =
       typeof urlContent === "object"
         ? JSON.stringify(urlContent, null, 2)
         : urlContent;
-
-    const prompt = createPrompt(
-      message,
-      recipeVersion || null,
-      contextData || null,
-    );
+    const prompt = createPrompt(message, recipeVersion || null, contextData);
 
     const aiResponse = await generateResponse(prompt);
 
@@ -43,6 +59,7 @@ router.post("/create", authMiddleware, async (req, res) => {
       recipeId: recipeId ?? null,
       userId: req.user.id,
       message,
+      url,
     });
 
     return res.json({ reply });
@@ -58,14 +75,7 @@ router.post("/create", authMiddleware, async (req, res) => {
   }
 });
 
-async function checkMessageURL(message) {
-  const URL_REGEX = /(https?:\/\/[^\s]+)/i;
-  const containsUrl = message.match(URL_REGEX);
-  const url = containsUrl ? containsUrl[1] : null;
-  if (!url) {
-    return null;
-  }
-
+async function checkMessageURL(url) {
   const impit = new Impit({
     browser: "chrome",
     ignoreTlsErrors: true,

@@ -6,13 +6,21 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
     if (!recipe || !isEditModalOpen) return;
 
     const currentVersion = recipe.versions[recipeVersion];
+    if (!currentVersion) return;
+
+    const instructionsWithIds =
+      currentVersion.instructions?.map((text, index) => ({
+        id: `instruction-${recipe.id}-${index}`,
+        text: text,
+      })) || [];
 
     let draftRecipe = {
       recipe_id: recipe.id,
       title: recipe.title,
       created_at: recipe.created_at,
-      tags: recipe.tags,
+      tags: recipe.tags || [],
       ...currentVersion,
+      instructions: instructionsWithIds,
     };
 
     setDraft(draftRecipe);
@@ -89,11 +97,43 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
         ...prev,
         [field]: prev[field].map((item, index) => {
           if (targetIndex === index) {
+            // If it's instructions field, update the text property
+            if (field === "instructions") {
+              return { ...item, text: value };
+            }
             return value;
           } else {
             return item;
           }
         }),
+      };
+    });
+  }
+
+  function handleDraftArrayReorder(field, reorderedArray) {
+    setDraft((prev) => {
+      return {
+        ...prev,
+        [field]: reorderedArray,
+      };
+    });
+  }
+
+  function handleDraftArrayPush(field, newValue) {
+    setDraft((prev) => {
+      if (field === "instructions") {
+        const newItem = {
+          id: `instruction-${prev.recipe_id}-${Date.now()}`,
+          text: newValue,
+        };
+        return {
+          ...prev,
+          [field]: [...prev[field], newItem],
+        };
+      }
+      return {
+        ...prev,
+        [field]: [...prev[field], newValue],
       };
     });
   }
@@ -118,5 +158,7 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
     handleDraftTagDelete,
     handleDraftArrayUpdate,
     handleDraftArrayDelete,
+    handleDraftArrayPush,
+    handleDraftArrayReorder,
   };
 }

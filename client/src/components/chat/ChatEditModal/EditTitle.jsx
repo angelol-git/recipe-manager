@@ -19,10 +19,10 @@ function EditTitle({ draft, handleDraftString }) {
             />
           </div>
           <div
-            className="self-end text-xs"
             onClick={() => {
               handleDraftString("title", "");
             }}
+            className="self-end text-xs cursor-pointer"
           >
             Clear
           </div>

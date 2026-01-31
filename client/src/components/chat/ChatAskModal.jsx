@@ -33,7 +33,7 @@ function ChatAskModal({
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTo({
         top: messagesEndRef.current.scrollHeight,
-        // behavior: "smooth",
+        behavior: "smooth",
       });
     }
   }
@@ -101,7 +101,7 @@ function ChatAskModal({
         />
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

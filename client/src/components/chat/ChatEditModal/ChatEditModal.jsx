@@ -26,6 +26,8 @@ function ChatEditModal({
     handleDraftTagDelete,
     handleDraftArrayUpdate,
     handleDraftArrayDelete,
+    handleDraftArrayPush,
+    handleDraftArrayReorder,
   } = useDraftRecipe({
     recipe,
     recipeVersion,
@@ -34,25 +36,39 @@ function ChatEditModal({
 
   function handleSave(event) {
     event.preventDefault();
-    updateRecipe(draft);
+    // Convert instructions from objects back to strings for saving
+    const recipeToSave = {
+      ...draft,
+      instructions: draft.instructions.map(item => item.text),
+    };
+    updateRecipe(recipeToSave);
     setIsEditModalOpen(false);
   }
 
-  if (!isEditModalOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 bg-black/30 flex  z-50 w-full">
+    <div
+      className={`fixed inset-0 bg-black/30 flex z-50 items-end justify-center transition-opacity duration-300 ${isEditModalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+    >
       <div
         ref={modalRef}
-        className="px-4 pt-6 pb-10 flex flex-col mt-10  h-full bg-base rounded shadow-lg w-full"
+        className={`w-full lg:max-w-screen-md max-h-[95vh] px-3 pt-6 pb-10 flex flex-col bg-base rounded-t-xl shadow-lg transform transition-transform ease-out duration-300 overflow-hidden ${isEditModalOpen ? "translate-y-0" : "translate-y-full"}`}
       >
         <div className="flex justify-between items-start">
-          <button onClick={() => setIsEditModalOpen(false)} className="">
+          <button
+            onClick={() => setIsEditModalOpen(false)}
+            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer"
+          >
             Cancel
           </button>
           <h2 className="font-bold pb-2">Edit Recipe</h2>
-          <button onClick={handleSave}>Save</button>
+          <button
+            onClick={handleSave}
+            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer"
+          >
+            Save
+          </button>
         </div>
-        <form className="flex flex-col gap-5 py-5 overflow-y-auto">
+        <form className="flex flex-col gap-5 py-5 overflow-y-auto px-2 flex-1">
           <EditTitle draft={draft} handleDraftString={handleDraftString} />
           <EditTags
             draft={draft}
@@ -77,11 +93,13 @@ function ChatEditModal({
             draft={draft}
             handleDraftArrayUpdate={handleDraftArrayUpdate}
             handleDraftArrayDelete={handleDraftArrayDelete}
+            handleDraftArrayPush={handleDraftArrayPush}
+            handleDraftArrayReorder={handleDraftArrayReorder}
           />
         </form>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

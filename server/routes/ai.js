@@ -30,7 +30,13 @@ export async function generateResponse(prompt) {
   return aiResponse;
 }
 
-export function validateAiResponse({ response, recipeId, userId, message }) {
+export function validateAiResponse({
+  response,
+  recipeId,
+  userId,
+  message,
+  sourceUrl,
+}) {
   let rawResponse = response.candidates[0].content.parts[0].text.trim();
 
   if (!rawResponse) {
@@ -95,9 +101,9 @@ export function validateAiResponse({ response, recipeId, userId, message }) {
       recipe = db
         .prepare(
           `
-                INSERT INTO recipes (id,user_id, title)
+                INSERT INTO recipes (id,user_id, title, source_url)
                 VALUES (?,?,?)
-                RETURNING id, user_id, title, created_at
+                RETURNING id, user_id, title, source_url, created_at
             `,
         )
         .get(newRecipeId, userId, parsedRecipe.title);
@@ -248,43 +254,3 @@ export function askPrompt(currentVersion, message) {
 }
 
 export default router;
-
-// router.post("/ask", authMiddleware, async (req, res) => {
-//     const { message, currentVersion, recipeId } = req.body;
-
-//     try {
-//         db.prepare(`
-//             INSERT INTO messages (user_id, recipe_id, role, content,status)
-//             VALUES (?, ?, 'user', ?,'ask')
-//         `).run(req.user.id, recipeId || null, message);
-
-//         const prompt = askPrompt(currentVersion, message);
-//         const response = await genAI.models.generateContent({
-//             model: "gemini-2.5-flash",
-//             contents: [{ type: "text", text: prompt }],
-//         });
-
-//         let reply = response.candidates[0].content.parts[0].text.trim();
-
-//         const result = db.prepare(`
-//             INSERT INTO messages (user_id, recipe_id, role, content,status)
-//             VALUES (?, ?, 'assistant', ?,'ask')
-//         `).run(req.user.id, recipeId || null, reply);
-//         const inserted = db.prepare(`SELECT * FROM messages WHERE id = ?`).get(result.lastInsertRowid);
-//         const formatted = {
-//             id: inserted.id,
-//             content: inserted.content,
-//             created_at: inserted.created_at,
-//             user_id: inserted.user_id,
-//             status: inserted.status,
-//             role: inserted.role,
-//         };
-
-//         return res.json({ reply: formatted });
-//     }
-
-//     catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: "Something went wrong" })
-//     }
-// })
