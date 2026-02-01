@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router";
 import { useChat } from "../../hooks/useChat.jsx";
+import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.jsx";
 import ChatHeader from "../../components/chat/ChatHeader.jsx";
 import ChatReply from "../../components/chat/ChatReply.jsx";
 import ChatNavigation from "../../components/chat/ChatNavigation.jsx";
 import ChatInput from "../../components/chat/ChatInput.jsx";
 import ChatEditModal from "../../components/chat/ChatEditModal/ChatEditModal.jsx";
+import ChatTags from "../../components/chat/ChatTags.jsx";
 import ChatErrorModal from "../../components/chat/ChatErrorModal.jsx";
 import ChatAskModal from "../../components/chat/ChatAskModal.jsx";
 import Toast from "../../components/Toast.jsx";
-import ChatTags from "../../components/chat/ChatTags.jsx";
+import DeleteRecipePortal from "../../components/delete/DeleteRecipePortal.jsx";
 
 function Chat() {
   const {
@@ -25,6 +27,8 @@ function Chat() {
     setToast,
     showToast,
   } = useOutletContext();
+  const { deleteModal, openDeleteModal, closeDeleteModal, handleDelete } =
+    useDeleteRecipe();
   const {
     sendCreateMessage,
     isPendingCreateMessage,
@@ -35,6 +39,7 @@ function Chat() {
   } = useChat(recipe, showToast);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInputMode, setChatInputMode] = useState("Create");
@@ -68,6 +73,7 @@ function Chat() {
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
         setIsEditModalOpen={setIsEditModalOpen}
+        openDeleteModal={openDeleteModal}
         isMobile={isMobile}
       />
       <div className="flex-1 min-h-0 flex flex-col items-center w-full">
@@ -133,6 +139,14 @@ function Chat() {
               setIsAskModalOpen={setIsAskModalOpen}
               variant="existing"
             />
+            {deleteModal.isOpen && (
+              <DeleteRecipePortal
+                recipe={deleteModal.recipe}
+                type={deleteModal.type}
+                onClose={closeDeleteModal}
+                onDelete={handleDelete}
+              />
+            )}
           </div>
         </div>
       </div>

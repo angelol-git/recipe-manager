@@ -19,8 +19,7 @@ export function useRecipes() {
   });
 
   const deleteRecipeVersionMutation = useMutation({
-    mutationFn: async ({ recipeVersionId }) =>
-      deleteRecipeVersion(recipeVersionId),
+    mutationFn: async (recipeVersionId) => deleteRecipeVersion(recipeVersionId),
 
     onMutate: async ({ recipeId, recipeVersionId }) => {
       //Pause any fetching result of the previous query, let our manual optimistic update finish first

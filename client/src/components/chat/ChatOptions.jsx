@@ -1,14 +1,14 @@
-import { useNavigate } from "react-router";
 import { useEffect, useRef, useState } from "react";
 import { CircleX, Share, Ellipsis, Trash2, SquarePen } from "lucide-react";
-import { useRecipes } from "../../hooks/useRecipes";
 
-function ChatOptions({ recipe, setIsEditModalOpen }) {
+function ChatOptions({
+  recipe,
+  recipeVersion,
+  setIsEditModalOpen,
+  openDeleteModal,
+}) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const menuRef = useRef(null);
-  const navigate = useNavigate();
-
-  const { deleteRecipe, deleteRecipeVersion } = useRecipes();
 
   useEffect(() => {
     if (!isOptionsOpen) return;
@@ -77,12 +77,14 @@ function ChatOptions({ recipe, setIsEditModalOpen }) {
               <button
                 onClick={() => {
                   setIsOptionsOpen(false);
-                  if (recipe.versions?.length === 1) {
-                    deleteRecipe(recipe.id);
-                  } else {
-                    deleteRecipeVersion(recipe.id);
-                  }
-                  navigate("/home");
+                  openDeleteModal(recipe, "version", recipeVersion);
+
+                  // if (recipe.versions?.length === 1) {
+                  //   deleteRecipe(recipe.id);
+                  // } else {
+                  //   deleteRecipeVersion(recipe.id);
+                  // }
+                  // navigate("/home");
                 }}
                 className="w-full flex justify-between items-center py-3 cursor-pointer hover:bg-mantle-hover duration-150 px-2 rounded-lg"
               >
@@ -95,10 +97,10 @@ function ChatOptions({ recipe, setIsEditModalOpen }) {
             <li>
               <button
                 onClick={() => {
-                  const recipeId = recipe.id;
                   setIsOptionsOpen(false);
-                  deleteRecipe(recipeId);
-                  navigate("/home");
+                  openDeleteModal(recipe, "all", recipeVersion);
+                  // deleteRecipe(recipeId);
+                  // navigate("/home");
                 }}
                 className="w-full flex justify-between items-center py-3 text-rose cursor-pointer px-2 hover:bg-rose/10 duration-150 rounded-lg"
               >

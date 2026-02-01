@@ -3,9 +3,11 @@ import ChatOptions from "./ChatOptions";
 
 function ChatHeader({
   recipe,
+  recipeVersion,
   isSideBarOpen,
   setIsSideBarOpen,
   setIsEditModalOpen,
+  openDeleteModal,
   isMobile,
 }) {
   return (
@@ -34,7 +36,12 @@ function ChatHeader({
         {recipe?.title}
       </h1>
       {recipe && (
-        <ChatOptions recipe={recipe} setIsEditModalOpen={setIsEditModalOpen} />
+        <ChatOptions
+          recipe={recipe}
+          recipeVersion={recipeVersion}
+          setIsEditModalOpen={setIsEditModalOpen}
+          openDeleteModal={openDeleteModal}
+        />
       )}
     </div>
   );
