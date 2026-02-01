@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import UserOptions from "../components/UserOptions";
 import HomeTags from "../components/home/HomeTags";
 import HomeRecipeCard from "../components/home/HomeRecipeCard";
+import { useDeleteRecipe } from "../hooks/useDeleteRecipe.jsx";
+import DeleteRecipePortal from "../components/delete/DeleteRecipePortal.jsx";
 
 function Home() {
   const { data: user, logout } = useUser();
@@ -21,6 +23,8 @@ function Home() {
   } = useTags(user, recipes);
   // console.log(recipes);
 
+  const { deleteModal, openDeleteModal, closeDeleteModal, handleDelete } =
+    useDeleteRecipe();
   useEffect(() => {
     document.title = `Recipes`;
   }, []);
@@ -70,11 +74,25 @@ function Home() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-4 lg:gap-6">
             {filteredRecipes?.map((recipe) => {
-              return <HomeRecipeCard key={recipe.id} recipe={recipe} />;
+              return (
+                <HomeRecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  openDeleteModal={openDeleteModal}
+                />
+              );
             })}
           </div>
         </div>
       </div>
+      {deleteModal.isOpen && (
+        <DeleteRecipePortal
+          recipe={deleteModal.recipe}
+          type={deleteModal.type}
+          onClose={closeDeleteModal}
+          onDelete={handleDelete}
+        />
+      )}
     </div>
   );
 }

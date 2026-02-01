@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import RecipeOptions from "../recipeOptions";
 
-function HomeRecipeCard({ recipe }) {
+function HomeRecipeCard({ recipe, openDeleteModal }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   function formatDate(dateString) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -30,6 +30,7 @@ function HomeRecipeCard({ recipe }) {
               recipe={recipe}
               isOptionsOpen={isOptionsOpen}
               setIsOptionsOpen={setIsOptionsOpen}
+              openDeleteModal={openDeleteModal}
             />
           </div>
         </div>
