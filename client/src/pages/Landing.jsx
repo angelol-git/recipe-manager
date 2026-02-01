@@ -44,7 +44,7 @@ function Landing() {
       <div className=" max-w-screen-lg flex flex-col gap-5">
         <h1 className="flex text-4xl font-medium font-lora items-center gap-2">
           <BookMarked size={24} />
-          Recipes
+          Recipe Book
         </h1>
         <p className="text-lg font-medium">
           For creating, modifying and organizing recipes, with AI.
