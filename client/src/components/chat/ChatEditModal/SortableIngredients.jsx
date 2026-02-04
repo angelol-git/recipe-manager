@@ -31,7 +31,7 @@ function SortableIngredients({
     <li
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl px-3 py-2 transition-all hover:shadow-sm ${
+      className={`flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl p-2 transition-all hover:shadow-sm ${
         isDragging ? "shadow-lg ring-2 ring-accent/50" : ""
       }`}
     >

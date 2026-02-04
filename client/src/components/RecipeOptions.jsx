@@ -1,8 +1,12 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef } from "react";
 import { CircleX, Share, Ellipsis } from "lucide-react";
-import DeleteRecipePortal from "./delete/DeleteRecipePortal.jsx";
-function RecipeOptions({ recipe, isOptionsOpen, setIsOptionsOpen, openDeleteModal }) {
+function RecipeOptions({
+  recipe,
+  isOptionsOpen,
+  setIsOptionsOpen,
+  openDeleteModal,
+}) {
   const buttonRef = useRef(null);
   const portalRef = useRef(null);
   //   console.log(buttonRef.current?.getBoundingClientRect());

@@ -31,13 +31,12 @@ function SortableInstruction({
     <li
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl px-3 py-2 transition-all hover:shadow-sm ${
+      className={`flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl p-2 transition-all hover:shadow-sm ${
         isDragging ? "shadow-lg ring-2 ring-accent/50" : ""
       }`}
     >
       <div className="flex gap-2 w-full">
-        <div className="flex flex-col items-center ">
-          <span className="font-semibold font-lora">{index + 1}. </span>
+        <div className="flex">
           <button
             type="button"
             {...attributes}
@@ -54,6 +53,7 @@ function SortableInstruction({
               }`}
             />
           </button>
+          <span className="font-semibold font-lora">{index + 1}. </span>
         </div>
         <textarea
           className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary text-sm leading-relaxed touch-none"
@@ -78,7 +78,7 @@ function SortableInstruction({
         onClick={() => {
           handleDraftArrayDelete("instructions", index);
         }}
-        className="p-1 rounded hover:bg-rose/10 transition-colors"
+        className="p-1 rounded hover:bg-rose/10 transition-colors cursor-pointer"
       >
         <X size={14} color={"#8C7A68"} strokeWidth={1.5} />
       </button>

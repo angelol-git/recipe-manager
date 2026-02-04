@@ -33,7 +33,7 @@ function NewChat() {
         isMobile={isMobile}
       />
       <div className="relative max-w-screen-md flex flex-col w-full flex-1">
-        <div className="flex flex-col gap-4 flex-1 lg:text-center justify-center p-6 pb-50">
+        <div className="flex flex-col gap-4 flex-1 sm:text-center justify-center p-6 pb-50">
           <h2 className="text-primary text-2xl font-medium font-lora">
             What recipe can I help you with?
           </h2>
