@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import EditTagItem from "../tags/editTagItem.jsx";
+import EditTagItem from "../tags/EditTagItem.jsx";
 import useDraftTags from "../../hooks/useDraftTags.jsx";
 function HomeTags({
   tags,
