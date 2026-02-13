@@ -31,11 +31,10 @@ function Chat() {
     showToast,
   );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInputMode, setChatInputMode] = useState("Create");
-  const hasRecipeNavigation = recipe?.versions.length > 1;
+  const hasRecipeNavigation = recipe?.versions?.length > 1;
 
   function handleSendMessage() {
     if (!message.trim()) return;
@@ -89,31 +88,35 @@ function Chat() {
         />
       )}
 
-      <div
-        className={`sticky bottom-0 flex w-full max-w-screen-md mx-auto px-4 pb-4 ${
-          hasRecipeNavigation ? "justify-between" : "justify-end"
-        }`}
-      >
-        <ChatNavigation
-          recipe={recipe}
-          recipeVersion={recipeVersion}
-          setRecipeVersion={setRecipeVersion}
-          isChatOpen={isChatOpen}
-        />
-        <ChatInput
-          message={message}
-          setMessage={setMessage}
-          handleSendMessage={handleSendMessage}
-          isPendingCreateMessage={isPendingCreateMessage}
-          hasRecipeNavigation={hasRecipeNavigation}
-          isChatOpen={isChatOpen}
-          setIsChatOpen={setIsChatOpen}
-          chatInputMode={chatInputMode}
-          setChatInputMode={setChatInputMode}
-          isAskModalOpen={isAskModalOpen}
-          setIsAskModalOpen={setIsAskModalOpen}
-          variant="existing"
-        />
+      <div className="sticky bottom-0 w-full max-w-screen-md mx-auto px-4 pb-4">
+        <div className="flex justify-between items-center gap-3">
+          {hasRecipeNavigation && !isChatOpen && (
+            <ChatNavigation
+              recipe={recipe}
+              recipeVersion={recipeVersion}
+              setRecipeVersion={setRecipeVersion}
+            />
+          )}
+          <div className="flex-1 flex justify-end">
+            <ChatInput
+              message={message}
+              setMessage={setMessage}
+              handleSendMessage={handleSendMessage}
+              isPendingCreateMessage={isPendingCreateMessage}
+              recipe={recipe}
+              recipeVersion={recipeVersion}
+              setRecipeVersion={setRecipeVersion}
+              hasRecipeNavigation={hasRecipeNavigation}
+              isChatOpen={isChatOpen}
+              setIsChatOpen={setIsChatOpen}
+              chatInputMode={chatInputMode}
+              setChatInputMode={setChatInputMode}
+              isAskModalOpen={isAskModalOpen}
+              setIsAskModalOpen={setIsAskModalOpen}
+              variant="existing"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -6,14 +6,19 @@ import {
   MessageCircleMore,
   Minimize2,
 } from "lucide-react";
+import ChatNavigation from "./ChatNavigation";
 
 function ChatInput({
   message,
   setMessage,
   handleSendMessage,
   isPendingCreateMessage,
-  //Optional
+  // Navigation props
+  recipe,
+  recipeVersion,
+  setRecipeVersion,
   hasRecipeNavigation,
+  //Optional
   isChatOpen = true,
   setIsChatOpen,
   chatInputMode,
@@ -90,22 +95,25 @@ function ChatInput({
         </button>
       )}
       <div
-        className={`flex bg-gap-3 items-center ${
+        className={`flex gap-3 items-center ${
           !isNewChat ? "justify-between" : "justify-end"
         }`}
       >
         {!isNewChat && (
-          <div
-            className={`flex gap-2 ${
-              hasRecipeNavigation ? "translate-x-28" : null
-            }`}
-          >
+          <div className="flex gap-2 items-center">
+            {hasRecipeNavigation && (
+              <ChatNavigation
+                recipe={recipe}
+                recipeVersion={recipeVersion}
+                setRecipeVersion={setRecipeVersion}
+              />
+            )}
             <select
               value={chatInputMode}
               onChange={(event) => {
                 setChatInputMode(event.target.value);
               }}
-              className={`ml-2 ${
+              className={`${
                 chatInputMode === "Create"
                   ? "bg-overlay0 text-secondary"
                   : "bg-overlay2 text-white"
@@ -150,7 +158,7 @@ function ChatInput({
     </div>
   ) : (
     <button
-      className="m-4 bg-accent hover:bg-accent-hover transition-colors duration-150 rounded-full flex items-center justify-center w-9 h-9 cursor-pointer h20"
+      className="bg-accent hover:bg-accent-hover transition-colors duration-150 rounded-full flex items-center justify-center w-9 h-9 cursor-pointer"
       onClick={() => {
         setIsChatOpen(true);
       }}
