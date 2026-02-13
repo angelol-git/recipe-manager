@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router";
 import { useChat } from "../../hooks/useChat.jsx";
 import ChatHeader from "../../components/chat/ChatHeader.jsx";
@@ -26,7 +26,7 @@ function Chat() {
     showToast,
     openDeleteModal,
   } = useOutletContext();
-  const { sendCreateMessage, isPendingCreateMessage } = useChat(
+  const { sendCreateMessage, isPending, isSuccess } = useChat(
     recipe,
     showToast,
   );
@@ -35,7 +35,11 @@ function Chat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInputMode, setChatInputMode] = useState("Create");
   const hasRecipeNavigation = recipe?.versions?.length > 1;
-
+  useEffect(() => {
+    if (isSuccess) {
+      setMessage("");
+    }
+  }, [isSuccess, setMessage]);
   function handleSendMessage() {
     if (!message.trim()) return;
 
@@ -68,7 +72,7 @@ function Chat() {
         isMobile={isMobile}
       />
 
-      <div className="flex-1 w-full max-w-screen-md mx-auto px-4">
+      <div className="flex-1 w-full max-w-screen-md mx-auto px-4 py-2">
         <ChatTags recipe={recipe} />
         <ChatReply recipe={recipe} recipeVersion={recipeVersion} />
       </div>
@@ -102,7 +106,7 @@ function Chat() {
               message={message}
               setMessage={setMessage}
               handleSendMessage={handleSendMessage}
-              isPendingCreateMessage={isPendingCreateMessage}
+              isPending={isPending}
               recipe={recipe}
               recipeVersion={recipeVersion}
               setRecipeVersion={setRecipeVersion}

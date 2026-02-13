@@ -163,7 +163,8 @@ export function useChat(showToast) {
 
   return {
     sendCreateMessage: sendCreateMessageMutation.mutate,
-    isPendingCreateMessage: sendCreateMessageMutation.isPending,
+    isPending: sendCreateMessageMutation.isPending,
+    isSuccess: sendCreateMessageMutation.isSuccess,
     // errors,
     // askMessages,
     // sendAskMessage,

@@ -13,7 +13,7 @@ const ChatLayout = () => {
   const { data: user } = useUser();
   const { data: recipes } = useRecipes();
   const isMobile = useIsMobile();
-  const { isSideBarOpen, setIsSideBarOpen, isInitialLoadComplete } = useChatSidebar(user, isMobile);
+  const { isSideBarOpen, setIsSideBarOpen } = useChatSidebar(user, isMobile);
   const [message, setMessage] = useState("");
   const [toast, setToast] = useState(null);
   const [recipe, setRecipe] = useState(null);
@@ -53,7 +53,6 @@ const ChatLayout = () => {
         isMobile={isMobile}
         isSideBarOpen={isSideBarOpen}
         setIsSideBarOpen={setIsSideBarOpen}
-        isInitialLoadComplete={isInitialLoadComplete}
         currentRecipe={recipe}
         openDeleteModal={openDeleteModal}
       />
