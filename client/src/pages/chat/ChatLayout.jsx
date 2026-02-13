@@ -47,7 +47,7 @@ const ChatLayout = () => {
   }, [recipes, id]);
 
   return (
-    <div className="bg-base relative flex h-screen text-primary w-full overflow-hidden">
+    <div className="bg-base relative flex min-h-screen text-primary w-full">
       <ChatSideBar
         recipes={recipes}
         isMobile={isMobile}
@@ -62,7 +62,7 @@ const ChatLayout = () => {
           onClick={() => setIsSideBarOpen(false)}
         />
       )}
-      <main className="relative flex flex-1 flex-col min-w-0 h-full">
+      <main className="relative flex flex-1 flex-col min-w-0">
         <Outlet
           context={{
             recipe,

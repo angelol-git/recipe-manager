@@ -10,6 +10,7 @@ function GoogleLoginButton({ onSuccess }) {
         window.google.accounts.id.initialize({
           client_id: clientID,
           callback: onSuccess,
+          use_fedcm_for_prompt: true,
         });
         window.google.accounts.id.renderButton(divRef.current, {
           theme: "outline",
