@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import RecipeOptions from "../recipeOptions";
+import RecipeOptions from "../RecipeOptions";
 
 function HomeRecipeCard({ recipe, openDeleteModal }) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);

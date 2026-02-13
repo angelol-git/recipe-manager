@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { X, PanelLeftClose, CirclePlus } from "lucide-react";
-import RecipeOptions from "../recipeOptions";
+import RecipeOptions from "../RecipeOptions";
 
 function ChatSideBar({
   recipes,
