@@ -1,4 +1,4 @@
-import EditTagItem from "../../tags/editTagItem";
+import EditTagItem from "../../tags/EditTagItem";
 
 function EditTags({
   draft,
