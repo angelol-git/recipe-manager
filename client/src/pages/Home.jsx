@@ -9,7 +9,7 @@ import { useTags } from "../hooks/useTags";
 import { useDeleteRecipe } from "../hooks/useDeleteRecipe.jsx";
 
 function Home() {
-  const { data: user, logout, isLoading: isUserLoading } = useUser();
+  const { user, logout, isLoading: isUserLoading } = useUser();
   const { data: recipes, isLoading: isRecipesLoading } = useRecipes();
   const {
     uniqueTags,
@@ -28,7 +28,6 @@ function Home() {
     document.title = `Recipes`;
   }, []);
 
-  // Hide shell once data is loaded
   useEffect(() => {
     if (!isUserLoading && !isRecipesLoading) {
       window.hideShell?.();

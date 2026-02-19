@@ -7,17 +7,23 @@ export function useUser() {
   const userQuery = useQuery({
     queryKey: ["user"],
     queryFn: fetchCurrentUser,
+    retry: false,
+    staleTime: 1000 * 60 * 10,
   });
 
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
-      queryClient.invalidateQueries(["user"]);
+      // Clear user data and local recipes if needed (or keep them)
+      queryClient.setQueryData(["user"], null);
+      queryClient.invalidateQueries(["recipes"]);
     },
   });
 
   return {
-    ...userQuery,
+    user: userQuery.data ?? null,
+    isLoading: userQuery.isLoading,
+    isError: userQuery.isError,
     logout: logoutMutation,
   };
 }

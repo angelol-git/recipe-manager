@@ -84,7 +84,7 @@ function ChatOptions({
                   // } else {
                   //   deleteRecipeVersion(recipe.id);
                   // }
-                  // navigate("/home");
+                  // navigate("/");
                 }}
                 className="w-full flex justify-between items-center py-3 cursor-pointer hover:bg-mantle-hover duration-150 px-2 rounded-lg"
               >
@@ -100,7 +100,7 @@ function ChatOptions({
                   setIsOptionsOpen(false);
                   openDeleteModal(recipe, "all", recipeVersion);
                   // deleteRecipe(recipeId);
-                  // navigate("/home");
+                  // navigate("/");
                 }}
                 className="w-full flex justify-between items-center py-3 text-rose cursor-pointer px-2 hover:bg-rose/10 duration-150 rounded-lg"
               >

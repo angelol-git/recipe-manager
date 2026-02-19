@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "./useUser.jsx";
 import {
   fetchAllRecipes,
   deleteRecipeVersion,
@@ -6,65 +7,95 @@ import {
   updateRecipe,
   addRecipeTag,
 } from "../api/recipes.js";
+import {
+  getLocalRecipes,
+  addLocalRecipe,
+  deleteLocalRecipe,
+} from "../utils/storage.js";
 
 export function useRecipes() {
+  const { user } = useUser();
   const queryClient = useQueryClient();
 
   const allRecipesQuery = useQuery({
-    queryKey: ["recipes"],
-    queryFn: fetchAllRecipes,
+    queryKey: ["recipes", user?.id || "guest_recipes"],
+    queryFn: () => {
+      if (user) {
+        return fetchAllRecipes();
+      } else {
+        return getLocalRecipes();
+      }
+    },
     staleTime: 1000 * 60 * 5,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
 
   const deleteRecipeVersionMutation = useMutation({
-    mutationFn: async (recipeVersionId) => deleteRecipeVersion(recipeVersionId),
-
+    mutationFn: async (recipeVersionId) => {
+      if (user) {
+        return deleteRecipeVersion(recipeVersionId);
+      } else {
+        return deleteLocalRecipe(recipeVersionId);
+      }
+    },
     onMutate: async ({ recipeId, recipeVersionId }) => {
       //Pause any fetching result of the previous query, let our manual optimistic update finish first
-      await queryClient.cancelQueries(["recipes"]);
+      if (user) {
+        await queryClient.cancelQueries(["recipes"]);
 
-      const previousRecipes = queryClient.getQueryData(["recipes"]);
-      queryClient.setQueryData(["recipes"], (old) => {
-        if (!old) return old;
+        const previousRecipes = queryClient.getQueryData(["recipes"]);
+        queryClient.setQueryData(["recipes"], (old) => {
+          if (!old) return old;
 
-        return old.map((recipe) => {
-          if (recipe.id !== recipeId) return recipe;
+          return old.map((recipe) => {
+            if (recipe.id !== recipeId) return recipe;
 
-          return {
-            ...recipe,
-            versions: recipe.versions.filter((v) => v.id !== recipeVersionId),
-          };
+            return {
+              ...recipe,
+              versions: recipe.versions.filter((v) => v.id !== recipeVersionId),
+            };
+          });
         });
-      });
-      return { previousRecipes };
+        return { previousRecipes };
+      }
     },
 
     onError: (err, variables, context) => {
       if (context?.previousRecipes) {
-        queryClient.setQueryData(["recipes"], context.previousRecipes);
+        queryClient.setQueryData(
+          ["recipes", user?.id || "guest_recipes"],
+          context.previousRecipes,
+        );
       }
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries(["recipes"]);
+      queryClient.invalidateQueries(["recipes", user?.id || "guest_recipes"]);
     },
   });
 
   const deleteRecipeMutation = useMutation({
-    mutationFn: async (recipeId) => deleteRecipe(recipeId),
+    mutationFn: async (recipeId) => {
+      if (user) {
+        deleteRecipe(recipeId);
+      } else {
+        deleteLocalRecipe(recipeId);
+      }
+    },
 
     onMutate: async (recipeId) => {
-      await queryClient.cancelQueries(["recipes"]);
+      if (user) {
+        await queryClient.cancelQueries(["recipes"]);
 
-      const previousRecipes = queryClient.getQueryData(["recipes"]);
-      queryClient.setQueryData(["recipes"], (old) => {
-        if (!old) return old;
+        const previousRecipes = queryClient.getQueryData(["recipes"]);
+        queryClient.setQueryData(["recipes"], (old) => {
+          if (!old) return old;
 
-        return old.filter((recipe) => recipe.id !== recipeId);
-      });
-      return { previousRecipes };
+          return old.filter((recipe) => recipe.id !== recipeId);
+        });
+        return { previousRecipes };
+      }
     },
 
     onError: (err, variables, context) => {
@@ -124,8 +155,14 @@ export function useRecipes() {
     },
   });
 
+  const addLocalRecipeMutation = useMutation({
+    mutationFn: async (recipe) => {
+      addLocalRecipe(recipe);
+    },
+  });
   return {
     ...allRecipesQuery,
+    addLocalRecipe: addLocalRecipeMutation.mutate,
     deleteRecipeVersion: deleteRecipeVersionMutation.mutate,
     deleteRecipe: deleteRecipeMutation.mutate,
     updateRecipe: updateRecipeMutation.mutate,

@@ -26,16 +26,22 @@ export function useDeleteRecipe() {
     if (type === "version") {
       if (recipe.versions?.length === 1) {
         deleteRecipe(recipe.id);
-        navigate("/home");
+        navigate("/");
       } else {
         deleteRecipeVersion(recipe.versions[recipeVersion].id);
       }
     } else {
       deleteRecipe(recipe.id);
-      navigate("/home");
+      navigate("/");
     }
     closeDeleteModal();
-  }, [deleteModal, deleteRecipe, deleteRecipeVersion, navigate, closeDeleteModal]);
+  }, [
+    deleteModal,
+    deleteRecipe,
+    deleteRecipeVersion,
+    navigate,
+    closeDeleteModal,
+  ]);
 
   return { deleteModal, openDeleteModal, closeDeleteModal, handleDelete };
 }
