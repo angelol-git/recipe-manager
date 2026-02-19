@@ -1,21 +1,18 @@
-import express from "express";
 import dotenv from "dotenv";
-import db from "../db.js";
-import { v7 as uuidv7 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 
-class AiValidationError extends Error {
+dotenv.config();
+
+const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
+const model = "gemini-3-flash-preview";
+
+export class AiValidationError extends Error {
   constructor(message, meta = {}) {
     super(message);
     this.name = "AiValidationError";
     this.meta = meta;
   }
 }
-
-dotenv.config();
-const router = express.Router();
-const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
-const model = "gemini-3-flash-preview";
 
 export async function generateResponse(prompt) {
   const aiResponse = await genAI.models.generateContent({
@@ -24,34 +21,21 @@ export async function generateResponse(prompt) {
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.7,
-      // responseSchema: recipeSchema,
     },
   });
   return aiResponse;
 }
 
-export function validateAiResponse({
-  response,
-  recipeId,
-  userId,
-  message,
-  sourceUrl,
-}) {
+export function validateAiResponse(response, message) {
   let rawResponse = response.candidates[0].content.parts[0].text.trim();
 
   if (!rawResponse) {
-    saveAiError(userId, recipeId, {
+    throw new AiValidationError("The AI returned an empty response.", {
       type: "empty_response",
-      message: "AI return no content",
       source_prompt: message,
-    });
-
-    throw new AiValidationError("The AI returned an empty response,", {
-      type: "empty_response",
     });
   }
 
-  // Strip code fences if present
   if (rawResponse.startsWith("```")) {
     rawResponse = rawResponse
       .replace(/^```[a-zA-Z]*\n?/, "")
@@ -63,127 +47,33 @@ export function validateAiResponse({
   try {
     parsedRecipe = JSON.parse(rawResponse);
   } catch (err) {
-    saveAiError(userId, recipeId, {
+    throw new AiValidationError("Invalid JSON from AI", {
       type: "invalid_json",
       rawResponse,
       source_prompt: message,
       ai_model: model,
     });
-    throw new AiValidationError("Invalid JSON from AI", {
-      rawResponse,
-      message,
-    });
   }
 
-  // Check for incomplete recipe
   if (
     !parsedRecipe.title?.trim() ||
     !parsedRecipe.ingredients?.length ||
     !parsedRecipe.instructions?.length
   ) {
-    saveAiError(userId, recipeId, {
-      type: "empty_recipe",
-      rawResponse,
-      source_prompt: message,
-    });
-
     throw new AiValidationError(
       "Recipe could not be generated from this input.",
-      { type: "empty_recipe" },
+      {
+        type: "empty_recipe",
+        rawResponse,
+        source_prompt: message,
+      }
     );
   }
 
-  const savedReply = db.transaction(() => {
-    let newRecipeId = recipeId ?? uuidv7();
-    let recipe = null;
+  parsedRecipe.ai_model = model;
+  parsedRecipe.source_prompt = message;
 
-    if (!recipeId) {
-      recipe = db
-        .prepare(
-          `
-                INSERT INTO recipes (id,user_id, title, source_url)
-                VALUES (?,?,?,?)
-                RETURNING id, user_id, title, source_url, created_at
-            `,
-        )
-        .get(newRecipeId, userId, parsedRecipe.title, sourceUrl);
-
-      const insertedRecipe = db
-        .prepare(
-          `SELECT id, user_id, title, source_url created_at FROM recipes WHERE id = ?`,
-        )
-        .get(newRecipeId);
-
-      parsedRecipe.created_at = insertedRecipe.created_at;
-      parsedRecipe.tags = [];
-    }
-
-    const version = db
-      .prepare(
-        `
-            INSERT INTO recipe_versions (recipe_id, servings, total_time, calories, 
-                description, instructions, ingredients, 
-                source_prompt, ai_model, relation)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING id, recipe_id, servings, total_time, calories,
-                    description, instructions, ingredients,
-                    source_prompt, ai_model, relation, created_at
-        `,
-      )
-      .get(
-        newRecipeId,
-        parsedRecipe.servings,
-        parsedRecipe.total_time,
-        parsedRecipe.calories,
-        parsedRecipe.description,
-        JSON.stringify(
-          Array.isArray(parsedRecipe.instructions)
-            ? parsedRecipe.instructions
-            : [parsedRecipe.instructions],
-        ),
-        JSON.stringify(
-          Array.isArray(parsedRecipe.ingredients)
-            ? parsedRecipe.ingredients
-            : [parsedRecipe.ingredients],
-        ),
-        parsedRecipe.source_prompt,
-        parsedRecipe.ai_model,
-        parsedRecipe.relation,
-      );
-
-    db.prepare(
-      `
-            INSERT INTO messages (user_id, recipe_id, role, content, status)
-            VALUES (?, ?, 'assistant', ?, 'recipe')
-        `,
-    ).run(userId, newRecipeId, JSON.stringify(parsedRecipe));
-
-    parsedRecipe.versionId = version.lastInsertRowid;
-
-    //Return the full object if a new recipe or partial if new recipe version
-    if (!recipeId) {
-      return {
-        id: recipe.id,
-        title: recipe.title,
-        created_at: recipe.created_at,
-        tags: [],
-        versions: [version],
-      };
-    }
-
-    return version;
-  })();
-
-  return savedReply;
-}
-
-function saveAiError(userId, recipeId, error) {
-  db.prepare(
-    `
-        INSERT INTO messages (user_id, recipe_id, role, content, status)
-        VALUES (?, ?, 'assistant', ?, 'error')
-    `,
-  ).run(userId, recipeId || null, JSON.stringify(error));
+  return parsedRecipe;
 }
 
 export function createPrompt(message, recipeVersion = {}, urlContent = {}) {
@@ -302,5 +192,3 @@ export function askPrompt(currentVersion, message) {
     User message: "${message}"
     `;
 }
-
-export default router;

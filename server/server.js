@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import authRoutes from "./routes/auth.js";
-import aiRoutes from "./routes/ai.js";
 import recipeRoutes from "./routes/recipes.js";
 import chatRoutes from "./routes/chat.js";
 import tagRoutes from "./routes/tags.js";
@@ -29,7 +28,6 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use("/api/auth", authRoutes);
-app.use("/api/ai", aiRoutes);
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/chat", chatRoutes);
@@ -60,7 +58,6 @@ const shutdown = (signal) => {
     process.exit(0);
   });
 
-  // Force exit after 30 seconds
   setTimeout(() => {
     log("Forced shutdown after timeout");
     process.exit(1);
@@ -70,7 +67,6 @@ const shutdown = (signal) => {
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
 
-// Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
   log(`Uncaught Exception: ${err.message}`);
   process.exit(1);

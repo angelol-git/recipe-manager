@@ -18,15 +18,16 @@ router.post("/google", async (req, res) => {
     const payload = ticket.getPayload();
 
     const existingUser = db
-      .prepare("SELECT * FROM users WHERE external_id = ?")
+      .prepare(
+        `SELECT * FROM users WHERE external_id = ?`
+      )
       .get(payload.sub);
+
     const userId = uuidv4();
     if (!existingUser) {
-      db.prepare("INSERT INTO users (id,external_id,email) VALUES (?,?,?)").run(
-        userId,
-        payload.sub,
-        payload.email,
-      );
+      db.prepare(
+        `INSERT INTO users (id, external_id, email) VALUES (?, ?, ?)`
+      ).run(userId, payload.sub, payload.email);
       createSession(userId, res);
     } else {
       createSession(existingUser.id, res);
@@ -43,7 +44,7 @@ router.post("/logout", (req, res) => {
   const sid = req.cookies.sid;
   if (sid) {
     try {
-      db.prepare("DELETE FROM sessions WHERE sid = ?").run(sid);
+      db.prepare(`DELETE FROM sessions WHERE sid = ?`).run(sid);
       res.clearCookie("sid");
     } catch (err) {
       console.log("Failed to delete session: ", err);
@@ -62,13 +63,11 @@ router.get("/me", authMiddleware, (req, res) => {
 
 function createSession(userId, res) {
   const sid = uuidv4();
-  const expires = Date.now() + 1000 * 60 * 60 * 24 * 30; //30 days
+  const expires = Date.now() + 1000 * 60 * 60 * 24 * 30; // 30 days
 
-  db.prepare("INSERT INTO sessions (sid,user_id,expires) VALUES (?,?,?)").run(
-    sid,
-    userId,
-    expires,
-  );
+  db.prepare(
+    `INSERT INTO sessions (sid, user_id, expires) VALUES (?, ?, ?)`
+  ).run(sid, userId, expires);
 
   res.cookie("sid", sid, {
     httpOnly: true,
