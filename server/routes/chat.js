@@ -55,24 +55,27 @@ router.post("/create", optionalAuth, async (req, res) => {
       return res.json({ reply: savedRecipe });
     }
 
+    //Guest recipe do not save into db
     const guestRecipeId = recipeId ?? uuidv7();
     const guestRecipe = {
       id: guestRecipeId,
       title: parsedRecipe.title,
       created_at: new Date().toISOString(),
       tags: [],
-      versions: [{
-        id: uuidv7(),
-        recipeDetails: {
-          calories: parsedRecipe.calories,
-          servings: parsedRecipe.servings,
-          total_time: parsedRecipe.total_time,
+      versions: [
+        {
+          id: uuidv7(),
+          recipeDetails: {
+            calories: parsedRecipe.calories,
+            servings: parsedRecipe.servings,
+            total_time: parsedRecipe.total_time,
+          },
+          description: parsedRecipe.description,
+          instructions: parsedRecipe.instructions,
+          ingredients: parsedRecipe.ingredients,
+          source_prompt: parsedRecipe.source_prompt,
         },
-        description: parsedRecipe.description,
-        instructions: parsedRecipe.instructions,
-        ingredients: parsedRecipe.ingredients,
-        source_prompt: parsedRecipe.source_prompt,
-      }],
+      ],
     };
 
     return res.json({ reply: guestRecipe });

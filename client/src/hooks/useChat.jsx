@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { sendCreateMessage } from "../api/chat";
-import { addLocalRecipe } from "../utils/storage.js";
+import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage.js";
 import { useUser } from "./useUser";
 
 export function useChat(showToast) {
@@ -27,18 +27,21 @@ export function useChat(showToast) {
       const newRecipe = data.reply;
       const isNewRecipe = !variables.recipeId;
 
-      //I do not think this work 100% yet
       if (!isNewRecipe) {
-        queryClient.setQueryData(
-          ["recipes", user?.id || "guest_recipes"],
-          (old) => {
-            if (!old) return [newRecipe];
+        if (!user) {
+          queryClient.setQueryData(
+            ["recipes", user?.id || "guest_recipes"],
+            (old) => {
+              if (!old) return [newRecipe];
 
-            return isNewRecipe
-              ? [...old, newRecipe]
-              : old.map((r) => (r.id === newRecipe.id ? newRecipe : r));
-          },
-        );
+              return isNewRecipe
+                ? [...old, newRecipe]
+                : old.map((r) => (r.id === newRecipe.id ? newRecipe : r));
+            },
+          );
+        }
+
+        addLocalRecipeVersion(newRecipe);
       }
 
       if (isNewRecipe) {

@@ -28,7 +28,10 @@ export function useDeleteRecipe() {
         deleteRecipe(recipe.id);
         navigate("/");
       } else {
-        deleteRecipeVersion(recipe.versions[recipeVersion].id);
+        deleteRecipeVersion({
+          recipeId: recipe.id,
+          recipeVersionId: recipe.versions[recipeVersion].id,
+        });
       }
     } else {
       deleteRecipe(recipe.id);

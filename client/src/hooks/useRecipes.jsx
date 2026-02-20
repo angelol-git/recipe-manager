@@ -10,7 +10,8 @@ import {
 import {
   getLocalRecipes,
   addLocalRecipe,
-  deleteLocalRecipe,
+  deleteLocalRecipeAll,
+  deleteLocalRecipeVersion,
 } from "../utils/storage.js";
 
 export function useRecipes() {
@@ -32,11 +33,11 @@ export function useRecipes() {
   });
 
   const deleteRecipeVersionMutation = useMutation({
-    mutationFn: async (recipeVersionId) => {
+    mutationFn: async ({ recipeId, recipeVersionId }) => {
       if (user) {
         return deleteRecipeVersion(recipeVersionId);
       } else {
-        return deleteLocalRecipe(recipeVersionId);
+        return deleteLocalRecipeVersion(recipeId, recipeVersionId);
       }
     },
     onMutate: async ({ recipeId, recipeVersionId }) => {
@@ -80,7 +81,7 @@ export function useRecipes() {
       if (user) {
         deleteRecipe(recipeId);
       } else {
-        deleteLocalRecipe(recipeId);
+        deleteLocalRecipeAll(recipeId);
       }
     },
 
