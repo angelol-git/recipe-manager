@@ -66,13 +66,12 @@ export function validateAiResponse(response, message) {
         type: "empty_recipe",
         rawResponse,
         source_prompt: message,
-      }
+      },
     );
   }
 
   parsedRecipe.ai_model = model;
   parsedRecipe.source_prompt = message;
-
   return parsedRecipe;
 }
 

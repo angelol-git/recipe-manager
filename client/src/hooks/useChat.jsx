@@ -2,7 +2,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { sendCreateMessage } from "../api/chat";
+import { addLocalRecipe } from "../utils/storage.js";
+import { useUser } from "./useUser";
+
 export function useChat(showToast) {
+  const { user } = useUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -13,7 +17,10 @@ export function useChat(showToast) {
 
     onError: (err, variables, context) => {
       showToast(err.error);
-      queryClient.setQueryData(["recipes"], context.previousRecipes);
+      queryClient.setQueryData(
+        ["recipes", user?.id || "guest_recipes"],
+        context.previousRecipes,
+      );
     },
 
     onSuccess: (data, variables) => {
@@ -22,20 +29,27 @@ export function useChat(showToast) {
 
       //I do not think this work 100% yet
       if (!isNewRecipe) {
-        queryClient.setQueryData(["recipes"], (old) => {
-          if (!old) return [newRecipe];
+        queryClient.setQueryData(
+          ["recipes", user?.id || "guest_recipes"],
+          (old) => {
+            if (!old) return [newRecipe];
 
-          return isNewRecipe
-            ? [...old, newRecipe]
-            : old.map((r) => (r.id === newRecipe.id ? newRecipe : r));
-        });
+            return isNewRecipe
+              ? [...old, newRecipe]
+              : old.map((r) => (r.id === newRecipe.id ? newRecipe : r));
+          },
+        );
       }
 
       if (isNewRecipe) {
+        console.log(newRecipe);
+        if (!user) {
+          addLocalRecipe(newRecipe);
+        }
         navigate(`/chat/${newRecipe.id}`);
       }
 
-      queryClient.invalidateQueries(["recipes"]);
+      queryClient.invalidateQueries(["recipes", user?.id || "guest_recipes"]);
     },
   });
 

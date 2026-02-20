@@ -1,4 +1,5 @@
 import express from "express";
+import { v7 as uuidv7 } from "uuid";
 import { optionalAuth } from "../middleware.js";
 import {
   generateResponse,
@@ -54,7 +55,27 @@ router.post("/create", optionalAuth, async (req, res) => {
       return res.json({ reply: savedRecipe });
     }
 
-    return res.json({ reply: parsedRecipe });
+    const guestRecipeId = recipeId ?? uuidv7();
+    const guestRecipe = {
+      id: guestRecipeId,
+      title: parsedRecipe.title,
+      created_at: new Date().toISOString(),
+      tags: [],
+      versions: [{
+        id: uuidv7(),
+        recipeDetails: {
+          calories: parsedRecipe.calories,
+          servings: parsedRecipe.servings,
+          total_time: parsedRecipe.total_time,
+        },
+        description: parsedRecipe.description,
+        instructions: parsedRecipe.instructions,
+        ingredients: parsedRecipe.ingredients,
+        source_prompt: parsedRecipe.source_prompt,
+      }],
+    };
+
+    return res.json({ reply: guestRecipe });
   } catch (err) {
     const now = new Date();
 
