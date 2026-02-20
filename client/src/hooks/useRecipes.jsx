@@ -12,6 +12,7 @@ import {
   addLocalRecipe,
   deleteLocalRecipeAll,
   deleteLocalRecipeVersion,
+  updateLocalRecipe,
 } from "../utils/storage.js";
 
 export function useRecipes() {
@@ -111,24 +112,32 @@ export function useRecipes() {
   });
 
   const updateRecipeMutation = useMutation({
-    mutationFn: async (updatedRecipe) => updateRecipe(updatedRecipe),
+    mutationFn: async (updatedRecipe) => {
+      if (user) {
+        updateRecipe(updatedRecipe);
+      } else {
+        updateLocalRecipe(updatedRecipe);
+      }
+    },
 
     onMutate: async (updatedRecipe) => {
-      await queryClient.cancelQueries(["recipes"]);
+      if (user) {
+        await queryClient.cancelQueries(["recipes"]);
 
-      const previousRecipes = queryClient.getQueryData(["recipes"]);
-      queryClient.setQueryData(["recipes"], (old) => {
-        if (!old) return old;
+        const previousRecipes = queryClient.getQueryData(["recipes"]);
+        queryClient.setQueryData(["recipes"], (old) => {
+          if (!old) return old;
 
-        return old.map((recipe) => {
-          if (recipe.id === updatedRecipe.id) {
-            return updatedRecipe;
-          } else {
-            return recipe;
-          }
+          return old.map((recipe) => {
+            if (recipe.id === updatedRecipe.id) {
+              return updatedRecipe;
+            } else {
+              return recipe;
+            }
+          });
         });
-      });
-      return { previousRecipes };
+        return { previousRecipes };
+      }
     },
 
     onError: (err, variables, context) => {
@@ -138,7 +147,7 @@ export function useRecipes() {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries(["recipes"]);
+      queryClient.invalidateQueries(["recipes", user?.id || "guest_recipes"]);
     },
   });
 

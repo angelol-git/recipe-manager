@@ -29,11 +29,42 @@ export function deleteLocalRecipeAll(id) {
 }
 
 export function deleteLocalRecipeVersion(recipeId, recipeVersionId) {
-  console.log(recipeId, recipeVersionId);
   const recipes = getLocalRecipes();
   const existingIndex = recipes.findIndex((r) => r.id === recipeId);
-  recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
-    (recipeVersion) => recipeVersion.id !== recipeVersionId,
+  if (existingIndex !== -1) {
+    recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
+      (v) => v.id !== recipeVersionId,
+    );
+    localStorage.setItem("guest_recipes", JSON.stringify(recipes));
+  }
+}
+
+export function updateLocalRecipe(recipe) {
+  const recipes = getLocalRecipes();
+  const existingIndex = recipes.findIndex((r) => r.id === recipe.recipe_id);
+
+  if (existingIndex === -1) return;
+
+  const versionIndex = recipes[existingIndex].versions.findIndex(
+    (v) => v.id === recipe.id,
   );
+
+  if (versionIndex !== -1) {
+    recipes[existingIndex].versions[versionIndex] = {
+      ...recipes[existingIndex].versions[versionIndex],
+      description: recipe.description,
+      instructions: recipe.instructions,
+      ingredients: recipe.ingredients,
+      recipeDetails: recipe.recipeDetails,
+      source_prompt: recipe.source_prompt,
+    };
+  }
+
+  recipes[existingIndex] = {
+    ...recipes[existingIndex],
+    title: recipe.title,
+    tags: recipe.tags,
+  };
+
   localStorage.setItem("guest_recipes", JSON.stringify(recipes));
 }
