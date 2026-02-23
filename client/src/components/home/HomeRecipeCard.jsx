@@ -8,7 +8,12 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
-
+  function formatDescription(description) {
+    if (description.length > 100) {
+      return description.slice(0, 100) + "...";
+    }
+    return description;
+  }
   return (
     <Link
       to={`/chat/${recipe.id}`}
@@ -21,7 +26,14 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
             isOptionsOpen ? "-rotate-y-15" : "group-hover:-rotate-y-15"
           }`}
         >
-          <h3 className="font-medium font-lora text-xl">{recipe.title}</h3>
+          <div className="flex flex-col gap-2">
+            <h3 className="font-medium font-lora text-xl">{recipe.title}</h3>
+            <p className="text-sm text-secondary">
+              {formatDescription(
+                recipe.versions[recipe.versions.length - 1].description,
+              )}
+            </p>
+          </div>
           <div className="flex justify-between">
             <p className="text-secondary mt-auto">
               {formatDate(recipe.created_at)}
