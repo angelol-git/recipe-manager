@@ -12,7 +12,7 @@ export function useTags(user, recipes = []) {
     }
 
     try {
-      const stored = localStorage.getItem(`selectedTags_${user.id}`);
+      const stored = localStorage.getItem(`recipe-selected-tags-${user.id}`);
       if (stored) {
         setSelectedTags(JSON.parse(stored));
       }
@@ -24,8 +24,8 @@ export function useTags(user, recipes = []) {
   useEffect(() => {
     if (!user?.id) return;
     localStorage.setItem(
-      `selectedTags_${user.id}`,
-      JSON.stringify(selectedTags)
+      `recipe-selected-tags-${user.id}`,
+      JSON.stringify(selectedTags),
     );
   }, [selectedTags, user?.id]);
 

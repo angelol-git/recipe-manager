@@ -1,12 +1,12 @@
 export function getLocalRecipes() {
-  const data = localStorage.getItem("guest_recipes");
+  const data = localStorage.getItem("recipe-guest-recipes");
   return data ? JSON.parse(data) : [];
 }
 
 export function addLocalRecipe(recipe) {
   const recipes = getLocalRecipes();
   recipes.push(recipe);
-  localStorage.setItem("guest_recipes", JSON.stringify(recipes));
+  localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   return recipe;
 }
 
@@ -17,7 +17,7 @@ export function addLocalRecipeVersion(recipe) {
   if (existingIndex !== -1 && recipe.versions?.length > 0) {
     const newVersion = recipe.versions[0];
     recipes[existingIndex].versions.push(newVersion);
-    localStorage.setItem("guest_recipes", JSON.stringify(recipes));
+    localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   }
 
   return recipe;
@@ -25,7 +25,7 @@ export function addLocalRecipeVersion(recipe) {
 
 export function deleteLocalRecipeAll(id) {
   const recipes = getLocalRecipes().filter((r) => r.id !== id);
-  localStorage.setItem("guest_recipes", JSON.stringify(recipes));
+  localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
 }
 
 export function deleteLocalRecipeVersion(recipeId, recipeVersionId) {
@@ -35,7 +35,7 @@ export function deleteLocalRecipeVersion(recipeId, recipeVersionId) {
     recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
       (v) => v.id !== recipeVersionId,
     );
-    localStorage.setItem("guest_recipes", JSON.stringify(recipes));
+    localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   }
 }
 
@@ -66,5 +66,7 @@ export function updateLocalRecipe(recipe) {
     tags: recipe.tags,
   };
 
-  localStorage.setItem("guest_recipes", JSON.stringify(recipes));
+  localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
 }
+
+export function addLocalRecipeTag(recipeId, newTag) {}

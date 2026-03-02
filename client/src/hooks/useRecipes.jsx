@@ -13,6 +13,7 @@ import {
   deleteLocalRecipeAll,
   deleteLocalRecipeVersion,
   updateLocalRecipe,
+  addLocalRecipeTag,
 } from "../utils/storage.js";
 
 export function useRecipes() {
@@ -152,7 +153,13 @@ export function useRecipes() {
   });
 
   const addRecipeTagMutation = useMutation({
-    mutationFn: async ({ recipeId, newTag }) => addRecipeTag(recipeId, newTag),
+    mutationFn: async ({ recipeId, newTag }) => {
+      if (user) {
+        return addRecipeTag(recipeId, newTag);
+      } else {
+        return addLocalRecipeTag(recipeId, newTag);
+      }
+    },
 
     // onError: (err, variables, context) => {
     //   if (context?.previousRecipes) {

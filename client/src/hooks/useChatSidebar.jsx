@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 function getInitialSidebarState(userId, isMobile) {
   if (!userId || isMobile) return false;
   try {
-    const stored = localStorage.getItem(`isSideBarOpen_${userId}`);
+    const stored = localStorage.getItem(`recipe-is-sidebar-open-${userId}`);
     if (stored !== null) {
       return JSON.parse(stored);
     }
@@ -22,7 +22,7 @@ export function useChatSidebar(user, isMobile) {
     if (!user?.id || isMobile) return;
 
     localStorage.setItem(
-      `isSideBarOpen_${user.id}`,
+      `recipe-is-sidebar-open-${user.id}`,
       JSON.stringify(isSideBarOpen),
     );
   }, [isSideBarOpen, user?.id, isMobile]);
