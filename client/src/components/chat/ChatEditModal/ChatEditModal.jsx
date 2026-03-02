@@ -58,14 +58,14 @@ function ChatEditModal({
         <div className="flex justify-between items-center">
           <button
             onClick={() => setIsEditModalOpen(false)}
-            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18 text-start"
+            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18"
           >
             Cancel
           </button>
-          <h2 className="font-bold pb-2 py-1">Edit Recipe</h2>
+          <h2 className="font-bold">Edit Recipe</h2>
           <button
             onClick={handleSave}
-            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18 text-end"
+            className="hover:bg-mantle-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18"
           >
             Save
           </button>
