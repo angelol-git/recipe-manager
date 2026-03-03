@@ -170,14 +170,14 @@ export function getRecipesByUserId(userId) {
   }));
 }
 
-export function getRecipeById(id) {
+export function getRecipeById(id, userId) {
   const recipe = db
     .prepare(
       `SELECT id, title, created_at
        FROM recipes
-       WHERE id = ?`,
+       WHERE id = ? AND user_id = ?`,
     )
-    .get(id);
+    .get(id, userId);
 
   if (!recipe) {
     return null;
@@ -211,7 +211,13 @@ export function getRecipeById(id) {
   };
 }
 
-export function getRecipeErrors(recipeId) {
+export function getRecipeErrors(recipeId, userId) {
+  // First verify recipe ownership
+  const recipe = db.prepare('SELECT 1 FROM recipes WHERE id = ? AND user_id = ?').get(recipeId, userId);
+  if (!recipe) {
+    return null;
+  }
+  
   const rows = db
     .prepare(
       `SELECT id, status, content, created_at
@@ -236,22 +242,50 @@ export function getRecipeErrors(recipeId) {
   });
 }
 
-export function deleteError(id) {
+export function deleteError(id, userId) {
+  // Verify the message belongs to the user's recipe
+  const message = db.prepare(`
+    SELECT m.id FROM messages m
+    JOIN recipes r ON m.recipe_id = r.id
+    WHERE m.id = ? AND r.user_id = ?
+  `).get(id, userId);
+  
+  if (!message) {
+    return false;
+  }
+  
   const result = db.prepare(`DELETE FROM messages WHERE id = ?`).run(id);
   return result.changes > 0;
 }
 
-export function deleteRecipeVersion(id) {
+export function deleteRecipeVersion(id, userId) {
+  // Verify the version belongs to the user's recipe
+  const version = db.prepare(`
+    SELECT rv.id FROM recipe_versions rv
+    JOIN recipes r ON rv.recipe_id = r.id
+    WHERE rv.id = ? AND r.user_id = ?
+  `).get(id, userId);
+  
+  if (!version) {
+    return false;
+  }
+  
   const result = db.prepare(`DELETE FROM recipe_versions WHERE id = ?`).run(id);
   return result.changes > 0;
 }
 
-export function deleteRecipe(id) {
-  const result = db.prepare(`DELETE FROM recipes WHERE id = ?`).run(id);
+export function deleteRecipe(id, userId) {
+  const result = db.prepare(`DELETE FROM recipes WHERE id = ? AND user_id = ?`).run(id, userId);
   return result.changes > 0;
 }
 
-export function getAskMessages(recipeId) {
+export function getAskMessages(recipeId, userId) {
+  // First verify recipe ownership
+  const recipe = db.prepare('SELECT 1 FROM recipes WHERE id = ? AND user_id = ?').get(recipeId, userId);
+  if (!recipe) {
+    return null;
+  }
+  
   const rows = db
     .prepare(
       `SELECT *
@@ -378,7 +412,13 @@ export function updateTag(tagId, userId, updates) {
   return { success: true };
 }
 
-export function removeTagFromRecipe(recipeId, tagId) {
+export function removeTagFromRecipe(recipeId, tagId, userId) {
+  // Verify the recipe belongs to the user
+  const recipe = db.prepare('SELECT 1 FROM recipes WHERE id = ? AND user_id = ?').get(recipeId, userId);
+  if (!recipe) {
+    return { success: false, error: "Recipe not found or access denied" };
+  }
+  
   db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(
     recipeId,
     parseInt(tagId),

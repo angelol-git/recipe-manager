@@ -29,7 +29,7 @@ router.get("/", authMiddleware, async (req, res) => {
 
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
-    const recipe = getRecipeById(req.params.id);
+    const recipe = getRecipeById(req.params.id, req.user.id);
     if (!recipe) {
       return res.status(404).json({ error: "Recipe not found" });
     }
@@ -42,7 +42,10 @@ router.get("/:id", authMiddleware, async (req, res) => {
 
 router.get("/errors/:id", authMiddleware, async (req, res) => {
   try {
-    const errors = getRecipeErrors(req.params.id);
+    const errors = getRecipeErrors(req.params.id, req.user.id);
+    if (errors === null) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
     res.json({ errors });
   } catch (error) {
     console.error("DB error:", error);
@@ -52,7 +55,7 @@ router.get("/errors/:id", authMiddleware, async (req, res) => {
 
 router.delete("/error/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = deleteError(req.params.id);
+    const deleted = deleteError(req.params.id, req.user.id);
     if (!deleted) {
       return res.status(404).json({ message: "Error message not found" });
     }
@@ -65,7 +68,7 @@ router.delete("/error/:id", authMiddleware, async (req, res) => {
 
 router.delete("/version/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = deleteRecipeVersion(req.params.id);
+    const deleted = deleteRecipeVersion(req.params.id, req.user.id);
     if (!deleted) {
       return res.status(404).json({ message: "Recipe version not found" });
     }
@@ -78,7 +81,7 @@ router.delete("/version/:id", authMiddleware, async (req, res) => {
 
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    const deleted = deleteRecipe(req.params.id);
+    const deleted = deleteRecipe(req.params.id, req.user.id);
     if (!deleted) {
       return res.status(404).json({ message: "Recipe not found" });
     }
@@ -91,7 +94,10 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 
 router.get("/:id/askMessages", authMiddleware, async (req, res) => {
   try {
-    const askMessages = getAskMessages(req.params.id);
+    const askMessages = getAskMessages(req.params.id, req.user.id);
+    if (askMessages === null) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
     res.json({ askMessages });
   } catch (error) {
     console.error("DB error:", error);
@@ -140,7 +146,10 @@ router.patch("/tag/:id", authMiddleware, async (req, res) => {
 
 router.delete("/:id/tag/:tagId", authMiddleware, async (req, res) => {
   try {
-    removeTagFromRecipe(req.params.id, req.params.tagId);
+    const result = removeTagFromRecipe(req.params.id, req.params.tagId, req.user.id);
+    if (!result.success) {
+      return res.status(404).json({ error: result.error || "Failed to remove tag" });
+    }
     res.status(204).send();
   } catch (error) {
     console.error(error);
