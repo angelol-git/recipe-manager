@@ -1,15 +1,12 @@
 import express from "express";
 import db from "../db.js";
 import authMiddleware from "../middleware.js";
+import { deleteTagsSchema, updateTagsSchema, validateRequest } from "../validation/tagSchemas.js";
 
 const router = express.Router();
 
-router.delete("/", authMiddleware, async (req, res) => {
+router.delete("/", authMiddleware, validateRequest(deleteTagsSchema), async (req, res) => {
   const { tagIds } = req.body;
-
-  if (!Array.isArray(tagIds) || tagIds.length === 0) {
-    return res.status(400).json({ error: "No tag IDs provided" });
-  }
 
   try {
     db.prepare(
@@ -27,13 +24,9 @@ router.delete("/", authMiddleware, async (req, res) => {
   }
 });
 
-router.patch("/", authMiddleware, async (req, res) => {
+router.patch("/", authMiddleware, validateRequest(updateTagsSchema), async (req, res) => {
   const { tags } = req.body;
   const userId = req.user.id;
-
-  if (!Array.isArray(tags) || tags.length === 0) {
-    return res.status(400).json({ error: "No tags provided" });
-  }
 
   try {
     const updateStatement = db.prepare(

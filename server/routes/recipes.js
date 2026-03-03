@@ -13,6 +13,7 @@ import {
   updateTag,
   removeTagFromRecipe,
 } from "../services/dbService.js";
+import { updateRecipeSchema, addTagSchema, validateRequest } from "../validation/recipeSchemas.js";
 
 const router = express.Router();
 
@@ -98,7 +99,7 @@ router.get("/:id/askMessages", authMiddleware, async (req, res) => {
   }
 });
 
-router.patch("/:id", authMiddleware, async (req, res) => {
+router.patch("/:id", authMiddleware, validateRequest(updateRecipeSchema), async (req, res) => {
   try {
     const result = updateRecipe(req.params.id, req.user.id, req.body.updatedRecipe);
     if (!result.success) {
@@ -111,7 +112,7 @@ router.patch("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-router.post("/:id/tag", authMiddleware, async (req, res) => {
+router.post("/:id/tag", authMiddleware, validateRequest(addTagSchema), async (req, res) => {
   try {
     const result = addTagToRecipe(req.params.id, req.user.id, req.body.newTag);
     if (!result.success) {
