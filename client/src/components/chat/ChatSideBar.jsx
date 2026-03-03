@@ -15,9 +15,9 @@ const ChatSideBar = memo(
     return (
       <nav
         className={`  
-        fixed inset-y-0 left-0 z-100 
-        lg:relative lg:z-0 
-        min-h-screen duration-200 ease-out transition-all flex-col flex bg-mantle
+        fixed inset-y-0 left-0 z-100
+        overflow-y-auto
+        h-screen duration-200 ease-out transition-all flex-col flex bg-mantle
         gap-4 text-sm lg:border-r-gray-300 lg:border-r-1 
         ${
           isSideBarOpen

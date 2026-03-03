@@ -71,7 +71,11 @@ const ChatLayout = () => {
   }, [recipes, id]);
 
   return (
-    <div className="bg-base relative flex min-h-screen text-primary w-full">
+    <div
+      className={`bg-base relative flex min-h-screen text-primary w-full ${
+        isMobile && isSideBarOpen ? "overflow-hidden h-screen" : ""
+      }`}
+    >
       <ChatSideBar
         recipes={recipes}
         isMobile={isMobile}

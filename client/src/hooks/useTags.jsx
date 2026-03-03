@@ -1,13 +1,26 @@
 import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTagsAll, editTagsAll } from "../api/tags.js";
+import { deleteLocalTagsAll, editLocalTagsAll } from "../utils/storage.js";
 
 export function useTags(user, recipes = []) {
   const queryClient = useQueryClient();
   const [selectedTags, setSelectedTags] = useState([]);
+  
   useEffect(() => {
     if (!user?.id) {
-      setSelectedTags([]);
+      // For guest users, try to load from localStorage
+      try {
+        const stored = localStorage.getItem("recipe-selected-tags-guest");
+        if (stored) {
+          setSelectedTags(JSON.parse(stored));
+        } else {
+          setSelectedTags([]);
+        }
+      } catch (err) {
+        console.log("Failed to parse saved tags: ", err);
+        setSelectedTags([]);
+      }
       return;
     }
 
@@ -22,11 +35,18 @@ export function useTags(user, recipes = []) {
   }, [user?.id]);
 
   useEffect(() => {
-    if (!user?.id) return;
-    localStorage.setItem(
-      `recipe-selected-tags-${user.id}`,
-      JSON.stringify(selectedTags),
-    );
+    if (user?.id) {
+      localStorage.setItem(
+        `recipe-selected-tags-${user.id}`,
+        JSON.stringify(selectedTags),
+      );
+    } else {
+      // Save guest user selected tags
+      localStorage.setItem(
+        "recipe-selected-tags-guest",
+        JSON.stringify(selectedTags),
+      );
+    }
   }, [selectedTags, user?.id]);
 
   const uniqueTags = useMemo(() => {
@@ -56,7 +76,13 @@ export function useTags(user, recipes = []) {
   }, [recipes]);
 
   const deleteTagsAllMutation = useMutation({
-    mutationFn: async (tagIds) => deleteTagsAll(tagIds),
+    mutationFn: async (tagIds) => {
+      if (user) {
+        return deleteTagsAll(tagIds);
+      } else {
+        return deleteLocalTagsAll(tagIds);
+      }
+    },
 
     onMutate: async (tagIds) => {
       await queryClient.cancelQueries(["recipes"]);
@@ -86,24 +112,36 @@ export function useTags(user, recipes = []) {
   });
 
   const editTagsAllMutation = useMutation({
-    mutationFn: async (updatedTags) => editTagsAll(updatedTags),
+    mutationFn: async (updatedTags) => {
+      if (user) {
+        return editTagsAll(updatedTags);
+      } else {
+        return editLocalTagsAll(updatedTags);
+      }
+    },
 
-    // onMutate: async (tags) => {
-    //   await queryClient.cancelQueries(["recipes"]);
+    onMutate: async (updatedTags) => {
+      await queryClient.cancelQueries(["recipes"]);
 
-    //   const previousRecipes = queryClient.getQueryData(["recipes"]);
-    //   queryClient.setQueryData(["recipes"], (old) => {
-    //     if (!old) return old;
-    //     return old.map((recipe) => {
-    //       return {
-    //         ...recipe,
-    //         tags: recipe.tags.filter((t) => !tagIds.includes(t.id)),
-    //       };
-    //     });
-    //   });
+      const previousRecipes = queryClient.getQueryData(["recipes"]);
+      queryClient.setQueryData(["recipes"], (old) => {
+        if (!old) return old;
+        return old.map((recipe) => {
+          return {
+            ...recipe,
+            tags: recipe.tags.map((tag) => {
+              const updatedTag = updatedTags.find((t) => t.id === tag.id);
+              if (updatedTag) {
+                return { ...tag, name: updatedTag.name, color: updatedTag.color };
+              }
+              return tag;
+            }),
+          };
+        });
+      });
 
-    //   return { previousRecipes };
-    // },
+      return { previousRecipes };
+    },
 
     onError: (err, variables, context) => {
       if (context?.previousRecipes) {

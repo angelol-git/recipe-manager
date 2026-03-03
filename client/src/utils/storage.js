@@ -1,3 +1,7 @@
+function generateId() {
+  return crypto.randomUUID();
+}
+
 export function getLocalRecipes() {
   const data = localStorage.getItem("recipe-guest-recipes");
   return data ? JSON.parse(data) : [];
@@ -69,4 +73,73 @@ export function updateLocalRecipe(recipe) {
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
 }
 
-export function addLocalRecipeTag(recipeId, newTag) {}
+export function addLocalRecipeTag(recipeId, newTag) {
+  const recipes = getLocalRecipes();
+  const recipeIndex = recipes.findIndex((r) => r.id === recipeId);
+
+  if (recipeIndex === -1) {
+    return { success: false, error: "Recipe not found" };
+  }
+
+  const recipe = recipes[recipeIndex];
+
+  const existingTagOnRecipe = recipe.tags.find(
+    (t) => t.name.toLowerCase() === newTag.name.toLowerCase(),
+  );
+
+  if (existingTagOnRecipe) {
+    return { success: false, error: "Tag already exists on this recipe" };
+  }
+
+  let tagToUse = null;
+  for (const r of recipes) {
+    const existingTag = r.tags.find(
+      (t) => t.name.toLowerCase() === newTag.name.toLowerCase(),
+    );
+    if (existingTag) {
+      tagToUse = { ...existingTag };
+      break;
+    }
+  }
+
+  if (!tagToUse) {
+    tagToUse = {
+      id: generateId(),
+      name: newTag.name,
+      color: newTag.color || "#FFB86C",
+    };
+  }
+
+  recipes[recipeIndex].tags.push(tagToUse);
+  localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
+
+  return { success: true, tag: tagToUse };
+}
+
+export function deleteLocalTagsAll(tagIds) {
+  const recipes = getLocalRecipes();
+
+  recipes.forEach((recipe) => {
+    recipe.tags = recipe.tags.filter((t) => !tagIds.includes(t.id));
+  });
+
+  localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
+  return { success: true };
+}
+
+export function editLocalTagsAll(updatedTags) {
+  const recipes = getLocalRecipes();
+
+  recipes.forEach((recipe) => {
+    recipe.tags = recipe.tags.map((tag) => {
+      const updatedTag = updatedTags.find((t) => t.id === tag.id);
+      if (updatedTag) {
+        return { ...tag, name: updatedTag.name, color: updatedTag.color };
+      }
+      return tag;
+    });
+  });
+
+  localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
+  return { success: true };
+}

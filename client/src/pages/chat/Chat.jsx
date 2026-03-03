@@ -9,6 +9,7 @@ import ChatTags from "../../components/chat/ChatTags.jsx";
 import ChatErrorModal from "../../components/chat/ChatErrorModal.jsx";
 import ChatAskModal from "../../components/chat/ChatAskModal.jsx";
 import Toast from "../../components/Toast.jsx";
+import NotFound from "../NotFound.jsx";
 
 function Chat() {
   const {
@@ -29,7 +30,6 @@ function Chat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const hasRecipeNavigation = recipe?.versions?.length > 1;
 
-  // Hide shell once recipe is loaded
   useEffect(() => {
     if (recipe) {
       window.hideShell?.();
@@ -37,7 +37,7 @@ function Chat() {
   }, [recipe]);
 
   if (!recipe) {
-    return null;
+    return <NotFound />;
   }
 
   return (
