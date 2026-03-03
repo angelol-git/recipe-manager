@@ -17,8 +17,8 @@ export function useTags(user, recipes = []) {
         } else {
           setSelectedTags([]);
         }
-      } catch (err) {
-        console.log("Failed to parse saved tags: ", err);
+      } catch {
+        // Silently ignore localStorage parse errors
         setSelectedTags([]);
       }
       return;
@@ -29,8 +29,8 @@ export function useTags(user, recipes = []) {
       if (stored) {
         setSelectedTags(JSON.parse(stored));
       }
-    } catch (err) {
-      console.log("Failed to parse saved tags: ", err);
+    } catch {
+      // Silently ignore localStorage parse errors
     }
   }, [user?.id]);
 

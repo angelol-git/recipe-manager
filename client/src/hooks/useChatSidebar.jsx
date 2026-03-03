@@ -7,8 +7,8 @@ function getInitialSidebarState(userId, isMobile) {
     if (stored !== null) {
       return JSON.parse(stored);
     }
-  } catch (err) {
-    console.error("Failed to parse isSideBarOpen:", err);
+  } catch {
+    // Silently ignore localStorage parse errors, fallback to default
   }
   return false;
 }
