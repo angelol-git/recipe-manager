@@ -115,9 +115,9 @@ export function useRecipes() {
   const updateRecipeMutation = useMutation({
     mutationFn: async (updatedRecipe) => {
       if (user) {
-        updateRecipe(updatedRecipe);
+        return await updateRecipe(updatedRecipe);
       } else {
-        updateLocalRecipe(updatedRecipe);
+        return updateLocalRecipe(updatedRecipe);
       }
     },
 
