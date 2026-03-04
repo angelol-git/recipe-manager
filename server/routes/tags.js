@@ -9,14 +9,17 @@ router.delete("/", authMiddleware, validateRequest(deleteTagsSchema), async (req
   const { tagIds } = req.body;
 
   try {
-    db.prepare(
-      `DELETE FROM recipe_tags WHERE tag_id IN (${tagIds.map(() => "?").join(", ")})`
-    ).run(...tagIds);
+    const deleteTransaction = db.transaction(() => {
+      db.prepare(
+        `DELETE FROM recipe_tags WHERE tag_id IN (${tagIds.map(() => "?").join(", ")})`
+      ).run(...tagIds);
 
-    db.prepare(
-      `DELETE FROM tags WHERE id IN (${tagIds.map(() => "?").join(", ")})`
-    ).run(...tagIds);
+      db.prepare(
+        `DELETE FROM tags WHERE id IN (${tagIds.map(() => "?").join(", ")})`
+      ).run(...tagIds);
+    });
 
+    deleteTransaction();
     res.json({ success: true, deletedTagIds: tagIds });
   } catch (error) {
     console.error(error);
