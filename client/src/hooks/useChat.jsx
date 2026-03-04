@@ -1,13 +1,11 @@
 // hooks/useRecipeApi.js
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 import { sendCreateMessage } from "../api/chat";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage.js";
 import { useUser } from "./useUser";
 
 export function useChat(showToast) {
   const { user } = useUser();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const sendCreateMessageMutation = useMutation({
@@ -44,12 +42,8 @@ export function useChat(showToast) {
         addLocalRecipeVersion(newRecipe);
       }
 
-      if (isNewRecipe) {
-        console.log(newRecipe);
-        if (!user) {
-          addLocalRecipe(newRecipe);
-        }
-        navigate(`/chat/${newRecipe.id}`);
+      if (isNewRecipe && !user) {
+        addLocalRecipe(newRecipe);
       }
 
       queryClient.invalidateQueries(["recipes", user?.id || "guest_recipes"]);
@@ -178,7 +172,7 @@ export function useChat(showToast) {
   // }
 
   return {
-    sendCreateMessage: sendCreateMessageMutation.mutate,
+    sendCreateMessage: sendCreateMessageMutation.mutateAsync,
     isPending: sendCreateMessageMutation.isPending,
     isSuccess: sendCreateMessageMutation.isSuccess,
     // errors,

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, memo } from "react";
+import { useNavigate } from "react-router";
 import { useChat } from "../../hooks/useChat.jsx";
 import {
   ArrowUp,
@@ -32,6 +33,7 @@ const ChatInput = memo(
     const minHeight = 30;
     const maxHeight = 160;
     const isNewChat = variant === "new-chat";
+    const navigate = useNavigate();
 
     const { sendCreateMessage, isPending, isSuccess } = useChat(showToast);
 
@@ -74,15 +76,23 @@ const ChatInput = memo(
       }
     }, [isSuccess]);
 
-    function handleSendMessage() {
+    async function handleSendMessage() {
       if (!message.trim()) return;
 
       if (chatInputMode === "Create") {
-        sendCreateMessage({
-          message,
-          recipeId: recipe?.id,
-          recipeVersion: recipe?.versions?.[recipeVersion],
-        });
+        try {
+          const result = await sendCreateMessage({
+            message,
+            recipeId: recipe?.id,
+            recipeVersion: recipe?.versions?.[recipeVersion],
+          });
+
+          if (!recipe?.id && result?.reply?.id) {
+            navigate(`/chat/${result.reply.id}`);
+          }
+        } catch (error) {
+          console.error("Failed to create recipe:", error);
+        }
       }
 
       if (chatInputMode === "Ask") {
