@@ -6,9 +6,16 @@ export function getLocalRecipes() {
   const data = localStorage.getItem("recipe-guest-recipes");
   if (!data) return [];
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (!Array.isArray(parsed)) {
+      console.warn("LocalStorage recipes is not an array, clearing");
+      localStorage.removeItem("recipe-guest-recipes");
+      return [];
+    }
+    return parsed;
   } catch (error) {
     console.error("Failed to parse localStorage recipes:", error);
+    localStorage.removeItem("recipe-guest-recipes");
     return [];
   }
 }
@@ -26,6 +33,9 @@ export function addLocalRecipeVersion(recipe) {
 
   if (existingIndex !== -1 && recipe.versions?.length > 0) {
     const newVersion = recipe.versions[0];
+    if (!Array.isArray(recipes[existingIndex].versions)) {
+      recipes[existingIndex].versions = [];
+    }
     recipes[existingIndex].versions.push(newVersion);
     localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   }
@@ -42,9 +52,11 @@ export function deleteLocalRecipeVersion(recipeId, recipeVersionId) {
   const recipes = getLocalRecipes();
   const existingIndex = recipes.findIndex((r) => r.id === recipeId);
   if (existingIndex !== -1) {
-    recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
-      (v) => v.id !== recipeVersionId,
-    );
+    if (Array.isArray(recipes[existingIndex].versions)) {
+      recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
+        (v) => v.id !== recipeVersionId,
+      );
+    }
     localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   }
 }
@@ -54,6 +66,10 @@ export function updateLocalRecipe(recipe) {
   const existingIndex = recipes.findIndex((r) => r.id === recipe.recipe_id);
 
   if (existingIndex === -1) return;
+
+  if (!Array.isArray(recipes[existingIndex].versions)) {
+    recipes[existingIndex].versions = [];
+  }
 
   const versionIndex = recipes[existingIndex].versions.findIndex(
     (v) => v.id === recipe.id,
@@ -73,7 +89,7 @@ export function updateLocalRecipe(recipe) {
   recipes[existingIndex] = {
     ...recipes[existingIndex],
     title: recipe.title,
-    tags: recipe.tags,
+    tags: recipe.tags || [],
   };
 
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
@@ -89,8 +105,12 @@ export function addLocalRecipeTag(recipeId, newTag) {
 
   const recipe = recipes[recipeIndex];
 
+  if (!Array.isArray(recipe.tags)) {
+    recipe.tags = [];
+  }
+
   const existingTagOnRecipe = recipe.tags.find(
-    (t) => t.name.toLowerCase() === newTag.name.toLowerCase(),
+    (t) => t.name?.toLowerCase() === newTag.name?.toLowerCase(),
   );
 
   if (existingTagOnRecipe) {
@@ -99,8 +119,12 @@ export function addLocalRecipeTag(recipeId, newTag) {
 
   let tagToUse = null;
   for (const r of recipes) {
+    if (!Array.isArray(r.tags)) {
+      r.tags = [];
+      continue;
+    }
     const existingTag = r.tags.find(
-      (t) => t.name.toLowerCase() === newTag.name.toLowerCase(),
+      (t) => t.name?.toLowerCase() === newTag.name?.toLowerCase(),
     );
     if (existingTag) {
       tagToUse = { ...existingTag };
@@ -126,7 +150,11 @@ export function deleteLocalTagsAll(tagIds) {
   const recipes = getLocalRecipes();
 
   recipes.forEach((recipe) => {
-    recipe.tags = recipe.tags.filter((t) => !tagIds.includes(t.id));
+    if (Array.isArray(recipe.tags)) {
+      recipe.tags = recipe.tags.filter((t) => !tagIds.includes(t.id));
+    } else {
+      recipe.tags = [];
+    }
   });
 
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
@@ -137,13 +165,17 @@ export function editLocalTagsAll(updatedTags) {
   const recipes = getLocalRecipes();
 
   recipes.forEach((recipe) => {
-    recipe.tags = recipe.tags.map((tag) => {
-      const updatedTag = updatedTags.find((t) => t.id === tag.id);
-      if (updatedTag) {
-        return { ...tag, name: updatedTag.name, color: updatedTag.color };
-      }
-      return tag;
-    });
+    if (Array.isArray(recipe.tags)) {
+      recipe.tags = recipe.tags.map((tag) => {
+        const updatedTag = updatedTags.find((t) => t.id === tag.id);
+        if (updatedTag) {
+          return { ...tag, name: updatedTag.name, color: updatedTag.color };
+        }
+        return tag;
+      });
+    } else {
+      recipe.tags = [];
+    }
   });
 
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
