@@ -4,7 +4,13 @@ function generateId() {
 
 export function getLocalRecipes() {
   const data = localStorage.getItem("recipe-guest-recipes");
-  return data ? JSON.parse(data) : [];
+  if (!data) return [];
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Failed to parse localStorage recipes:", error);
+    return [];
+  }
 }
 
 export function addLocalRecipe(recipe) {
