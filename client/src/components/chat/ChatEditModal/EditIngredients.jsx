@@ -48,11 +48,9 @@ function EditIngredients({
   function handleDragEnd(event) {
     const { active, over } = event;
     if (!over) {
-      console.log("No drop target");
       return;
     }
     if (active.id === over.id) {
-      console.log("Dropped on itself");
       return;
     }
 

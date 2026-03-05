@@ -22,8 +22,8 @@ function UserOptions({ user, logout }) {
         const err = await result.json();
         console.error("Login failed:", err);
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
+      // console.log(error);
     }
   }
 
