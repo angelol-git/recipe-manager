@@ -8,9 +8,8 @@ const tagSchema = z.object({
   id: z.union([z.string(), z.number()]),
   name: z
     .string()
-    .min(1)
-    .max(50)
-    .transform((s) => s.trim()),
+    .transform((s) => s.trim())
+    .pipe(z.string().min(1).max(50)),
   color: hexColorSchema.default("#FFB86C"),
 });
 
@@ -54,9 +53,8 @@ export const addTagSchema = z.object({
     newTag: z.object({
       name: z
         .string()
-        .min(1)
-        .max(50)
-        .transform((s) => s.trim()),
+        .transform((s) => s.trim())
+        .pipe(z.string().min(1).max(50)),
       color: hexColorSchema.default("#FFB86C"),
     }),
   }),

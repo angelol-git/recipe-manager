@@ -1,24 +1,23 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import EditTagItem from "../tags/EditTagItem.jsx";
 import useDraftTags from "../../hooks/useDraftTags.jsx";
+
 function HomeTags({
   tags,
   selectedTags,
   handleTagSelectedClick,
   tagCounts,
-  // handleTagClick,
-  // editRecipeTagAll,
   deleteTagsAll,
   editTagsAll,
 }) {
-  const tagsToBeDeleted = useRef([]);
+  const [tagsToBeDeleted, setTagsToBeDeleted] = useState([]);
   const [isEditTags, setIsEditTags] = useState(false);
   const {
     draftTags,
     handleDraftTagDelete,
     handleEditDraftTagName,
     handleEditDraftTagColor,
-  } = useDraftTags({ tags, isEditTags, tagsToBeDeleted });
+  } = useDraftTags({ tags, isEditTags, setTagsToBeDeleted });
 
   function handleTagDone() {
     const tagsToUpdate = draftTags.filter((tag) => {
@@ -28,25 +27,17 @@ function HomeTags({
       );
     });
 
-    if (tagsToBeDeleted.current.length) {
-      deleteTagsAll(tagsToBeDeleted.current.map((t) => t.id));
+    if (tagsToBeDeleted.length) {
+      deleteTagsAll(tagsToBeDeleted.map((t) => t.id));
     }
     if (tagsToUpdate.length) {
       editTagsAll(tagsToUpdate);
     }
 
     setIsEditTags(false);
-    tagsToBeDeleted.current = [];
+    setTagsToBeDeleted([]);
   }
 
-  // useEffect(() => {
-  //   if (!isDeletingTags && isEditTags) {
-
-  //   }
-  // }, [isDeletingTags]);
-
-  // console.log(tags);
-  // console.log(tagCounts);
   return (
     <div>
       {!isEditTags ? (

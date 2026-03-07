@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function useDraftTags({ tags, isEditTags, tagsToBeDeleted }) {
+function useDraftTags({ tags, isEditTags, setTagsToBeDeleted }) {
   const [draftTags, setDraftTags] = useState([]);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function useDraftTags({ tags, isEditTags, tagsToBeDeleted }) {
   }
 
   function handleDraftTagDelete(tag) {
-    tagsToBeDeleted.current.push(tag);
+    setTagsToBeDeleted((prev) => [...prev, tag]);
     setDraftTags((prev) => {
       return prev.filter((t) => t.id !== tag.id);
     });
