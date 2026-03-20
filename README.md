@@ -1,4 +1,4 @@
-# <img src="https://github.com/angelol-git/ai-recipe-manager/blob/main/.github/logo.png?raw=true" width="32" /> AI Recipe Manager
+# <img src="https://github.com/angelol-git/ai-recipe-manager/tree/main/.github/logo.png?raw=true" width="32" /> AI Recipe Manager
 
 AI-powered recipe management application with a clean, intuitive interface. Save recipes from URLs, organize them with custom tags, and interact with an AI assistant to discover new recipes.
 
