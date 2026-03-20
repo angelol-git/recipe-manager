@@ -30,7 +30,8 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
             <h3 className="font-medium font-lora text-xl">{recipe.title}</h3>
             <p className="text-sm text-secondary">
               {formatDescription(
-                recipe.versions[recipe.versions.length - 1].description,
+                recipe.versions?.[recipe.versions.length - 1]?.description ||
+                  "",
               )}
             </p>
           </div>
