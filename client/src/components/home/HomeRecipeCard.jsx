@@ -35,8 +35,8 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
               )}
             </p>
           </div>
-          <div className="flex justify-between">
-            <p className="text-secondary mt-auto">
+          <div className="flex justify-between  items-center">
+            <p className="text-secondary  text-sm">
               {formatDate(recipe.created_at)}
             </p>
             <RecipeOptions
