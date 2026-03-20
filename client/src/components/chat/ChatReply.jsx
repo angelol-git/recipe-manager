@@ -97,7 +97,10 @@ const ChatReply = memo(({ recipe, recipeVersion }) => {
           </h3>
           <ol className="list-decimal flex flex-col gap-2 pt-2">
             {instructions.map((item, index) => (
-              <li key={`${recipe.id}-instruction-${index}`} className="flex gap-2">
+              <li
+                key={`${recipe.id}-instruction-${index}`}
+                className="flex gap-2"
+              >
                 <span className="font-semibold font-lora">{index + 1}.</span>
                 {item}
               </li>
