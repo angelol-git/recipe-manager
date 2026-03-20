@@ -13,7 +13,7 @@ export function useChat(showToast) {
       return sendCreateMessage(payload);
     },
 
-    onMutate: async (_variables) => {
+    onMutate: async () => {
       await queryClient.cancelQueries({
         queryKey: ["recipes", user?.id || "guest_recipes"],
       });

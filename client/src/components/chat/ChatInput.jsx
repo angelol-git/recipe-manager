@@ -90,6 +90,8 @@ const ChatInput = memo(
           if (!recipe?.id && result?.reply?.id) {
             navigate(`/chat/${result.reply.id}`);
           }
+
+          showToast("Recipe created successfully!", "success");
         } catch {
           showToast("Failed to create recipe. Please try again.", "error");
         }
