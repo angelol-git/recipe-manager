@@ -52,7 +52,7 @@ function ChatEditModal({
     >
       <div
         ref={modalRef}
-        className={`w-full lg:max-w-screen-md max-h-[95vh] overflow-y-auto overscroll-contain px-3 pt-6 pb-10 flex flex-col bg-base rounded-t-xl shadow-lg transform transition-transform ease-out duration-300 ${isEditModalOpen ? "translate-y-0" : "translate-y-full"}`}
+        className={`w-full lg:max-w-screen-md max-h-[90dvh] overflow-y-auto overscroll-contain px-3 pt-6 pb-10 flex flex-col bg-base rounded-t-xl shadow-lg transform transition-transform ease-out duration-300 ${isEditModalOpen ? "translate-y-0" : "translate-y-full"}`}
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         <div className="flex justify-between items-center">

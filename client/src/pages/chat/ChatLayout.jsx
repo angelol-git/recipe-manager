@@ -100,7 +100,7 @@ const ChatLayout = () => {
           openDeleteModal={openDeleteModal}
           isMobile={isMobile}
         />
-        <div className="flex-1 overflow-y-auto ios-scroll">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <Outlet context={contextValue} />
         </div>
       </main>

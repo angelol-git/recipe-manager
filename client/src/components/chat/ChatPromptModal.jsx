@@ -27,7 +27,7 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt }) {
       onClick={onClose}
     >
       <div
-        className={`w-full lg:max-w-screen-md h-[95vh] overflow-y-auto overscroll-contain px-4 pt-6 pb-10 flex flex-col bg-base rounded-t-xl lg:rounded-xl shadow-lg transform transition-transform ease-out duration-300 ${
+        className={`w-full lg:max-w-screen-md h-[90dvh] overflow-y-auto overscroll-contain px-4 pt-6 pb-10 flex flex-col bg-base rounded-t-xl lg:rounded-xl shadow-lg transform transition-transform ease-out duration-300 ${
           isOpen ? "translate-y-0 lg:scale-100" : "translate-y-full lg:scale-95"
         }`}
         style={{ WebkitOverflowScrolling: "touch" }}
