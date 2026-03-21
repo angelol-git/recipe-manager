@@ -4,11 +4,7 @@ import ChatHeader from "../../components/chat/ChatHeader.jsx";
 import { useOutletContext } from "react-router";
 
 function NewChat() {
-  const {
-    isMobile,
-    isSideBarOpen,
-    setIsSideBarOpen,
-  } = useOutletContext();
+  const { isMobile, isSideBarOpen, setIsSideBarOpen } = useOutletContext();
 
   // Hide shell once component is ready
   useEffect(() => {
@@ -39,7 +35,7 @@ function NewChat() {
             servings.
           </div>
         </div>
-        <div className="bottom-0 absolute w-full px-4 pb-4">
+        <div className="bottom-0 fixed w-full px-4">
           <ChatInput variant="new-chat" />
         </div>
       </div>

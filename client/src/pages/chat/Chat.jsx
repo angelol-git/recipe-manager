@@ -47,7 +47,7 @@ function Chat() {
         isMobile={isMobile}
       />
 
-      <div className="flex-1 w-full max-w-screen-md mx-auto px-4 py-2">
+      <div className="flex-1 w-full max-w-screen-md mx-auto px-4 pt-2 pb-20">
         <ChatTags recipe={recipe} />
         <ChatReply recipe={recipe} recipeVersion={recipeVersion} />
       </div>

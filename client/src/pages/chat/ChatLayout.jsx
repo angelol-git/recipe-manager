@@ -62,7 +62,7 @@ const ChatLayout = () => {
 
   return (
     <div
-      className={`bg-base relative flex min-h-screen h-full overflow-hidden text-primary w-full`}
+      className={`bg-base relative flex overscroll-contain h-[100dvh] overflow-hidden text-primary w-full`}
     >
       <ChatSideBar
         recipes={recipes}
@@ -78,7 +78,7 @@ const ChatLayout = () => {
           onClick={() => setIsSideBarOpen(false)}
         />
       )}
-      <main className="relative flex flex-1 flex-col min-w-0 overflow-y-auto">
+      <main className="relative flex flex-1 flex-col min-w-0 overflow-y-auto ios-scroll">
         <Outlet context={contextValue} />
       </main>
       {deleteModal.isOpen && (

@@ -157,7 +157,7 @@ const ChatInput = memo(
                   setRecipeVersion={setRecipeVersion}
                 />
               )}
-              <select
+              {/* <select
                 value={chatInputMode}
                 disabled={isPending}
                 onChange={(event) => {
@@ -165,12 +165,12 @@ const ChatInput = memo(
                 }}
                 className={`${
                   chatInputMode === "Create"
-                    ? "bg-overlay0 text-secondary"
+                    ? "bg-base text-secondary"
                     : "bg-overlay2 text-white"
                 } w-min px-2 ${isPending ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:brightness-90"} py-1 rounded-2xl duration-150 transition-colors text-sm flex items-center gap-1`}
               >
                 <option value="Create">Create</option>
-              </select>
+              </select> */}
             </div>
           )}
 
