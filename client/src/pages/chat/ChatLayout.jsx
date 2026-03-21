@@ -5,6 +5,7 @@ import { useRecipes } from "../../hooks/useRecipes";
 import { useChatSidebar } from "../../hooks/useChatSidebar";
 import useIsMobile from "../../hooks/useIsMobile";
 import ChatSideBar from "../../components/chat/ChatSideBar";
+import ChatHeader from "../../components/chat/ChatHeader.jsx";
 import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.jsx";
 import DeleteRecipePortal from "../../components/delete/DeleteRecipePortal.jsx";
 import { useToast } from "../../hooks/useToast";
@@ -23,6 +24,7 @@ const ChatLayout = () => {
   }, [recipes, id]);
 
   const [recipeVersion, setRecipeVersion] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { deleteModal, openDeleteModal, closeDeleteModal, handleDelete } =
     useDeleteRecipe();
@@ -37,6 +39,8 @@ const ChatLayout = () => {
       setIsSideBarOpen,
       showToast,
       openDeleteModal,
+      isEditModalOpen,
+      setIsEditModalOpen,
     }),
     [
       recipe,
@@ -47,6 +51,8 @@ const ChatLayout = () => {
       setIsSideBarOpen,
       showToast,
       openDeleteModal,
+      isEditModalOpen,
+      setIsEditModalOpen,
     ],
   );
 
@@ -84,8 +90,19 @@ const ChatLayout = () => {
           onClick={() => setIsSideBarOpen(false)}
         />
       )}
-      <main className="relative flex flex-1 flex-col min-w-0 overflow-y-auto ios-scroll">
-        <Outlet context={contextValue} />
+      <main className="relative flex flex-1 flex-col min-w-0 overflow-hidden">
+        <ChatHeader
+          recipe={recipe}
+          recipeVersion={recipeVersion}
+          isSideBarOpen={isSideBarOpen}
+          setIsSideBarOpen={setIsSideBarOpen}
+          setIsEditModalOpen={setIsEditModalOpen}
+          openDeleteModal={openDeleteModal}
+          isMobile={isMobile}
+        />
+        <div className="flex-1 overflow-y-auto ios-scroll">
+          <Outlet context={contextValue} />
+        </div>
       </main>
       {deleteModal.isOpen && (
         <DeleteRecipePortal

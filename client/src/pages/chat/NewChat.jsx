@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import ChatInput from "../../components/chat/ChatInput.jsx";
-import ChatHeader from "../../components/chat/ChatHeader.jsx";
 import { useOutletContext } from "react-router";
 
 function NewChat() {
@@ -13,11 +12,6 @@ function NewChat() {
 
   return (
     <div className="w-full items-center flex h-full flex-col">
-      <ChatHeader
-        isSideBarOpen={isSideBarOpen}
-        setIsSideBarOpen={setIsSideBarOpen}
-        isMobile={isMobile}
-      />
       <div className="relative max-w-screen-md flex flex-col w-full flex-1 ">
         <div className="flex flex-col gap-4 flex-1 sm:text-center justify-center p-6 pb-50">
           <h2 className="text-primary text-2xl font-medium font-lora">

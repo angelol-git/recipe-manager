@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router";
-import ChatHeader from "../../components/chat/ChatHeader.jsx";
 import ChatReply from "../../components/chat/ChatReply.jsx";
 import ChatNavigation from "../../components/chat/ChatNavigation.jsx";
 import ChatInput from "../../components/chat/ChatInput.jsx";
@@ -14,13 +13,10 @@ function Chat() {
     recipe,
     recipeVersion,
     setRecipeVersion,
-    isMobile,
-    isSideBarOpen,
-    setIsSideBarOpen,
-    openDeleteModal,
+    isEditModalOpen,
+    setIsEditModalOpen,
   } = useOutletContext();
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const hasRecipeNavigation = recipe?.versions?.length > 1;
@@ -37,16 +33,6 @@ function Chat() {
 
   return (
     <div className="flex flex-col min-h-full">
-      <ChatHeader
-        recipe={recipe}
-        recipeVersion={recipeVersion}
-        isSideBarOpen={isSideBarOpen}
-        setIsSideBarOpen={setIsSideBarOpen}
-        setIsEditModalOpen={setIsEditModalOpen}
-        openDeleteModal={openDeleteModal}
-        isMobile={isMobile}
-      />
-
       <div className="flex-1 w-full max-w-screen-md mx-auto px-4 pt-2 pb-20">
         <ChatTags recipe={recipe} />
         <ChatReply recipe={recipe} recipeVersion={recipeVersion} />
