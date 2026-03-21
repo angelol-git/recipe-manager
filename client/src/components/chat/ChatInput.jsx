@@ -61,14 +61,14 @@ const ChatInput = memo(
     }, [isExpanded]);
 
     useEffect(() => {
-      if (textAreaRef.current) {
+      if (textAreaRef.current && isChatOpen) {
         textAreaRef.current.style.height = "auto";
         textAreaRef.current.style.height = `${Math.min(
           Math.max(textAreaRef.current.scrollHeight, minHeight),
           maxHeight,
         )}px`;
       }
-    }, [message]);
+    }, [isChatOpen, message]);
 
     useEffect(() => {
       if (isSuccess) {
