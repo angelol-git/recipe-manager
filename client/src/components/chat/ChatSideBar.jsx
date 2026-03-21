@@ -1,5 +1,6 @@
 import { useState, memo } from "react";
 import { Link } from "react-router";
+import logo from "../../assets/logo.png";
 import { X, PanelLeftClose, CirclePlus } from "lucide-react";
 import RecipeOptions from "../RecipeOptions";
 
@@ -30,9 +31,9 @@ const ChatSideBar = memo(
         <div className="flex justify-between items-center">
           <Link
             to={`/`}
-            className="cursor-pointer w-min p-1 rounded-lg duration-150 hover:bg-mantle-hover"
+            className="cursor-pointer  p-1 rounded-lg duration-150 hover:bg-mantle-hover"
           >
-            <h2>Home</h2>
+            <img src={logo} className="w-8" />
           </Link>
           <button
             onClick={() => {
