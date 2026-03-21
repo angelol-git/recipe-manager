@@ -21,7 +21,7 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
           }`}
         >
           <div className="flex flex-col gap-2">
-            <h3 className="font-medium font-lora text-xl line-clamp-2 min-h-[3.25rem] leading-snug">
+            <h3 className="font-medium font-lora text-lg md:text-xl line-clamp-2 min-h-[3.25rem] leading-snug">
               {recipe.title}
             </h3>
             <p className="text-sm text-secondary line-clamp-5">

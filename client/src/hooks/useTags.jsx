@@ -6,7 +6,7 @@ import { deleteLocalTagsAll, editLocalTagsAll } from "../utils/storage.js";
 export function useTags(user, recipes = []) {
   const queryClient = useQueryClient();
   const [selectedTags, setSelectedTags] = useState([]);
-  
+
   useEffect(() => {
     if (!user?.id) {
       // For guest users, try to load from localStorage
@@ -63,6 +63,16 @@ export function useTags(user, recipes = []) {
 
     return Array.from(map.values());
   }, [recipes]);
+
+  //Deselects all associated tags if all items are deleted
+  useEffect(() => {
+    setSelectedTags((prev) => {
+      const stillValid = prev.filter((selectedTag) =>
+        uniqueTags.some((uniqueTag) => uniqueTag.id === selectedTag.id),
+      );
+      return stillValid.length === prev.length ? prev : stillValid;
+    });
+  }, [uniqueTags]);
 
   const tagCounts = useMemo(() => {
     if (!recipes.length) return {};
@@ -132,7 +142,11 @@ export function useTags(user, recipes = []) {
             tags: recipe.tags.map((tag) => {
               const updatedTag = updatedTags.find((t) => t.id === tag.id);
               if (updatedTag) {
-                return { ...tag, name: updatedTag.name, color: updatedTag.color };
+                return {
+                  ...tag,
+                  name: updatedTag.name,
+                  color: updatedTag.color,
+                };
               }
               return tag;
             }),
