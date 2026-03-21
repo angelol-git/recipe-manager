@@ -79,3 +79,8 @@ body,
 @utility ios-scroll {
   -webkit-overflow-scrolling: touch;
 }
+
+
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+}

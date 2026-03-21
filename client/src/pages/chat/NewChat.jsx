@@ -18,7 +18,7 @@ function NewChat() {
         setIsSideBarOpen={setIsSideBarOpen}
         isMobile={isMobile}
       />
-      <div className="relative max-w-screen-md flex flex-col w-full flex-1">
+      <div className="relative max-w-screen-md flex flex-col w-full flex-1 ">
         <div className="flex flex-col gap-4 flex-1 sm:text-center justify-center p-6 pb-50">
           <h2 className="text-primary text-2xl font-medium font-lora">
             What recipe can I help you with?
@@ -35,7 +35,7 @@ function NewChat() {
             servings.
           </div>
         </div>
-        <div className="bottom-0 fixed w-full px-4">
+        <div className="bottom-0 absolute w-full max-w-screen-md px-4 pb-4">
           <ChatInput variant="new-chat" />
         </div>
       </div>

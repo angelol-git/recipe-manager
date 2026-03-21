@@ -104,7 +104,7 @@ const ChatInput = memo(
 
     return isChatOpen ? (
       <div
-        className={`relative bg-base p-2 border-crust border-8 rounded-2xl w-full ${isPending && "bg-loading"}`}
+        className={`relative p-2 border-crust bg-base border-8 rounded-2xl w-full`}
       >
         <textarea
           rows={1}
