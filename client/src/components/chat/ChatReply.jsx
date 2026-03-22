@@ -2,7 +2,7 @@ import { useState, memo } from "react";
 import { Flame, Clock, Utensils } from "lucide-react";
 import ChatPromptModal from "./ChatPromptModal";
 
-const ChatReply = memo(({ recipe, recipeVersion }) => {
+const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const current = recipe?.versions?.[recipeVersion];
 
@@ -111,6 +111,7 @@ const ChatReply = memo(({ recipe, recipeVersion }) => {
         isOpen={isPromptModalOpen}
         onClose={() => setIsPromptModalOpen(false)}
         sourcePrompt={source_prompt || ""}
+        anchorRef={modalAnchorRef}
       />
     </div>
   );

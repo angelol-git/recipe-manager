@@ -21,6 +21,7 @@ function Chat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [composerHeight, setComposerHeight] = useState(0);
   const composerRef = useRef(null);
+  const replyPanelRef = useRef(null);
   const hasRecipeNavigation = recipe?.versions?.length > 1;
 
   useEffect(() => {
@@ -57,11 +58,16 @@ function Chat() {
     <div className="relative flex h-full min-h-0 flex-col">
       <div className="flex-1 min-h-0 overflow-y-auto ios-scroll">
         <div
+          ref={replyPanelRef}
           className="w-full max-w-screen-md mx-auto px-4 pt-2"
           style={{ paddingBottom: `${composerHeight + 16}px` }}
         >
           <ChatTags recipe={recipe} />
-          <ChatReply recipe={recipe} recipeVersion={recipeVersion} />
+          <ChatReply
+            recipe={recipe}
+            recipeVersion={recipeVersion}
+            modalAnchorRef={replyPanelRef}
+          />
         </div>
       </div>
 
@@ -70,6 +76,7 @@ function Chat() {
         recipeVersion={recipeVersion}
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
+        anchorRef={replyPanelRef}
       />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0">

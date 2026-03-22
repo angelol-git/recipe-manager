@@ -197,7 +197,7 @@ const ChatInput = memo(
       </div>
     ) : (
       <button
-        className="bg-accent hover:bg-accent-hover transition-colors duration-150 rounded-full flex items-center justify-center w-9 h-9 cursor-pointer"
+        className=" bg-accent hover:bg-accent-hover transition-colors duration-150 rounded-full flex items-center justify-center w-9 h-9 cursor-pointer"
         onClick={() => {
           setIsChatOpen(true);
         }}
