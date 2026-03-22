@@ -22,10 +22,10 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
 
   return createPortal(
     <div
-      className={`fixed inset-0 bg-black/10 backdrop-blur-xs  z-[200] transition-opacity duration-300 ${
+      className={`fixed inset-0 z-[200] bg-black/10 backdrop-blur-xs transition-opacity duration-300 ${
         isOpen
-          ? "opacity-100 pointer-events-auto"
-          : "opacity-0 pointer-events-none"
+          ? "pointer-events-auto opacity-100"
+          : "pointer-events-none opacity-0"
       }`}
       onClick={onClose}
     >
@@ -34,16 +34,16 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
         style={anchorStyle}
       >
         <div
-          className={`w-full h-[90dvh] overflow-y-auto overscroll-contain px-4 pt-6 pb-10 flex flex-col bg-base rounded-t-xl lg:rounded-xl shadow-lg transform transition-transform ease-out duration-300 ${
+          className={`bg-base flex h-[90dvh] w-full transform flex-col overflow-y-auto overscroll-contain rounded-t-xl px-4 pt-6 pb-10 shadow-lg transition-transform duration-300 ease-out lg:rounded-xl ${
             isOpen ? "translate-y-0" : "translate-y-full"
           }`}
           style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex justify-between items-center mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <button
               onClick={onClose}
-              className="text-secondary hover:text-primary hover:bg-base-hover duration-150 transition-colors w-18 h-9 px-2 rounded-lg cursor-pointer flex items-center justify-center"
+              className="text-secondary hover:text-primary hover:bg-base-hover flex h-9 w-18 cursor-pointer items-center justify-center rounded-lg px-2 transition-colors duration-150"
             >
               Close
             </button>
@@ -52,7 +52,7 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
             </div>
             <button
               onClick={handleCopy}
-              className="text-secondary hover:text-primary hover:bg-base-hover duration-150 transition-colors w-18 h-9 px-2 rounded-lg cursor-pointer flex items-center justify-center gap-1.5"
+              className="text-secondary hover:text-primary hover:bg-base-hover flex h-9 w-18 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2 transition-colors duration-150"
               aria-label="Copy source prompt"
             >
               <Copy size={18} />
@@ -60,8 +60,8 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
             </button>
           </div>
 
-          <div className="flex-1 rounded-2xl border border-crust bg-modal/45 p-5">
-            <p className="whitespace-pre-wrap break-words  text-primary leading-7">
+          <div className="border-crust bg-modal/45 flex-1 rounded-2xl border p-5">
+            <p className="text-primary leading-7 break-words whitespace-pre-wrap">
               {sourcePrompt}
             </p>
           </div>

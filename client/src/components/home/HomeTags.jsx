@@ -43,18 +43,18 @@ function HomeTags({
     <div>
       {!isEditTags ? (
         <div>
-          <div className="flex justify-between items-end">
+          <div className="flex items-end justify-between">
             <h2 className="font-semibold">Tags</h2>
             <button
               onClick={() => {
                 setIsEditTags(true);
               }}
-              className="text-sm text-secondary cursor-pointer underline hover:bg-mantle-hover duration-150 transition-colors rounded-lg py-1 px-2"
+              className="text-secondary hover:bg-mantle-hover cursor-pointer rounded-lg px-2 py-1 text-sm underline transition-colors duration-150"
             >
               Edit
             </button>
           </div>
-          <div className="flex gap-2 py-2 flex-wrap">
+          <div className="flex flex-wrap gap-2 py-2">
             {tags.length > 0 ? (
               tags.map((tag) => {
                 const count = tagCounts[tag.id] || 0;
@@ -67,7 +67,7 @@ function HomeTags({
                     onClick={() => {
                       handleTagSelectedClick(tag);
                     }}
-                    className={`cursor-pointer hover:bg-tag-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
+                    className={`hover:bg-tag-hover focus-visible:ring-accent/30 cursor-pointer focus-visible:ring-2 focus-visible:outline-none ${
                       isSelected ? "bg-tag-selected" : ""
                     }`}
                     key={tag.id}
@@ -89,18 +89,18 @@ function HomeTags({
         </div>
       ) : (
         <div>
-          <div className="flex justify-between items-end">
+          <div className="flex items-end justify-between">
             <h2 className="font-semibold">Edit Tags</h2>
             <div className="flex gap-2">
               <button
                 onClick={handleTagDone}
-                className="text-sm cursor-pointer text-white bg-accent hover:bg-accent-hover duration-150 transition-colors rounded-lg py-1 px-2"
+                className="bg-accent hover:bg-accent-hover cursor-pointer rounded-lg px-2 py-1 text-sm text-white transition-colors duration-150"
               >
                 Done
               </button>
             </div>
           </div>
-          <div className="flex gap-3 py-2 flex-wrap">
+          <div className="flex flex-wrap gap-3 py-2">
             {draftTags.length > 0 ? (
               draftTags.map((tag) => {
                 return (

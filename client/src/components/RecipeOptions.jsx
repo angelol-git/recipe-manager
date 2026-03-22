@@ -40,7 +40,7 @@ function RecipeOptions({
         aria-haspopup="true"
         aria-expanded={isOptionsOpen}
         aria-label="Chat options"
-        className="cursor-pointer font-bold px-2 py-1 color-black duration-150 hover:bg-mantle-hover rounded-md"
+        className="color-black hover:bg-mantle-hover cursor-pointer rounded-md px-2 py-1 font-bold duration-150"
         ref={buttonRef}
       >
         <Ellipsis size={24} strokeWidth={1.5} className="stroke-icon" />
@@ -56,10 +56,10 @@ function RecipeOptions({
               left:
                 buttonRef.current?.getBoundingClientRect().left - 100 + "px",
             }}
-            className="z-1000 bg-mantle w-42 rounded-lg p-2 shadow-lg border border-secondary/20"
+            className="bg-mantle border-secondary/20 z-1000 w-42 rounded-lg border p-2 shadow-lg"
             role="menu"
           >
-            <ul className="flex flex-col text-primary ">
+            <ul className="text-primary flex flex-col">
               {/* <li className="w-full">
                 <button
                   onClick={(event) => {
@@ -88,7 +88,7 @@ function RecipeOptions({
                     openDeleteModal(recipe, "all");
                     setIsOptionsOpen(false);
                   }}
-                  className="w-full px-2 py-2 flex justify-between items-center cursor-pointer rounded-lg hover:bg-rose/10 duration-150 text-rose transition-colors"
+                  className="hover:bg-rose/10 text-rose flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-2 transition-colors duration-150"
                 >
                   <CircleX
                     size={18}

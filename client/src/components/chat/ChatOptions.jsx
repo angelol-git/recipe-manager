@@ -31,7 +31,7 @@ function ChatOptions({
         aria-haspopup="true"
         aria-expanded={isOptionsOpen}
         aria-label="Chat options"
-        className={`cursor-pointer hover:bg-mantle-hover duration-150 font-bold px-2 py-1 color-black rounded-md ${
+        className={`hover:bg-mantle-hover color-black cursor-pointer rounded-md px-2 py-1 font-bold duration-150 ${
           isOptionsOpen ? "bg-crust" : ""
         }`}
       >
@@ -40,10 +40,10 @@ function ChatOptions({
 
       {isOptionsOpen && (
         <div
-          className="absolute  right-0 z-50 bg-base w-42 p-2 rounded-lg shadow-xl border border-secondary/20"
+          className="bg-base border-secondary/20 absolute right-0 z-50 w-42 rounded-lg border p-2 shadow-xl"
           role="menu"
         >
-          <ul className="flex flex-col text-primary">
+          <ul className="text-primary flex flex-col">
             {/* <li>
               <button
                 onClick={() => setIsOptionsOpen(false)}
@@ -59,7 +59,7 @@ function ChatOptions({
                   setIsOptionsOpen(false);
                   setIsEditModalOpen(true);
                 }}
-                className="w-full flex gap-2 items-center py-2 cursor-pointer hover:bg-base-hover duration-150 px-2 rounded-lg"
+                className="hover:bg-base-hover flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 duration-150"
               >
                 <SquarePen
                   size={18}
@@ -70,7 +70,7 @@ function ChatOptions({
               </button>
             </li>
 
-            <div className="h-[1px] bg-secondary/40 my-1" />
+            <div className="bg-secondary/40 my-1 h-[1px]" />
 
             <li>
               <button
@@ -85,7 +85,7 @@ function ChatOptions({
                   // }
                   // navigate("/");
                 }}
-                className="w-full flex  gap-2 items-center py-2 cursor-pointer hover:bg-base-hover duration-150 px-2 rounded-lg"
+                className="hover:bg-base-hover flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 duration-150"
               >
                 <Trash2 size={18} strokeWidth={1.5} className="stroke-icon" />
                 <div className="text-sm">Delete</div>
@@ -102,7 +102,7 @@ function ChatOptions({
                   // deleteRecipe(recipeId);
                   // navigate("/");
                 }}
-                className="w-full flex gap-2 items-center py-2 text-rose cursor-pointer px-2 hover:bg-rose/10 duration-150 rounded-lg"
+                className="text-rose hover:bg-rose/10 flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 duration-150"
               >
                 <CircleX size={18} strokeWidth={1.5} className="stroke-rose" />
                 <div className="text-sm font-medium">

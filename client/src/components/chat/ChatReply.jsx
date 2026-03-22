@@ -21,19 +21,19 @@ const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
       <div
         role="group"
         aria-label="Recipe details"
-        className="flex gap-5 text-secondary break-inside-avoid pt-2 pb-2"
+        className="text-secondary flex break-inside-avoid gap-5 pt-2 pb-2"
       >
-        <div className="flex gap-1 items-center">
+        <div className="flex items-center gap-1">
           <Flame size={"20"} strokeWidth={1.5} className="stroke-secondary" />
           <div>{recipeDetails.calories}</div>
           kcal
         </div>
-        <div className="flex gap-1 items-center">
+        <div className="flex items-center gap-1">
           <Clock size={"20"} strokeWidth={1.5} className="stroke-secondary" />
           <div>{recipeDetails.total_time}</div>
           mins
         </div>
-        <div className="flex gap-1 items-center">
+        <div className="flex items-center gap-1">
           <Utensils
             size={"20"}
             strokeWidth={1.5}
@@ -44,17 +44,17 @@ const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
         </div>
       </div>
 
-      <p className="break-inside-avoid mb-4">{description}</p>
+      <p className="mb-4 break-inside-avoid">{description}</p>
 
       {ingredients && (
-        <section aria-labelledby="ingredients-heading" className="w-full mb-4">
+        <section aria-labelledby="ingredients-heading" className="mb-4 w-full">
           <h3
             id="ingredients-heading"
-            className="font-medium font-lora text-lg"
+            className="font-lora text-lg font-medium"
           >
             Ingredients
           </h3>
-          <ul className="list-disc pl-4 pt-2">
+          <ul className="list-disc pt-2 pl-4">
             {ingredients.map((item, index) => (
               <li key={`${recipe?.id}-ingredient-${index}`}>{item}</li>
             ))}
@@ -63,20 +63,20 @@ const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
       )}
 
       {instructions && (
-        <section aria-labelledby="instructions-heading" className="w-full mb-4">
+        <section aria-labelledby="instructions-heading" className="mb-4 w-full">
           <h3
             id="instructions-heading"
-            className="font-lora font-medium text-lg"
+            className="font-lora text-lg font-medium"
           >
             Instructions
           </h3>
-          <ol className="list-decimal flex flex-col gap-2 pt-2">
+          <ol className="flex list-decimal flex-col gap-2 pt-2">
             {instructions.map((item, index) => (
               <li
                 key={`${recipe?.id}-instruction-${index}`}
                 className="flex gap-2"
               >
-                <span className="font-semibold font-lora">{index + 1}.</span>
+                <span className="font-lora font-semibold">{index + 1}.</span>
                 {item}
               </li>
             ))}
@@ -85,11 +85,11 @@ const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
       )}
 
       {source_prompt && (
-        <div className="flex gap-4 justify-between text-secondary text-sm mt-4 max-w-full">
-          <div className="flex flex-col items-start gap-2 py-2 min-w-0 max-w-full w-full">
+        <div className="text-secondary mt-4 flex max-w-full justify-between gap-4 text-sm">
+          <div className="flex w-full max-w-full min-w-0 flex-col items-start gap-2 py-2">
             <button
               onClick={() => setIsPromptModalOpen(true)}
-              className="underline cursor-pointer p-1 rounded-lg hover:bg-base-hover duration-150 transition-colors"
+              className="hover:bg-base-hover cursor-pointer rounded-lg p-1 underline transition-colors duration-150"
             >
               View Prompt
             </button>

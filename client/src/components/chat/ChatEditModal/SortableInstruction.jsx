@@ -30,17 +30,17 @@ function SortableInstruction({
     <li
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl p-2 transition-all hover:shadow-sm ${
-        isDragging ? "shadow-lg ring-2 ring-accent/50" : ""
+      className={`bg-mantle/70 border-crust flex items-center gap-2 rounded-xl border p-2 transition-all hover:shadow-sm ${
+        isDragging ? "ring-accent/50 shadow-lg ring-2" : ""
       }`}
     >
-      <div className="flex gap-2 w-full">
+      <div className="flex w-full gap-2">
         <div className="flex">
           <button
             type="button"
             {...attributes}
             {...listeners}
-            className={`cursor-grab active:cursor-grabbing p-1 rounded hover:bg-crust/50 transition-colors touch-none ${
+            className={`hover:bg-crust/50 cursor-grab touch-none rounded p-1 transition-colors active:cursor-grabbing ${
               isDragging ? "cursor-grabbing" : ""
             }`}
             aria-label={`Drag to reorder instruction ${index + 1}`}
@@ -53,10 +53,10 @@ function SortableInstruction({
               }`}
             />
           </button>
-          <span className="font-semibold font-lora">{index + 1}. </span>
+          <span className="font-lora font-semibold">{index + 1}. </span>
         </div>
         <textarea
-          className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary leading-relaxed"
+          className="text-primary w-full resize-none overflow-hidden bg-transparent leading-relaxed outline-none"
           value={instruction.text}
           rows={1}
           aria-label={`Instruction step ${index + 1}`}
@@ -79,7 +79,7 @@ function SortableInstruction({
         onClick={() => {
           handleDraftArrayDelete("instructions", index);
         }}
-        className="p-1 rounded hover:bg-rose/10 transition-colors cursor-pointer"
+        className="hover:bg-rose/10 cursor-pointer rounded p-1 transition-colors"
       >
         <X size={14} color={"#8C7A68"} strokeWidth={1.5} />
       </button>

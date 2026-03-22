@@ -49,7 +49,7 @@ function ColorPickerPortal({ color, tagName, buttonRef, onChange, onClose }) {
     if (!portalRef.current) return;
 
     const focusable = portalRef.current.querySelector(
-      'input, button, select, [tabindex]:not([tabindex="-1"])'
+      'input, button, select, [tabindex]:not([tabindex="-1"])',
     );
 
     if (focusable) {
@@ -104,7 +104,7 @@ function ColorPickerPortal({ color, tagName, buttonRef, onChange, onClose }) {
         disableAlpha={true}
       />
     </div>,
-    document.body
+    document.body,
   );
 }
 

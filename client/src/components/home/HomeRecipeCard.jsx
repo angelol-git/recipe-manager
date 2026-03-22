@@ -12,24 +12,24 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
     <Link
       to={`/chat/${recipe.id}`}
       key={recipe.id}
-      className="group relative w-full md:w-[230px] md:flex-shrink-0 h-[250px] md:h-[275px] cursor-pointer"
+      className="group relative h-[250px] w-full cursor-pointer md:h-[275px] md:w-[230px] md:flex-shrink-0"
     >
-      <div className="relative w-full h-full">
+      <div className="relative h-full w-full">
         <div
-          className={`absolute flex flex-col justify-between inset-0 border bg-mantle rounded-l-xl rounded-r-2xl p-4 border-black/30 ease-in-out transform transition-transform duration-200 origin-left z-20 ${
+          className={`bg-mantle absolute inset-0 z-20 flex origin-left transform flex-col justify-between rounded-l-xl rounded-r-2xl border border-black/30 p-4 transition-transform duration-200 ease-in-out ${
             isOptionsOpen ? "-rotate-y-15" : "group-hover:-rotate-y-15"
           }`}
         >
           <div className="flex flex-col gap-2">
-            <h3 className="font-medium font-lora text-lg md:text-xl line-clamp-2 min-h-[3.25rem] leading-snug">
+            <h3 className="font-lora line-clamp-2 min-h-[3.25rem] text-lg leading-snug font-medium md:text-xl">
               {recipe.title}
             </h3>
-            <p className="text-sm text-secondary line-clamp-5">
+            <p className="text-secondary line-clamp-5 text-sm">
               {recipe.versions?.[recipe.versions.length - 1]?.description || ""}
             </p>
           </div>
-          <div className="flex justify-between  items-center">
-            <p className="text-secondary  text-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-secondary text-sm">
               {formatDate(recipe.created_at)}
             </p>
             <RecipeOptions
@@ -40,7 +40,7 @@ function HomeRecipeCard({ recipe, openDeleteModal }) {
             />
           </div>
         </div>
-        <div className="absolute inset-0 bg-primary/40 rounded-r-2xl rounded-l-xl p-4 z-10 "></div>
+        <div className="bg-primary/40 absolute inset-0 z-10 rounded-l-xl rounded-r-2xl p-4"></div>
       </div>
     </Link>
   );

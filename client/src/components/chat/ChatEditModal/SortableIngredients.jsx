@@ -30,15 +30,15 @@ function SortableIngredients({
     <li
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl p-2 transition-all hover:shadow-sm ${
-        isDragging ? "shadow-lg ring-2 ring-accent/50" : ""
+      className={`bg-mantle/70 border-crust flex items-center gap-2 rounded-xl border p-2 transition-all hover:shadow-sm ${
+        isDragging ? "ring-accent/50 shadow-lg ring-2" : ""
       }`}
     >
       <button
         type="button"
         {...attributes}
         {...listeners}
-        className={`cursor-grab active:cursor-grabbing p-1 rounded hover:bg-crust/50 transition-colors touch-none ${
+        className={`hover:bg-crust/50 cursor-grab touch-none rounded p-1 transition-colors active:cursor-grabbing ${
           isDragging ? "cursor-grabbing" : ""
         }`}
         aria-label={`Drag to reorder ingredient ${index + 1}`}
@@ -52,7 +52,7 @@ function SortableIngredients({
         />
       </button>
       <textarea
-        className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary  leading-relaxed"
+        className="text-primary w-full resize-none overflow-hidden bg-transparent leading-relaxed outline-none"
         value={ingredient.text}
         rows={1}
         aria-label={`Ingredient ${index + 1}`}
@@ -75,7 +75,7 @@ function SortableIngredients({
         onClick={() => {
           handleDraftArrayDelete("ingredients", index);
         }}
-        className="p-1 rounded hover:bg-rose/10 transition-colors"
+        className="hover:bg-rose/10 rounded p-1 transition-colors"
       >
         <X size={14} color={"#8C7A68"} strokeWidth={1.5} />
       </button>

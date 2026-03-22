@@ -16,19 +16,17 @@ function ChatAskInput({
       textAreaRef.current.style.height = "auto";
       textAreaRef.current.style.height = `${Math.min(
         Math.max(textAreaRef.current.scrollHeight, minHeight),
-        maxHeight
+        maxHeight,
       )}px`;
     }
   }, [askMessage]);
 
   return (
-    <div className="flex p-2 rounded-2xl bg-crust">
+    <div className="bg-crust flex rounded-2xl p-2">
       <textarea
         rows={1}
         ref={textAreaRef}
-        className="w-full px-2 rounded-xl 
-                 outline-none resize-none leading-6
-                 placeholder:text-grey-500"
+        className="placeholder:text-grey-500 w-full resize-none rounded-xl px-2 leading-6 outline-none"
         style={{
           minHeight: `${minHeight}px`,
           maxHeight: `${maxHeight}px`,
@@ -41,7 +39,7 @@ function ChatAskInput({
       />
 
       <button
-        className="cursor-pointer flex items-center justify-center w-9 h-9 p-0 text-white bg-lavender hover:bg-accent-dark rounded-full shrink-0"
+        className="bg-lavender hover:bg-accent-dark flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full p-0 text-white"
         onClick={() => {
           if (askMessage.trim().length === 0) return;
           sendAskMessage(askMessage);

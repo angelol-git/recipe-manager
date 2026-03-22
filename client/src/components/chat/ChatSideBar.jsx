@@ -26,31 +26,26 @@ const ChatSideBar = memo(
 
     return (
       <nav
-        className={`
-        inset-y-0 left-0 z-100 h-full flex-col flex bg-mantle gap-4 text-sm
-        ${isMobile ? "fixed" : "relative shrink-0 border-r-1 border-r-gray-300"}
-        ${
+        className={`bg-mantle inset-y-0 left-0 z-100 flex h-full flex-col gap-4 text-sm ${isMobile ? "fixed" : "relative shrink-0 border-r-1 border-r-gray-300"} ${
           isMobile
             ? isSideBarOpen
-              ? "translate-x-0 w-70 p-2"
-              : "-translate-x-full w-0 p-0 overflow-hidden"
+              ? "w-70 translate-x-0 p-2"
+              : "w-0 -translate-x-full overflow-hidden p-0"
             : isSideBarOpen
               ? "w-70 p-2"
-              : "w-0 p-0 overflow-hidden"
-        }
-        ${
+              : "w-0 overflow-hidden p-0"
+        } ${
           hasMounted && isSidebarHydrated && hasSidebarInteracted
             ? isMobile
-              ? "duration-200 transition-all ease-out"
-              : "duration-200 transition-[width,padding] ease-out"
+              ? "transition-all duration-200 ease-out"
+              : "transition-[width,padding] duration-200 ease-out"
             : "transition-none"
-        }
-        `}
+        } `}
       >
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <Link
             to={`/`}
-            className="cursor-pointer  p-1 rounded-lg duration-150 hover:bg-mantle-hover"
+            className="hover:bg-mantle-hover cursor-pointer rounded-lg p-1 duration-150"
           >
             <img src={logo} className="w-8" />
           </Link>
@@ -58,19 +53,19 @@ const ChatSideBar = memo(
             onClick={() => {
               setIsSideBarOpen(false);
             }}
-            className="cursor-pointer rounded-lg p-2 duration-150 hover:bg-mantle-hover"
+            className="hover:bg-mantle-hover cursor-pointer rounded-lg p-2 duration-150"
           >
             {isMobile ? (
               <X
                 size={20}
                 strokeWidth={1.5}
-                className="stroke-icon duration-150 hover:bg-mantle-hover"
+                className="stroke-icon hover:bg-mantle-hover duration-150"
               />
             ) : (
               <PanelLeftClose
                 size={20}
                 strokeWidth={1.5}
-                className="stroke-icon duration-150 hover:bg-mantle-hover"
+                className="stroke-icon hover:bg-mantle-hover duration-150"
               />
             )}
           </button>
@@ -85,7 +80,7 @@ const ChatSideBar = memo(
         >
           <Link
             to="/chat"
-            className="flex gap-2 p-2 rounded-lg duration-150 items-center hover:bg-mantle-hover"
+            className="hover:bg-mantle-hover flex items-center gap-2 rounded-lg p-2 duration-150"
           >
             <CirclePlus size={18} strokeWidth={1.5} className="stroke-icon" />
             New Chat
@@ -108,8 +103,8 @@ const ChatSideBar = memo(
             })}
           </div>
         </div>
-        <div className="mt-auto border-t border-secondary/20 pt-2">
-          <div className="flex items-center justify-between rounded-lg px-1 py-1 hover:bg-mantle-hover/40">
+        <div className="border-secondary/20 mt-auto border-t pt-2">
+          <div className="hover:bg-mantle-hover/40 flex items-center justify-between rounded-lg px-1 py-1">
             <UserOptions
               user={user}
               logout={logout}
@@ -119,7 +114,7 @@ const ChatSideBar = memo(
               redirectOnLogout="/"
             />
             <div className="min-w-0 flex-1 px-2">
-              <p className="truncate text-sm text-primary">
+              <p className="text-primary truncate text-sm">
                 {user?.name || user?.email || "Guest"}
               </p>
             </div>
@@ -144,9 +139,7 @@ const SideBarItem = memo(
             setIsSideBarOpen(false);
           }
         }}
-        className={`items-center px-2 py-1 flex justify-between duration-150 cursor-pointer rounded-lg hover:bg-mantle-hover 
-          ${isActive ? "bg-overlay0" : ""} 
-          ${isOptionsOpen ? "bg-mantle-hover" : ""}`}
+        className={`hover:bg-mantle-hover flex cursor-pointer items-center justify-between rounded-lg px-2 py-1 duration-150 ${isActive ? "bg-overlay0" : ""} ${isOptionsOpen ? "bg-mantle-hover" : ""}`}
       >
         <p className="truncate">{recipe.title}</p>
 

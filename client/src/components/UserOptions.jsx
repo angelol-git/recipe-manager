@@ -64,7 +64,7 @@ function UserOptions({
         id="profileMenuButton"
         aria-haspopup="true"
         aria-expanded={isUserOptionsOpen}
-        className={`cursor-pointer rounded-md p-1 transition-colors duration-150 hover:bg-mantle-hover/50 ${
+        className={`hover:bg-mantle-hover/50 cursor-pointer rounded-md p-1 transition-colors duration-150 ${
           isUserOptionsOpen ? "bg-mantle-hover/50" : ""
         }`}
         onClick={() => {
@@ -78,26 +78,26 @@ function UserOptions({
         <div
           role="menu"
           aria-labelledby="profileMenuButton"
-          className={`absolute z-50 rounded-lg border border-secondary/20 bg-base p-2 shadow-xl ${
+          className={`border-secondary/20 bg-base absolute z-50 rounded-lg border p-2 shadow-xl ${
             openUpwards
               ? "bottom-[calc(100%+0.35rem)] left-0"
               : "top-[calc(100%+0.35rem)] right-0"
           } ${user ? "w-52" : "w-[264px]"}`}
         >
           {user ? (
-            <div className="flex flex-col text-primary">
+            <div className="text-primary flex flex-col">
               {!hideUserSummary && (
                 <>
                   <div className="px-2 py-2">
-                    <p className="text-xs text-secondary">Signed in</p>
+                    <p className="text-secondary text-xs">Signed in</p>
                     <p
-                      className="mt-1 truncate text-sm text-primary"
+                      className="text-primary mt-1 truncate text-sm"
                       title={user.name || user.email}
                     >
                       {user.name || user.email}
                     </p>
                   </div>
-                  <div className="my-1 h-[1px] bg-secondary/30" />
+                  <div className="bg-secondary/30 my-1 h-[1px]" />
                 </>
               )}
               <button
@@ -111,7 +111,7 @@ function UserOptions({
                     },
                   });
                 }}
-                className="flex gap-2 items-center rounded-lg px-2 py-2 text-sm text-primary cursor-pointer transition-colors duration-150 hover:bg-base-hover"
+                className="text-primary hover:bg-base-hover flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors duration-150"
               >
                 <LogOut size={18} strokeWidth={1.5} />
                 <div>Logout</div>
@@ -120,14 +120,14 @@ function UserOptions({
           ) : (
             <div className="flex flex-col gap-3 p-1">
               <div className="px-1">
-                <p className="text-sm font-medium text-primary">
+                <p className="text-primary text-sm font-medium">
                   Sign in to save your recipes
                 </p>
-                <p className="text-sm text-secondary">
+                <p className="text-secondary text-sm">
                   Sync your chats and recipe history.
                 </p>
               </div>
-              <div className="w-full rounded-lg bg-base">
+              <div className="bg-base w-full rounded-lg">
                 <GoogleLoginButton onSuccess={handleSuccess} />
               </div>
             </div>

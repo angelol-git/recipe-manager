@@ -86,8 +86,8 @@ function EditInstructions({
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex justify-between items-center">
-        <h3 className="font-lora text-lg font-medium text-secondary">
+      <div className="flex items-center justify-between">
+        <h3 className="font-lora text-secondary text-lg font-medium">
           Instructions
         </h3>
         <button
@@ -95,7 +95,7 @@ function EditInstructions({
           onClick={() => {
             setIsAddingInstruction((prev) => !prev);
           }}
-          className="inline-flex min-h-8 items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700"
+          className="inline-flex min-h-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700"
         >
           + Add
         </button>
@@ -123,15 +123,15 @@ function EditInstructions({
             {isAddingInstruction && (
               <li
                 ref={newInstructionRef}
-                className="flex items-center gap-2 bg-mantle/70 border border-crust rounded-xl px-3 py-2 transition-all hover:shadow-sm"
+                className="bg-mantle/70 border-crust flex items-center gap-2 rounded-xl border px-3 py-2 transition-all hover:shadow-sm"
               >
-                <div className="flex gap-2 w-full">
-                  <span className="font-semibold font-lora">
+                <div className="flex w-full gap-2">
+                  <span className="font-lora font-semibold">
                     {(draft?.instructions?.length || 0) + 1}.{" "}
                   </span>
                   <textarea
                     ref={newTextAreaRef}
-                    className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary leading-relaxed"
+                    className="text-primary w-full resize-none overflow-hidden bg-transparent leading-relaxed outline-none"
                     value={newInstruction}
                     rows={1}
                     placeholder="Enter new instruction..."

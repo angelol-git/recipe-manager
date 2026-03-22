@@ -51,7 +51,7 @@ function ChatEditModal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 bg-black/10 backdrop-blur-xs z-[200] transition-opacity duration-300 ${isEditModalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 z-[200] bg-black/10 backdrop-blur-xs transition-opacity duration-300 ${isEditModalOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
       onClick={() => setIsEditModalOpen(false)}
     >
       <div
@@ -60,21 +60,21 @@ function ChatEditModal({
       >
         <div
           ref={modalRef}
-          className={`w-full max-h-[90dvh] overflow-y-auto overscroll-contain px-4 pt-5 pb-8 flex flex-col bg-base rounded-t-xl shadow-lg transform transition-transform ease-out duration-300 lg:rounded-xl lg:px-5 lg:pt-6 lg:pb-10 ${isEditModalOpen ? "translate-y-0" : "translate-y-full"}`}
+          className={`bg-base flex max-h-[90dvh] w-full transform flex-col overflow-y-auto overscroll-contain rounded-t-xl px-4 pt-5 pb-8 shadow-lg transition-transform duration-300 ease-out lg:rounded-xl lg:px-5 lg:pt-6 lg:pb-10 ${isEditModalOpen ? "translate-y-0" : "translate-y-full"}`}
           style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(event) => event.stopPropagation()}
         >
           <div className="flex items-center justify-between pb-4">
             <button
               onClick={() => setIsEditModalOpen(false)}
-              className="hover:bg-base-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18"
+              className="hover:bg-base-hover transition-color w-18 cursor-pointer rounded-lg px-2 py-1 duration-150"
             >
               Cancel
             </button>
             <h2 className="font-bold">Edit Recipe</h2>
             <button
               onClick={handleSave}
-              className="hover:bg-base-hover duration-150 transition-color px-2 py-1 rounded-lg cursor-pointer w-18"
+              className="hover:bg-base-hover transition-color w-18 cursor-pointer rounded-lg px-2 py-1 duration-150"
             >
               Save
             </button>

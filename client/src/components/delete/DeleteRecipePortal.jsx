@@ -24,12 +24,12 @@ function DeletePortal({ recipe, type, onClose, onDelete }) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
   return createPortal(
-    <div className="fixed inset-0 bg-black/30 z-150 flex justify-center items-center">
+    <div className="fixed inset-0 z-150 flex items-center justify-center bg-black/30">
       <div
         ref={portalRef}
         role="dialog"
         aria-modal="true"
-        className="rounded-2xl bg-white p-4 w-full m-4 flex flex-col gap-4 max-w-[450px]"
+        className="m-4 flex w-full max-w-[450px] flex-col gap-4 rounded-2xl bg-white p-4"
       >
         <div>Delete recipe?</div>
         {type === "version" ? (
@@ -49,13 +49,13 @@ function DeletePortal({ recipe, type, onClose, onDelete }) {
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="px-3 py-2 bg-mantle hover:bg-mantle-hover duration-150 transition-colors rounded-xl cursor-pointer"
+            className="bg-mantle hover:bg-mantle-hover cursor-pointer rounded-xl px-3 py-2 transition-colors duration-150"
           >
             Cancel
           </button>
           <button
             onClick={onDelete}
-            className="px-3 py-2 bg-rose text-white hover:bg-rose/80 duration-150 transition-colors rounded-xl cursor-pointer"
+            className="bg-rose hover:bg-rose/80 cursor-pointer rounded-xl px-3 py-2 text-white transition-colors duration-150"
           >
             Delete
           </button>

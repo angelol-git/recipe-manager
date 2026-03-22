@@ -25,6 +25,7 @@ const ChatInput = memo(
     variant = "new-chat",
   }) => {
     const [message, setMessage] = useState("");
+    // eslint-disable-next-line no-unused-vars
     const [chatInputMode, setChatInputMode] = useState("Create");
     const [isExpanded, setIsExpanded] = useState(false);
     const isExpandedRef = useRef();
@@ -103,11 +104,11 @@ const ChatInput = memo(
     }
 
     return isChatOpen ? (
-      <div className="relative w-full rounded-3xl border border-secondary/15 bg-base transition-colors duration-200 focus-within:border-secondary/30">
+      <div className="border-secondary/30 bg-base focus-within:border-secondary/60 relative w-full rounded-3xl border transition-colors duration-200">
         <textarea
           rows={1}
           ref={textAreaRef}
-          className={`w-full bg-transparent px-4 pt-4  outline-none resize-none leading-6 placeholder:text-icon-disabled/90 ${!isNewChat ? "pr-14" : ""} ${isPending ? "text-icon-disabled" : "text-primary"}`}
+          className={`placeholder:text-icon-disabled/90 w-full resize-none bg-transparent px-4 pt-4 leading-6 outline-none ${!isNewChat ? "pr-14" : ""} ${isPending ? "text-icon-disabled" : "text-primary"}`}
           style={{
             minHeight: `${minHeight}px`,
             maxHeight: `${maxHeight}px`,
@@ -129,14 +130,14 @@ const ChatInput = memo(
         {!isNewChat && (
           <button
             onClick={() => setIsChatOpen(false)}
-            className="absolute right-3 top-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-icon-muted transition-colors duration-150 hover:bg-overlay0/50"
+            className="text-icon-muted hover:bg-overlay0/50 absolute top-3 right-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors duration-150"
             aria-label="Minimize chat"
           >
             <Minimize2 size={16} strokeWidth={1.5} className="stroke-current" />
           </button>
         )}
         <div
-          className={`relative z-1 flex items-end gap-3 px-3 pb-3 pt-2 ${
+          className={`relative z-1 flex items-end gap-3 px-3 pt-2 pb-3 ${
             !isNewChat ? "justify-between" : "justify-end"
           }`}
         >
@@ -170,8 +171,8 @@ const ChatInput = memo(
             type="button"
             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white transition-colors duration-200 ${
               canSend
-                ? "cursor-pointer bg-accent hover:bg-accent-hover"
-                : "cursor-not-allowed bg-overlay1"
+                ? "bg-accent hover:bg-accent-hover cursor-pointer"
+                : "bg-overlay1 cursor-not-allowed"
             }`}
             onClick={(event) => {
               event.stopPropagation();
@@ -184,7 +185,7 @@ const ChatInput = memo(
               <LoaderCircle
                 size={20}
                 strokeWidth={1.5}
-                className="stroke-white animate-spin"
+                className="animate-spin stroke-white"
               />
             ) : (
               <ArrowUp size={20} strokeWidth={1.5} className="stroke-white" />
@@ -194,13 +195,13 @@ const ChatInput = memo(
       </div>
     ) : (
       <button
-        className="flex cursor-pointer items-center gap-2 rounded-full border border-secondary/15 bg-base px-3 py-2 text-secondary transition-colors duration-200 hover:text-primary"
+        className="border-secondary/15 bg-base text-secondary hover:text-primary flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 transition-colors duration-200"
         onClick={() => {
           setIsChatOpen(true);
         }}
         aria-label="Open chat"
       >
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white">
+        <span className="bg-accent flex h-9 w-9 items-center justify-center rounded-full text-white">
           <MessageCircleMore size={20} strokeWidth={1.5} />
         </span>
         <span className="pr-1 text-sm font-medium">Open chat</span>

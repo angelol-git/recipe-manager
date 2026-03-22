@@ -93,7 +93,7 @@ function EditIngredients({
           onClick={() => {
             setIsAddingIngredient((prev) => !prev);
           }}
-          className="inline-flex min-h-8 items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700"
+          className="inline-flex cursor-pointer min-h-8 items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700"
         >
           + Add
         </button>

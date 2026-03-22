@@ -37,7 +37,7 @@ function ChatTags({ recipe }) {
   }
 
   return (
-    <div className="flex gap-2 py-2 flex-wrap">
+    <div className="flex flex-wrap gap-2 py-2">
       {tags?.length > 0 &&
         tags.map((tag) => {
           return (
@@ -59,7 +59,7 @@ function ChatTags({ recipe }) {
               }}
               value={newTag.name}
               type="text"
-              className="w-[100px] min-w-[4ch] border-0 border-b border-secondary/50 bg-transparent px-0 pb-0.5 text-[15px] leading-none text-primary outline-none placeholder:text-secondary/70"
+              className="border-secondary/50 text-primary placeholder:text-secondary/70 w-[100px] min-w-[4ch] border-0 border-b bg-transparent px-0 pb-0.5 text-[15px] leading-none outline-none"
               aria-label="New tag name"
               placeholder="Tag name"
             />
@@ -70,13 +70,13 @@ function ChatTags({ recipe }) {
               setNewTag({ id: "", name: "", color: "#FFB86C" });
               setIsAddingTag(false);
             }}
-            className="inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            className="focus-visible:ring-accent/30 inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
           >
             <X size={14} strokeWidth={1.5} className="stroke-gray-600" />
           </button>
           <button
             onClick={handleAddTag}
-            className="inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            className="focus-visible:ring-accent/30 inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
           >
             <Check size={"14"} strokeWidth={1.5} className="stroke-gray-600" />
           </button>
@@ -87,7 +87,7 @@ function ChatTags({ recipe }) {
           onClick={() => {
             setIsAddingTag((prev) => !prev);
           }}
-          className="inline-flex min-h-8 w-fit cursor-pointer items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+          className="focus-visible:ring-accent/30 inline-flex min-h-8 w-fit cursor-pointer items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
         >
           <Plus size={14} strokeWidth={1.5} className="stroke-gray-600" />
           Add Tag
@@ -98,7 +98,7 @@ function ChatTags({ recipe }) {
           onClick={() => {
             setIsAddingTag((prev) => !prev);
           }}
-          className="inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+          className="focus-visible:ring-accent/30 inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
         >
           <Plus size={14} strokeWidth={1.5} className="stroke-gray-600" />
         </button>

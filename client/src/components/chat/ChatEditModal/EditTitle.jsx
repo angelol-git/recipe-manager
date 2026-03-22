@@ -1,18 +1,18 @@
 function EditTitle({ draft, handleDraftString }) {
   return (
     <section className="flex flex-col gap-3">
-      <label className="font-lora text-lg font-medium text-secondary tracking-wide">
+      <label className="font-lora text-secondary text-lg font-medium tracking-wide">
         Title
       </label>
-      <div className="rounded-xl border border-crust bg-mantle/50 p-4">
+      <div className="border-crust bg-mantle/50 rounded-xl border p-4">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex w-full flex-col gap-2">
             <input
               name="editTitle"
               id="editTitle"
               type="text"
               value={draft?.title || ""}
-              className="border-b border-overlay0 px-2 pb-1"
+              className="border-overlay0 border-b px-2 pb-1"
               onChange={(event) => {
                 handleDraftString("title", event.target.value);
               }}
@@ -23,7 +23,7 @@ function EditTitle({ draft, handleDraftString }) {
             onClick={() => {
               handleDraftString("title", "");
             }}
-            className="text-xs cursor-pointer"
+            className="cursor-pointer text-xs"
           >
             Clear
           </button>

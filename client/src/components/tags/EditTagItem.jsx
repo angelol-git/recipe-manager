@@ -27,7 +27,7 @@ function EditTagItem({
         <input
           id={tag.id}
           type="text"
-          className="min-w-[4ch] border-0 border-b border-secondary/50 bg-transparent px-0 pb-0.5 text-[15px] leading-none text-primary outline-none placeholder:text-secondary/70"
+          className="border-secondary/50 text-primary placeholder:text-secondary/70 min-w-[4ch] border-0 border-b bg-transparent px-0 pb-0.5 text-[15px] leading-none outline-none"
           value={tag.name}
           size={tag.name.length || 1}
           aria-label="Tag name"
@@ -51,7 +51,7 @@ function EditTagItem({
         onClick={() => {
           handleDelete(tag);
         }}
-        className="inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        className="focus-visible:ring-accent/30 inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-2 text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
       >
         <X size={12} strokeWidth={1.5} className="stroke-gray-600" />
       </button>

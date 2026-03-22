@@ -45,7 +45,9 @@ function GoogleLoginButton({ onSuccess }) {
 
   return (
     <div className="relative w-full min-w-0">
-      {isLoading && <div className="h-[40px] w-[220px] max-w-full rounded bg-white" />}
+      {isLoading && (
+        <div className="h-[40px] w-[220px] max-w-full rounded bg-white" />
+      )}
       <div
         ref={buttonRef}
         className={`w-full transition-opacity duration-300 ${

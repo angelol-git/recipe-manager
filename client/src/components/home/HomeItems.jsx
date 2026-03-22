@@ -4,7 +4,7 @@ import HomeRecipeCard from "./HomeRecipeCard";
 function HomeItems({ filteredRecipes, openDeleteModal }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-4 items-center">
+      <div className="flex items-center gap-4">
         <div className="font-semibold">Items({filteredRecipes?.length})</div>
         <Link
           to="/chat"
@@ -13,7 +13,7 @@ function HomeItems({ filteredRecipes, openDeleteModal }) {
           + Add
         </Link>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-wrap gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:flex md:flex-wrap lg:gap-6">
         {filteredRecipes?.map((recipe) => {
           return (
             <HomeRecipeCard

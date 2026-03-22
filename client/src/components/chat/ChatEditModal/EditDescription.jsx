@@ -1,10 +1,10 @@
 function EditDescription({ draft, handleDraftString }) {
   return (
     <section className="flex flex-col gap-3">
-      <label className="font-lora text-lg font-medium text-secondary tracking-wide">
+      <label className="font-lora text-secondary text-lg font-medium tracking-wide">
         Description
       </label>
-      <div className="rounded-xl border border-crust bg-mantle/50 p-4">
+      <div className="border-crust bg-mantle/50 rounded-xl border p-4">
         <div className="flex w-full flex-col gap-3">
           <textarea
             id="description"
@@ -14,7 +14,7 @@ function EditDescription({ draft, handleDraftString }) {
             onChange={(event) => {
               handleDraftString("description", event.target.value);
             }}
-            className="text-primary border-b border-secondary/20"
+            className="text-primary border-secondary/20 border-b"
           />
           <div className="flex justify-end">
             <button
@@ -22,7 +22,7 @@ function EditDescription({ draft, handleDraftString }) {
               onClick={() => {
                 handleDraftString("description", "");
               }}
-              className="text-xs cursor-pointer"
+              className="cursor-pointer text-xs"
             >
               Clear
             </button>

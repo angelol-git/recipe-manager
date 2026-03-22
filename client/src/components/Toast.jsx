@@ -4,13 +4,10 @@ function Toast({ message, onClose, type = "error" }) {
     <div
       role="alert"
       aria-live="assertive"
-      className={` ${type === "error" ? "bg-rose" : "bg-accent"}
-                fixed top-15 left-1/2 transform -translate-x-1/2
-                w-[calc(100%-2rem)] sm:w-auto max-w-screen-md  text-white 
-                p-4 rounded-lg shadow-lg flex gap-2 justify-between center z-[200] text-sm`}
+      className={` ${type === "error" ? "bg-rose" : "bg-accent"} center fixed top-15 left-1/2 z-[200] flex w-[calc(100%-2rem)] max-w-screen-md -translate-x-1/2 transform justify-between gap-2 rounded-lg p-4 text-sm text-white shadow-lg sm:w-auto`}
     >
       <span>{message}</span>
-      <button className="underline cursor-pointer" onClick={onClose}>
+      <button className="cursor-pointer underline" onClick={onClose}>
         Close
       </button>
     </div>,

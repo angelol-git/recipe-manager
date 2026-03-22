@@ -45,10 +45,10 @@ function Home() {
   });
 
   return (
-    <div className="text-primary items-center bg-base p-5 lg:p-10 flex flex-col min-h-screen">
-      <div className="max-w-screen-lg w-full flex flex-col gap-5">
-        <header className="flex justify-between items-center">
-          <h1 className="text-4xl font-medium font-lora">Recipes</h1>
+    <div className="text-primary bg-base flex min-h-screen flex-col items-center p-5 lg:p-10">
+      <div className="flex w-full max-w-screen-lg flex-col gap-5">
+        <header className="flex items-center justify-between">
+          <h1 className="font-lora text-4xl font-medium">Recipes</h1>
           <UserOptions user={user} logout={logout} />
         </header>
         <main className="flex flex-col gap-4">

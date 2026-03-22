@@ -50,21 +50,21 @@ function ChatAskModal({
 
   if (!isAskModalOpen) return null;
   return createPortal(
-    <div className="fixed inset-0 bg-black/40 flex justify-center  z-50 p-4 w-full">
+    <div className="fixed inset-0 z-50 flex w-full justify-center bg-black/40 p-4">
       <div
         ref={modalRef}
-        className="p-4 flex flex-col gap-2 rounded shadow-lg w-full overflow-y-auto"
+        className="flex w-full flex-col gap-2 overflow-y-auto rounded p-4 shadow-lg"
       >
         <div className="flex">
           <button
             onClick={() => setIsAskModalOpen(false)}
-            className="bg-crust p-2 rounded-full cursor-pointer"
+            className="bg-crust cursor-pointer rounded-full p-2"
           >
             <X size={20} strokeWidth={1.5} className="text-icon" />
           </button>
         </div>
         <div
-          className="flex overflow-y-auto h-full flex-col gap-2 rounded-lg"
+          className="flex h-full flex-col gap-2 overflow-y-auto rounded-lg"
           ref={messagesEndRef}
         >
           {askMessages.map((item) => {
@@ -73,15 +73,15 @@ function ChatAskModal({
                 key={item.id}
                 className={`${
                   item.role === "assistant"
-                    ? "bg-sky p-2 rounded-lg"
-                    : "bg-pink p-2 rounded-lg self-end max-w-[80%]"
+                    ? "bg-sky rounded-lg p-2"
+                    : "bg-pink max-w-[80%] self-end rounded-lg p-2"
                 }`}
               >
                 <Markdown
                   components={{
-                    ul: ({ node, ...props }) => (
+                    ul: ({ ...props }) => (
                       <ul
-                        className="list-disc my-2 pl-4 flex flex-col gap-2"
+                        className="my-2 flex list-disc flex-col gap-2 pl-4"
                         {...props}
                       />
                     ),
