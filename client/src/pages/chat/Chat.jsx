@@ -82,17 +82,23 @@ function Chat() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
         <div
           ref={composerRef}
-          className="pointer-events-auto w-full max-w-screen-md mx-auto px-4 pt-2 pb-safe"
+          className="w-full max-w-screen-md mx-auto px-4 pt-2 pb-safe"
         >
           <div className="flex justify-between items-end gap-3">
             {hasRecipeNavigation && !isChatOpen && (
-              <ChatNavigation
-                recipe={recipe}
-                recipeVersion={recipeVersion}
-                setRecipeVersion={setRecipeVersion}
-              />
+              <div className="pointer-events-auto shrink-0">
+                <ChatNavigation
+                  recipe={recipe}
+                  recipeVersion={recipeVersion}
+                  setRecipeVersion={setRecipeVersion}
+                />
+              </div>
             )}
-            <div className="flex-1 flex justify-end">
+            <div
+              className={`pointer-events-auto flex justify-end ${
+                isChatOpen ? "flex-1" : "ml-auto shrink-0"
+              }`}
+            >
               <ChatInput
                 recipe={recipe}
                 recipeVersion={recipeVersion}

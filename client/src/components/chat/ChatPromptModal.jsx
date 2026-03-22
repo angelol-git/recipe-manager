@@ -14,6 +14,7 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
       const clipboardItem = new ClipboardItem(clipboardItemData);
       await navigator.clipboard.write([clipboardItem]);
       showToast("Copied to clipboard!", "success");
+      onClose();
     } catch {
       // Clipboard access denied or failed
     }
@@ -55,7 +56,7 @@ function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
               aria-label="Copy source prompt"
             >
               <Copy size={18} />
-              <span className="hidden sm:inline">Copy</span>
+              <div>Copy</div>
             </button>
           </div>
 
