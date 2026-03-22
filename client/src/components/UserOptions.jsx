@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, LogOut } from "lucide-react";
 import GoogleLoginButton from "./GoogleLoginButton";
 import API_BASE_URL from "../config/api.js";
 import { useToast } from "../hooks/useToast";
@@ -49,36 +49,61 @@ function UserOptions({ user, logout }) {
       <button
         id="profileMenuButton"
         aria-haspopup="true"
-        className={`rounded-full hover:bg-mantle-hover duration-150 transition-colors border-5  cursor-pointer  ${
-          isUserOptionsOpen ? " border-gray-400/30" : "border-base"
+        aria-expanded={isUserOptionsOpen}
+        className={`cursor-pointer rounded-md p-1 transition-colors duration-150 hover:bg-mantle-hover/50 ${
+          isUserOptionsOpen ? "bg-mantle-hover/50" : ""
         }`}
         onClick={() => {
           setIsUserOptionsOpen((prev) => !prev);
         }}
       >
-        <CircleUserRound size={28} strokeWidth={1.5} className="stroke-icon" />
+        <CircleUserRound size={24} strokeWidth={1.5} className="stroke-icon" />
       </button>
 
       {isUserOptionsOpen && (
         <div
           role="menu"
           aria-labelledby="profileMenuButton"
-          className="absolute right-0 z-50 bg-crust  p-4 rounded-lg shadow-lg flex flex-col gap-3 border border-secondary/60"
+          className={`absolute right-0 z-50 rounded-lg border border-secondary/20 bg-base p-2 shadow-xl ${
+            user ? "w-52" : "w-[264px]"
+          }`}
         >
           {user ? (
-            <div className="flex flex-col gap-4 items-center">
-              <p>{user.email}</p>
+            <div className="flex flex-col text-primary">
+              <div className="px-2 py-2">
+                <p className="text-xs text-secondary">Signed in</p>
+                <p
+                  className="mt-1 truncate text-sm text-primary"
+                  title={user.email}
+                >
+                  {user.email}
+                </p>
+              </div>
+              <div className="my-1 h-[1px] bg-secondary/30" />
               <button
                 onClick={() => {
                   logout.mutate();
                 }}
-                className="w-full rounded-md hover:bg-accent-hover duration-150 transition-colors bg-accent text-white p-2 cursor-pointer"
+                className="flex gap-2 items-center rounded-lg px-2 py-2 text-sm text-primary cursor-pointer transition-colors duration-150 hover:bg-base-hover"
               >
-                Logout
+                <LogOut size={18} strokeWidth={1.5} />
+                <div>Logout</div>
               </button>
             </div>
           ) : (
-            <GoogleLoginButton onSuccess={handleSuccess} />
+            <div className="flex flex-col gap-3 p-1">
+              <div className="px-1">
+                <p className="text-sm font-medium text-primary">
+                  Sign in to save your recipes
+                </p>
+                <p className="text-sm text-secondary">
+                  Sync your chats and recipe history.
+                </p>
+              </div>
+              <div className="w-full rounded-lg bg-base">
+                <GoogleLoginButton onSuccess={handleSuccess} />
+              </div>
+            </div>
           )}
         </div>
       )}

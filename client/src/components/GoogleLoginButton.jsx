@@ -16,6 +16,7 @@ function GoogleLoginButton({ onSuccess }) {
         window.google.accounts.id.renderButton(buttonRef.current, {
           theme: "outline",
           size: "large",
+          width: 220,
         });
 
         // Only set loading false AFTER the button is actually rendered
@@ -43,11 +44,11 @@ function GoogleLoginButton({ onSuccess }) {
   }, [onSuccess, clientID]);
 
   return (
-    <div className="relative">
-      {isLoading && <div className="w-[180px] h-[40px] bg-white rounded" />}
+    <div className="relative w-full min-w-0">
+      {isLoading && <div className="h-[40px] w-[220px] max-w-full rounded bg-white" />}
       <div
         ref={buttonRef}
-        className={`transition-opacity duration-300 ${
+        className={`w-full transition-opacity duration-300 ${
           isLoading ? "opacity-0" : "opacity-100"
         }`}
         style={{ minHeight: isLoading ? "40px" : "auto" }}

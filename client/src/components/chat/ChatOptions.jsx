@@ -35,7 +35,7 @@ function ChatOptions({
           isOptionsOpen ? "bg-crust" : ""
         }`}
       >
-        <Ellipsis size={18} strokeWidth={1.5} className="stroke-icon" />
+        <Ellipsis size={20} strokeWidth={1.5} className="stroke-icon" />
       </button>
 
       {isOptionsOpen && (

@@ -18,15 +18,13 @@ router.post("/google", async (req, res) => {
     const payload = ticket.getPayload();
 
     const existingUser = db
-      .prepare(
-        `SELECT * FROM users WHERE external_id = ?`
-      )
+      .prepare(`SELECT * FROM users WHERE external_id = ?`)
       .get(payload.sub);
 
     const userId = uuidv4();
     if (!existingUser) {
       db.prepare(
-        `INSERT INTO users (id, external_id, email) VALUES (?, ?, ?)`
+        `INSERT INTO users (id, external_id, email) VALUES (?, ?, ?)`,
       ).run(userId, payload.sub, payload.email);
       createSession(userId, res);
     } else {
@@ -66,7 +64,7 @@ function createSession(userId, res) {
   const expires = Date.now() + 1000 * 60 * 60 * 24 * 30; // 30 days
 
   db.prepare(
-    `INSERT INTO sessions (sid, user_id, expires) VALUES (?, ?, ?)`
+    `INSERT INTO sessions (sid, user_id, expires) VALUES (?, ?, ?)`,
   ).run(sid, userId, expires);
 
   res.cookie("sid", sid, {
