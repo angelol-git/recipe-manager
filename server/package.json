@@ -11,6 +11,8 @@
     "dev": "nodemon server.js",
     "build": "echo 'No build step needed for Node.js server'",
     "benchmark:create:text": "node scripts/benchmarkCreateTextOnly.js",
+    "benchmark:scrape": "node scripts/benchmarkScrapingService.js",
+    "benchmark:url": "node scripts/benchmarkUrlParse.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

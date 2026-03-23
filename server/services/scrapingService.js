@@ -12,13 +12,21 @@ const REMOVE_SELECTORS = `
 `;
 
 export async function extractRecipeFromUrl(url) {
+  const html = await fetchHtmlFromUrl(url);
+  return extractRecipeFromHtml(html);
+}
+
+export async function fetchHtmlFromUrl(url) {
   const impit = new Impit({
     browser: "chrome",
     ignoreTlsErrors: true,
   });
 
   const response = await impit.fetch(url);
-  const html = await response.text();
+  return response.text();
+}
+
+export function extractRecipeFromHtml(html) {
   const $ = cheerio.load(html);
 
   const jsonLd = parseJsonLd($);
