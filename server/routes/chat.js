@@ -5,6 +5,7 @@ import {
   generateResponse,
   validateAiResponse,
   createPrompt,
+  getModelName,
   AiValidationError,
 } from "../services/aiService.js";
 import {
@@ -55,7 +56,7 @@ router.post("/create", optionalAuth, async (req, res) => {
         recipeId: recipeId ?? null,
         sourceUrl: url,
       });
-      return res.json({ reply: savedRecipe });
+      return res.json({ reply: savedRecipe, model: getModelName() });
     }
 
     //Guest recipe do not save into db
@@ -81,7 +82,7 @@ router.post("/create", optionalAuth, async (req, res) => {
       ],
     };
 
-    return res.json({ reply: guestRecipe });
+    return res.json({ reply: guestRecipe, model: getModelName() });
   } catch (err) {
     const now = new Date();
 
@@ -91,7 +92,7 @@ router.post("/create", optionalAuth, async (req, res) => {
       if (user) {
         saveAiError(user.id, recipeId ?? null, {
           ...err.meta,
-          ai_model: "gemini-3-flash-preview",
+          ai_model: getModelName(),
         });
       }
 

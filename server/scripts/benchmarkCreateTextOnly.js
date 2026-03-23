@@ -22,20 +22,7 @@ function parseArgs(argv) {
 Makes about 9
 
 Bake for 5 minutes at 425 then, keeping the muffins in the oven, reduce the oven temperature to 350°F (177°C). Bake for an additional 18-20 minutes or until a toothpick inserted in the center comes out clean. The total time these muffins take in the oven is about 23-25 minutes, give or take. Allow the muffins to cool for 5 minutes in the muffin pan, then transfer to a wire rack to continue cooling.
-
-12 muffins
-- 2 1/4 cups (281g) all-purpose flour (spoon & leveled)
-- 1 1/4 teaspoons baking soda
-- 1 1/4 teaspoons baking powder
-- 3/4 teaspoon salt
-- 3/4 cup (170g) unsalted butter, softened to room temperature
-- 2/3 cup (133g) granulated sugar
-- 1/3 cup (67g) packed light or dark brown sugar
-- 3 large eggs, at room temperature
-- 2/3 cup (160g) sour cream or plain/vanilla yogurt, at room temperature
-- 2 1/2 teaspoons pure vanilla extract
-- 1/3 cup (80ml) milk, at room temperature
-- 2 cups (330g) fresh or frozen blueberries`,
+`,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -91,6 +78,7 @@ async function timeRequest(url, message) {
   return {
     durationMs,
     title: body?.reply?.title ?? null,
+    model: body?.model ?? null,
   };
 }
 
@@ -114,7 +102,7 @@ async function run() {
   console.log(`URL: ${url}`);
   console.log(`Iterations: ${iterations}`);
   console.log(`Concurrency: ${concurrency}`);
-  console.log(`Message: ${message}`);
+  // console.log(`Message: ${message}`);
 
   async function worker() {
     while (completed < iterations) {
@@ -128,7 +116,7 @@ async function run() {
       const result = await timeRequest(url, message);
       results.push(result);
       console.log(
-        `#${current + 1} ${formatSeconds(result.durationMs)}${result.title ? ` | ${result.title}` : ""}`,
+        `#${current + 1} ${formatSeconds(result.durationMs)}${result.model ? ` | ${result.model}` : ""}${result.title ? ` | ${result.title}` : ""}`,
       );
     }
   }
@@ -145,9 +133,11 @@ async function run() {
 
   const average =
     durations.reduce((sum, value) => sum + value, 0) / durations.length;
+  const models = [...new Set(results.map((result) => result.model).filter(Boolean))];
 
   console.log("");
   console.log(`Completed ${durations.length} requests in ${formatSeconds(totalMs)}`);
+  console.log(`model ${models.length ? models.join(", ") : "unknown"}`);
   console.log(`avg ${formatSeconds(average)}`);
   console.log(`min ${formatSeconds(durations[0])}`);
   console.log(`p50 ${formatSeconds(percentile(durations, 50))}`);

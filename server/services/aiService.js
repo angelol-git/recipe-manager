@@ -3,8 +3,21 @@ import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
-const genAI = new GoogleGenAI(process.env.GOOGLE_API_KEY);
-const model = "gemini-3-flash-preview";
+const apiKey = process.env.GOOGLE_API_KEY;
+
+if (!apiKey) {
+  throw new Error("GOOGLE_API_KEY is not set");
+}
+
+const genAI = new GoogleGenAI({ apiKey });
+
+// const model = "gemini-3-flash-preview";
+
+const model = "gemini-3.1-flash-lite-preview";
+
+export function getModelName() {
+  return model;
+}
 
 export class AiValidationError extends Error {
   constructor(message, meta = {}) {
