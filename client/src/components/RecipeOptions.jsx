@@ -56,7 +56,7 @@ function RecipeOptions({
               left:
                 buttonRef.current?.getBoundingClientRect().left - 100 + "px",
             }}
-            className="bg-mantle border-secondary/20 z-1000 w-42 rounded-lg border p-2 shadow-lg"
+            className="bg-base border-secondary/20 z-1000 w-42 rounded-lg border p-2 shadow-lg"
             role="menu"
           >
             <ul className="text-primary flex flex-col">

@@ -69,7 +69,10 @@ const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
           <div>{formatApproxValue(recipeDetails.servings)}</div>
           servings
         </div>
-        <div ref={detailsPopoverRef} className="relative ml-auto flex items-center">
+        <div
+          ref={detailsPopoverRef}
+          className="relative ml-auto flex items-center"
+        >
           <button
             type="button"
             className="text-secondary/60 hover:text-secondary focus:text-secondary cursor-pointer"
@@ -77,7 +80,7 @@ const ChatReply = memo(({ recipe, recipeVersion, modalAnchorRef }) => {
             aria-expanded={isDetailsPopoverOpen}
             aria-label="Recipe details may be estimated"
           >
-            <Info size={14} strokeWidth={1.5} />
+            <Info size={16} strokeWidth={1.5} />
           </button>
           {isDetailsPopoverOpen && (
             <div

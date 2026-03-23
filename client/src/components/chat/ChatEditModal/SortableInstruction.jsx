@@ -18,8 +18,12 @@ function SortableInstruction({
     isDragging,
   } = useSortable({ id });
 
+  const dragTransform = transform
+    ? { ...transform, scaleX: 1, scaleY: 1 }
+    : null;
+
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(dragTransform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 50 : "auto",
