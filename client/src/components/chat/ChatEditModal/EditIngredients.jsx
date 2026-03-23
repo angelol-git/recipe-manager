@@ -93,7 +93,7 @@ function EditIngredients({
           onClick={() => {
             setIsAddingIngredient((prev) => !prev);
           }}
-          className="inline-flex cursor-pointer min-h-8 items-center justify-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-[15px] leading-none text-gray-600 shadow-xs transition-colors hover:bg-gray-100 hover:text-gray-700"
+          className="focus-visible:ring-accent/25 inline-flex min-h-8 cursor-pointer items-center justify-center rounded-full border border-accent/45 bg-accent/8 px-3 py-1 text-sm leading-none text-accent-hover shadow-xs transition-colors hover:border-accent/55 hover:bg-accent/18 hover:text-accent-hover focus-visible:ring-2 focus-visible:outline-none"
         >
           + Add
         </button>
@@ -126,7 +126,7 @@ function EditIngredients({
                 <div className="flex gap-2 w-full">
                   <textarea
                     ref={newTextAreaRef}
-                    className="w-full bg-transparent resize-none overflow-hidden outline-none text-primary leading-relaxed"
+                    className="w-full resize-none overflow-hidden bg-transparent text-base leading-relaxed text-primary outline-none"
                     value={newIngredient}
                     rows={1}
                     placeholder="Enter new ingredient..."

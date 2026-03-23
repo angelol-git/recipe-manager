@@ -7,7 +7,7 @@ function TagChip({
 }) {
   return (
     <Component
-      className={`border-mantle bg-tag text-primary inline-flex min-h-8 w-fit items-center gap-2 rounded-full border px-3 py-1 text-[15px] leading-none transition-colors ${className}`.trim()}
+      className={`border-mantle bg-tag text-primary inline-flex min-h-8 w-fit items-center gap-2 rounded-full border px-3 py-1 leading-none transition-colors ${className}`.trim()}
       {...props}
     >
       {color ? (
