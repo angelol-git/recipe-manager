@@ -4,7 +4,7 @@ import {
   extractRecipeFromUrl,
   extractRecipeFromHtml,
   fetchHtmlFromUrl,
-} from "../services/scrapingService.js";
+} from "../services/urlContentService.js";
 
 function parseArgs(argv) {
   const options = {

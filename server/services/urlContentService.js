@@ -1,7 +1,8 @@
 import { Impit } from "impit";
-import { URL } from "url";
 import TurndownService from "turndown";
 import * as cheerio from "cheerio";
+import { checkURL, saveURLContent } from "./dbService.js";
+import { normalizeUrl } from "../utils/urlValidator.js";
 
 const REMOVE_SELECTORS = `
   style, script, nav, footer, header, .drawer-nav, .site-header,
@@ -10,6 +11,33 @@ const REMOVE_SELECTORS = `
   iframe, img, svg, picture, video, noscript, button, form, 
   aside, .ads, .sidebar, .nav-menu
 `;
+
+const URL_CACHE_TTL_DAYS = 30;
+
+export async function getUrlContext(url) {
+  const normalizedUrl = normalizeUrl(url);
+  const existingURL = checkURL(normalizedUrl);
+
+  if (existingURL.success) {
+    return existingURL.urlContent.content;
+  }
+
+  const urlContent = await extractRecipeFromUrl(url);
+  const contextData =
+    typeof urlContent === "object"
+      ? JSON.stringify(urlContent, null, 2)
+      : urlContent;
+
+  const now = new Date();
+  const fetchedAt = now.toISOString();
+  const expiresAt = new Date(
+    now.getTime() + URL_CACHE_TTL_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
+  saveURLContent(normalizedUrl, url, urlContent, fetchedAt, expiresAt);
+
+  return contextData;
+}
 
 export async function extractRecipeFromUrl(url) {
   const html = await fetchHtmlFromUrl(url);

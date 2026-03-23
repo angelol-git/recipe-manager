@@ -29,3 +29,32 @@ export function isValidUrl(urlString) {
     return false;
   }
 }
+
+export function normalizeUrl(input) {
+  const url = new URL(input);
+
+  url.protocol = url.protocol.toLowerCase();
+  url.hostname = url.hostname.toLowerCase();
+  url.hash = "";
+
+  const trackingParams = [
+    "fbclid",
+    "gclid",
+    "dclid",
+    "msclkid",
+    "mc_cid",
+    "mc_eid",
+  ];
+
+  for (const key of [...url.searchParams.keys()]) {
+    if (key.startsWith("utm_") || trackingParams.includes(key)) {
+      url.searchParams.delete(key);
+    }
+  }
+
+  if (url.pathname.length > 1) {
+    url.pathname = url.pathname.replace(/\/+$/, "");
+  }
+
+  return url.toString();
+}

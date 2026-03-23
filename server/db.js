@@ -95,4 +95,17 @@ db.prepare(
 `,
 ).run();
 
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS url_cache (
+    normalized_url TEXT NOT NULL PRIMARY KEY,
+    source_url TEXT NOT NULL,
+    content TEXT NOT NULL,
+    fetched_at DATETIME NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+`,
+).run();
+
 export default db;

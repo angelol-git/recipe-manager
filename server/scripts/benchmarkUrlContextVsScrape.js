@@ -11,7 +11,7 @@ import {
 import {
   extractJsonLdRecipeFromUrl,
   extractMarkdownFromUrl,
-} from "../services/scrapingService.js";
+} from "../services/urlContentService.js";
 import { aiRecipeSchema } from "../validation/aiSchemas.js";
 
 dotenv.config();
