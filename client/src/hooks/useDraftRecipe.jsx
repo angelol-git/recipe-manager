@@ -98,6 +98,33 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
     });
   }
 
+  function handleDraftTagAdd(tag) {
+    const trimmedName = tag.name.trim();
+    if (!trimmedName) return;
+
+    setDraft((prev) => {
+      const hasMatchingTag = (prev.tags || []).some((prevTag) => {
+        return prevTag.name.trim().toLowerCase() === trimmedName.toLowerCase();
+      });
+
+      if (hasMatchingTag) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        tags: [
+          ...(prev.tags || []),
+          {
+            id: `draft-tag-${Date.now()}`,
+            name: trimmedName,
+            color: tag.color || "#FFB86C",
+          },
+        ],
+      };
+    });
+  }
+
   function handleDraftArrayUpdate(field, value, targetIndex) {
     setDraft((prev) => {
       return {
@@ -162,6 +189,7 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
     handleDraftTagName,
     handleDraftTagColor,
     handleDraftTagDelete,
+    handleDraftTagAdd,
     handleDraftArrayUpdate,
     handleDraftArrayDelete,
     handleDraftArrayPush,

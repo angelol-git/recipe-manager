@@ -27,6 +27,7 @@ function ChatEditModal({
     handleDraftTagName,
     handleDraftTagColor,
     handleDraftTagDelete,
+    handleDraftTagAdd,
     handleDraftArrayUpdate,
     handleDraftArrayDelete,
     handleDraftArrayPush,
@@ -86,6 +87,7 @@ function ChatEditModal({
               handleDraftTagName={handleDraftTagName}
               handleDraftTagColor={handleDraftTagColor}
               handleDraftTagDelete={handleDraftTagDelete}
+              handleDraftTagAdd={handleDraftTagAdd}
             />
             <EditRecipeDetails
               draft={draft}

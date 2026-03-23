@@ -341,21 +341,56 @@ export function updateRecipe(id, userId, updatedRecipe) {
       id,
     );
 
-    const incomingTagIds = updatedRecipe.tags.map((t) => t.id);
+    const resolvedTagIds = [];
 
-    if (incomingTagIds.length > 0) {
+    for (const tag of updatedRecipe.tags) {
+      const existingTagById = db
+        .prepare(`SELECT id FROM tags WHERE id = ? AND user_id = ?`)
+        .get(tag.id, userId);
+
+      if (existingTagById) {
+        db.prepare(
+          `UPDATE tags SET name = ?, color = ? WHERE id = ? AND user_id = ?`,
+        ).run(tag.name, tag.color, existingTagById.id, userId);
+
+        resolvedTagIds.push(existingTagById.id);
+        continue;
+      }
+
+      let existingTagByName = db
+        .prepare(`SELECT id FROM tags WHERE user_id = ? AND name = ?`)
+        .get(userId, tag.name);
+
+      if (existingTagByName) {
+        db.prepare(`UPDATE tags SET color = ? WHERE id = ? AND user_id = ?`).run(
+          tag.color,
+          existingTagByName.id,
+          userId,
+        );
+        resolvedTagIds.push(existingTagByName.id);
+        continue;
+      }
+
+      const insertResult = db
+        .prepare(`INSERT INTO tags (user_id, name, color) VALUES (?, ?, ?)`)
+        .run(userId, tag.name, tag.color);
+
+      resolvedTagIds.push(insertResult.lastInsertRowid);
+    }
+
+    if (resolvedTagIds.length > 0) {
       db.prepare(
         `DELETE FROM recipe_tags
-         WHERE recipe_id = ? AND tag_id NOT IN (${incomingTagIds.map(() => "?").join(", ")})`,
-      ).run(id, ...incomingTagIds);
+         WHERE recipe_id = ? AND tag_id NOT IN (${resolvedTagIds.map(() => "?").join(", ")})`,
+      ).run(id, ...resolvedTagIds);
     } else {
       db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ?`).run(id);
     }
 
-    for (const tag of updatedRecipe.tags) {
+    for (const tagId of resolvedTagIds) {
       db.prepare(
-        `UPDATE tags SET name = ?, color = ? WHERE id = ? AND user_id = ?`,
-      ).run(tag.name, tag.color, tag.id, userId);
+        `INSERT OR IGNORE INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)`,
+      ).run(id, tagId);
     }
 
     db.prepare(
