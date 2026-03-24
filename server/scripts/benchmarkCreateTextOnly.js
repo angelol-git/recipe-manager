@@ -140,8 +140,6 @@ async function run() {
   console.log(`model ${models.length ? models.join(", ") : "unknown"}`);
   console.log(`avg ${formatSeconds(average)}`);
   console.log(`min ${formatSeconds(durations[0])}`);
-  console.log(`p50 ${formatSeconds(percentile(durations, 50))}`);
-  console.log(`p95 ${formatSeconds(percentile(durations, 95))}`);
   console.log(`max ${formatSeconds(durations[durations.length - 1])}`);
   console.log(`throughput ${(durations.length / (totalMs / 1000)).toFixed(2)} req/s`);
 }

@@ -16,8 +16,10 @@ import { aiRecipeSchema } from "../validation/aiSchemas.js";
 
 dotenv.config();
 
+// const DEFAULT_URL = "https://tasty.co/recipe/creamy-shrimp-udon";
+// const DEFAULT_URL = "https://www.allrecipes.com/recipe/16383/basic-crepes/";
+// const DEFAULT_URL = "https://sallysbakingaddiction.com/best-banana-bread-recipe/";
 const DEFAULT_URL = "https://sallysbakingaddiction.com/blueberry-muffins/";
-
 function parseArgs(argv) {
   const options = {
     url: DEFAULT_URL,
@@ -91,6 +93,25 @@ async function generateRecipe(ai, model, prompt, extraConfig = {}) {
   return { response, elapsedMs };
 }
 
+async function generateText(ai, model, prompt, extraConfig = {}) {
+  const startedAt = performance.now();
+  const response = await ai.models.generateContent({
+    model,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    config: {
+      temperature: 0.7,
+      ...extraConfig,
+    },
+  });
+  const elapsedMs = performance.now() - startedAt;
+
+  if (!response.usageMetadata) {
+    throw new Error("Response is missing usageMetadata.");
+  }
+
+  return { response, elapsedMs };
+}
+
 function printUsage(label, usageMetadata) {
   console.log(`${label}:`);
   console.log(
@@ -148,24 +169,63 @@ async function runMarkdownPath(ai, model, url) {
 
 async function runUrlContextPath(ai, model, url) {
   const prompt = createPrompt(url, null, null);
-  const { response, elapsedMs } = await generateRecipe(ai, model, prompt, {
-    tools: [{ urlContext: {} }],
-  });
-  const urlContextMetadata = response.candidates?.[0]?.urlContextMetadata;
-  const retrievedUrls = urlContextMetadata?.urlMetadata ?? [];
+  try {
+    const { response, elapsedMs } = await generateRecipe(ai, model, prompt, {
+      tools: [{ urlContext: {} }],
+    });
+    const urlContextMetadata = response.candidates?.[0]?.urlContextMetadata;
+    const retrievedUrls = urlContextMetadata?.urlMetadata ?? [];
 
-  if (!retrievedUrls.length) {
-    throw new Error("urlContext path did not return retrieval metadata.");
+    if (!retrievedUrls.length) {
+      throw new Error("urlContext path did not return retrieval metadata.");
+    }
+
+    const parsedRecipe = validateAiResponse(response, url);
+
+    return {
+      elapsedMs,
+      mode: "structured",
+      parsedTitle: parsedRecipe.title,
+      usageMetadata: response.usageMetadata,
+      urlContextMetadata,
+    };
+  } catch (error) {
+    const errorMessage = error?.message ?? String(error);
+    if (!errorMessage.includes("INVALID_ARGUMENT")) {
+      throw error;
+    }
+
+    const fallbackPrompt = `
+Return a plain text answer only.
+
+Read the recipe at this URL and report:
+1. The recipe title
+2. Whether URL context retrieval succeeded
+3. A one-sentence summary of the recipe
+
+URL: ${url}
+`;
+
+    const { response, elapsedMs } = await generateText(ai, model, fallbackPrompt, {
+      tools: [{ urlContext: {} }],
+    });
+    const urlContextMetadata = response.candidates?.[0]?.urlContextMetadata;
+    const retrievedUrls = urlContextMetadata?.urlMetadata ?? [];
+
+    if (!retrievedUrls.length) {
+      throw error;
+    }
+
+    return {
+      elapsedMs,
+      mode: "plain-text-fallback",
+      parsedTitle: null,
+      usageMetadata: response.usageMetadata,
+      urlContextMetadata,
+      fallbackError: errorMessage,
+      text: response.text ?? "",
+    };
   }
-
-  const parsedRecipe = validateAiResponse(response, url);
-
-  return {
-    elapsedMs,
-    parsedTitle: parsedRecipe.title,
-    usageMetadata: response.usageMetadata,
-    urlContextMetadata,
-  };
 }
 
 function printComparisonLine(label, result) {
@@ -177,6 +237,19 @@ function getCheapestLabel(entries, selector) {
   return entries.reduce((best, current) =>
     selector(current.result) < selector(best.result) ? current : best,
   ).label;
+}
+
+async function runStep(label, task, printResult) {
+  try {
+    const result = await task();
+    printResult(result);
+    return { ok: true, result };
+  } catch (error) {
+    console.log(`${label}: failed`);
+    console.log(`  error: ${error.message}`);
+    console.log("");
+    return { ok: false, error };
+  }
 }
 
 async function run() {
@@ -194,38 +267,66 @@ async function run() {
   console.log(`Model: ${model}`);
   console.log("");
 
-  const jsonLdResult = await runJsonLdPath(ai, model, url);
-  printUsage("JSON-LD path", jsonLdResult.usageMetadata);
-  console.log(`  elapsed: ${formatMs(jsonLdResult.elapsedMs)}`);
-  console.log(`  extractedTitle: ${jsonLdResult.extractedTitle}`);
-  console.log(`  parsedTitle: ${jsonLdResult.parsedTitle}`);
-  console.log("");
+  const jsonLdStep = await runStep(
+    "JSON-LD path",
+    () => runJsonLdPath(ai, model, url),
+    (jsonLdResult) => {
+      printUsage("JSON-LD path", jsonLdResult.usageMetadata);
+      console.log(`  elapsed: ${formatMs(jsonLdResult.elapsedMs)}`);
+      console.log(`  extractedTitle: ${jsonLdResult.extractedTitle}`);
+      console.log(`  parsedTitle: ${jsonLdResult.parsedTitle}`);
+      console.log("");
+    },
+  );
 
-  const markdownResult = await runMarkdownPath(ai, model, url);
-  printUsage("Markdown path", markdownResult.usageMetadata);
-  console.log(`  elapsed: ${formatMs(markdownResult.elapsedMs)}`);
-  console.log(`  markdownChars: ${markdownResult.markdownChars}`);
-  console.log(`  parsedTitle: ${markdownResult.parsedTitle}`);
-  console.log("");
+  const markdownStep = await runStep(
+    "Markdown path",
+    () => runMarkdownPath(ai, model, url),
+    (markdownResult) => {
+      printUsage("Markdown path", markdownResult.usageMetadata);
+      console.log(`  elapsed: ${formatMs(markdownResult.elapsedMs)}`);
+      console.log(`  markdownChars: ${markdownResult.markdownChars}`);
+      console.log(`  parsedTitle: ${markdownResult.parsedTitle}`);
+      console.log("");
+    },
+  );
 
-  const urlContextResult = await runUrlContextPath(ai, model, url);
-  printUsage("urlContext path", urlContextResult.usageMetadata);
-  console.log(`  elapsed: ${formatMs(urlContextResult.elapsedMs)}`);
-  console.log(`  parsedTitle: ${urlContextResult.parsedTitle}`);
-  console.log("  urlContextMetadata:");
-  console.log(JSON.stringify(urlContextResult.urlContextMetadata, null, 2));
-  console.log("");
+  const urlContextStep = await runStep(
+    "urlContext path",
+    () => runUrlContextPath(ai, model, url),
+    (urlContextResult) => {
+      printUsage("urlContext path", urlContextResult.usageMetadata);
+      console.log(`  elapsed: ${formatMs(urlContextResult.elapsedMs)}`);
+      console.log(`  mode: ${urlContextResult.mode}`);
+      if (urlContextResult.fallbackError) {
+        console.log(`  structuredError: ${urlContextResult.fallbackError}`);
+      }
+      if (urlContextResult.parsedTitle) {
+        console.log(`  parsedTitle: ${urlContextResult.parsedTitle}`);
+      }
+      if (urlContextResult.text) {
+        console.log(`  text: ${JSON.stringify(urlContextResult.text)}`);
+      }
+      console.log("  urlContextMetadata:");
+      console.log(JSON.stringify(urlContextResult.urlContextMetadata, null, 2));
+      console.log("");
+    },
+  );
 
   const results = [
-    { label: "jsonld", result: jsonLdResult },
-    { label: "markdown", result: markdownResult },
-    { label: "urlContext", result: urlContextResult },
-  ];
+    jsonLdStep.ok ? { label: "jsonld", result: jsonLdStep.result } : null,
+    markdownStep.ok ? { label: "markdown", result: markdownStep.result } : null,
+    urlContextStep.ok ? { label: "urlContext", result: urlContextStep.result } : null,
+  ].filter(Boolean);
+
+  if (!results.length) {
+    throw new Error("All benchmark paths failed.");
+  }
 
   console.log("Comparison summary:");
-  printComparisonLine("jsonld", jsonLdResult);
-  printComparisonLine("markdown", markdownResult);
-  printComparisonLine("urlContext", urlContextResult);
+  for (const entry of results) {
+    printComparisonLine(entry.label, entry.result);
+  }
   console.log(
     `  cheapest input path: ${getCheapestLabel(
       results,
