@@ -143,6 +143,11 @@ export function createPrompt(message, recipeVersion = {}, urlContent = {}) {
     - Treat scaling, substitutions, dietary changes, flavor changes, and method changes as modifications unless the message clearly asks for a new recipe.
     - For scaling, adjust all ingredient quantities proportionally using: new servings / original servings.
     - Keep calories per serving constant when only scaling servings.
+    - When scaling, recalculate total_time based on realistic elapsed cooking time, not a direct servings multiplier.
+    - Scaling usually changes prep time more than cook time. Passive oven, simmering, resting, chilling, and marinating time often stays the same.
+    - Only increase cook time when the larger quantity would realistically need longer to heat through, brown, reduce, or cook in multiple batches. When that happens, increase time modestly and conservatively.
+    - If the scaled recipe would no longer fit in the same pot, pan, tray, or air fryer basket, account for extra batch or round time instead of simply multiplying the full recipe time.
+    - Do not leave total_time unchanged by default when scaling. Re-estimate it from the method and equipment constraints.
     - Preserve the recipe's core identity unless the user explicitly asks to change it.
     - Update the title and description when a major modification was made.
 
