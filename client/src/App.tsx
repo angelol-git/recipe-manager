@@ -5,8 +5,8 @@ import NotFound from "./pages/NotFound";
 import ChatLayout from "./pages/chat/ChatLayout";
 import Chat from "./pages/chat/Chat";
 import NewChat from "./pages/chat/NewChat";
-import Toast from "./components/Toast.jsx";
-import { ToastProvider } from "./context/ToastContext.jsx";
+import Toast from "./components/Toast";
+import { ToastProvider } from "./context/ToastContext";
 import { useToast } from "./hooks/useToast";
 
 const queryClient = new QueryClient();

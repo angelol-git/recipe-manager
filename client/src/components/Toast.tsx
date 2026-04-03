@@ -1,5 +1,13 @@
 import { createPortal } from "react-dom";
-function Toast({ message, onClose, type = "error" }) {
+import type { ToastType } from "../context/ToastContext";
+
+type ToastProps = {
+  message: string;
+  onClose: () => void;
+  type?: ToastType;
+};
+
+function Toast({ message, onClose, type = "error" }: ToastProps) {
   return createPortal(
     <div
       role="alert"
