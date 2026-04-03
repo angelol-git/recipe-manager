@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { DraftTag } from "../types/tag";
 
 export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
   const [draft, setDraft] = useState(null);
@@ -16,10 +17,12 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
       }),
     );
 
-    const ingredientsWithIds = currentVersion.ingredients.map((text, index) => ({
-      id: `ingredient-${recipe.id}-${index}`,
-      text,
-    }));
+    const ingredientsWithIds = currentVersion.ingredients.map(
+      (text, index) => ({
+        id: `ingredient-${recipe.id}-${index}`,
+        text,
+      }),
+    );
 
     const draftRecipe = {
       recipe_id: recipe.id,
@@ -113,7 +116,7 @@ export function useDraftRecipe({ recipe, recipeVersion, isEditModalOpen }) {
     });
   }
 
-  function handleDraftTagAdd(tag) {
+  function handleDraftTagAdd(tag: DraftTag) {
     const trimmedName = tag.name.trim();
     if (!trimmedName) return;
 

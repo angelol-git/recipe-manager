@@ -1,7 +1,17 @@
 import { useState } from "react";
 import EditTagItem from "../tags/EditTagItem.jsx";
 import TagChip from "../tags/TagChip.jsx";
-import useDraftTags from "../../hooks/useDraftTags.jsx";
+import useDraftTags from "../../hooks/useDraftTags.js";
+import type { Tag, EditableTagUpdate } from "../../types/tag.js";
+
+type HomeTagsProps = {
+  tags: Tag[];
+  selectedTags: Tag[];
+  handleTagSelectedClick: (tag: Tag) => void;
+  tagCounts: Record<number, number>;
+  deleteTagsAll: (tagIds: number[]) => void;
+  editTagsAll: (updatedTags: EditableTagUpdate[]) => void;
+};
 
 function HomeTags({
   tags,
@@ -10,7 +20,7 @@ function HomeTags({
   tagCounts,
   deleteTagsAll,
   editTagsAll,
-}) {
+}: HomeTagsProps) {
   const [tagsToBeDeleted, setTagsToBeDeleted] = useState([]);
   const [isEditTags, setIsEditTags] = useState(false);
   const {
@@ -21,7 +31,7 @@ function HomeTags({
   } = useDraftTags({ tags, isEditTags, setTagsToBeDeleted });
 
   function handleTagDone() {
-    const tagsToUpdate = draftTags.filter((tag) => {
+    const tagsToUpdate = draftTags.filter((tag: Tag) => {
       const original = tags.find((t) => t.id === tag.id);
       return (
         original && (original.name !== tag.name || original.color !== tag.color)
@@ -29,7 +39,7 @@ function HomeTags({
     });
 
     if (tagsToBeDeleted.length) {
-      deleteTagsAll(tagsToBeDeleted.map((t) => t.id));
+      deleteTagsAll(tagsToBeDeleted.map((t: Tag) => t.id));
     }
     if (tagsToUpdate.length) {
       editTagsAll(tagsToUpdate);
@@ -102,7 +112,7 @@ function HomeTags({
           </div>
           <div className="flex flex-wrap gap-3 py-2">
             {draftTags.length > 0 ? (
-              draftTags.map((tag) => {
+              draftTags.map((tag: Tag) => {
                 return (
                   <EditTagItem
                     key={tag.id}

@@ -1,8 +1,9 @@
 import API_BASE_URL from "../config/api.js";
+import type {EditableTagUpdate} from "../types/tag";
 
 const backendUrl = API_BASE_URL;
 
-export async function deleteTagsAll(tagIds) {
+export async function deleteTagsAll(tagIds:number[]) {
     const res = await fetch(`${backendUrl}/tags`, {
         method: "DELETE",
         credentials: "include",
@@ -16,7 +17,7 @@ export async function deleteTagsAll(tagIds) {
     return res.json();
 }
 
-export async function editTagsAll(updatedTags) {
+export async function editTagsAll(updatedTags:EditableTagUpdate[]) {
     const res = await fetch(`${backendUrl}/tags`, {
         method: "PATCH",
         credentials: "include",

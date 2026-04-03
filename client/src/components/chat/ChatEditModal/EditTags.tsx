@@ -2,6 +2,23 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import EditTagItem from "../../tags/EditTagItem";
 import TagChip from "../../tags/TagChip";
+import type { Tag, DraftTag } from "../../../types/tag";
+
+type DraftWithTags = {
+  tags?: Tag[];
+} | null;
+
+type ColorChange = {
+  hex: string;
+};
+
+type EditTagProps = {
+  draft: DraftWithTags;
+  handleDraftTagName: (newName: string, tagId: number) => void;
+  handleDraftTagColor: (color: ColorChange, tag: Tag) => void;
+  handleDraftTagDelete: (tagId: number) => void;
+  handleDraftTagAdd: (tag: DraftTag) => void;
+};
 
 function EditTags({
   draft,
@@ -9,10 +26,10 @@ function EditTags({
   handleDraftTagColor,
   handleDraftTagDelete,
   handleDraftTagAdd,
-}) {
-  const tags = draft?.tags || [];
+}: EditTagProps) {
+  const tags = draft?.tags ?? [];
   const [isAddingTag, setIsAddingTag] = useState(false);
-  const [newTag, setNewTag] = useState({
+  const [newTag, setNewTag] = useState<DraftTag>({
     name: "",
     color: "#FFB86C",
   });
@@ -48,7 +65,7 @@ function EditTags({
         <div className="flex w-full flex-col gap-2">
           <div className="flex flex-wrap gap-3">
             {tags.length > 0
-              ? tags.map((tag) => {
+              ? tags.map((tag: Tag) => {
                   return (
                     <EditTagItem
                       key={tag.id}

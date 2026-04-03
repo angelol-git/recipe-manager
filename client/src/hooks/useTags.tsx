@@ -2,10 +2,13 @@ import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTagsAll, editTagsAll } from "../api/tags.js";
 import { deleteLocalTagsAll, editLocalTagsAll } from "../utils/storage.js";
+import type { Tag, EditableTagUpdate } from "../types/tag";
+import type { User } from "../types/user";
+import type { Recipe } from "../types/recipe";
 
-export function useTags(user, recipes = []) {
+export function useTags(user: User, recipes: Recipe[] = []) {
   const queryClient = useQueryClient();
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -54,7 +57,7 @@ export function useTags(user, recipes = []) {
 
     const map = new Map();
     recipes.forEach((recipe) => {
-      recipe.tags.forEach((tag) => {
+      recipe.tags.forEach((tag: Tag) => {
         if (!map.has(tag.id)) {
           map.set(tag.id, tag);
         }
@@ -74,10 +77,10 @@ export function useTags(user, recipes = []) {
     });
   }, [uniqueTags]);
 
-  const tagCounts = useMemo(() => {
+  const tagCounts = useMemo<Record<number, number>>(() => {
     if (!recipes.length) return {};
 
-    return recipes.reduce((acc, recipe) => {
+    return recipes.reduce<Record<number, number>>((acc, recipe) => {
       recipe.tags.forEach((tag) => {
         acc[tag.id] = (acc[tag.id] ?? 0) + 1;
       });
@@ -86,7 +89,7 @@ export function useTags(user, recipes = []) {
   }, [recipes]);
 
   const deleteTagsAllMutation = useMutation({
-    mutationFn: async (tagIds) => {
+    mutationFn: async (tagIds: number[]) => {
       if (user) {
         return deleteTagsAll(tagIds);
       } else {
@@ -94,16 +97,16 @@ export function useTags(user, recipes = []) {
       }
     },
 
-    onMutate: async (tagIds) => {
-      await queryClient.cancelQueries(["recipes"]);
+    onMutate: async (tagIds: number[]) => {
+      await queryClient.cancelQueries({ queryKey: ["recipes"] });
 
-      const previousRecipes = queryClient.getQueryData(["recipes"]);
-      queryClient.setQueryData(["recipes"], (old) => {
+      const previousRecipes = queryClient.getQueryData<Recipe[]>(["recipes"]);
+      queryClient.setQueryData<Recipe[]>(["recipes"], (old) => {
         if (!old) return old;
-        return old.map((recipe) => {
+        return old.map((recipe: Recipe) => {
           return {
             ...recipe,
-            tags: recipe.tags.filter((t) => !tagIds.includes(t.id)),
+            tags: recipe.tags.filter((t: Tag) => !tagIds.includes(t.id)),
           };
         });
       });
@@ -117,12 +120,12 @@ export function useTags(user, recipes = []) {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries(["recipes"]);
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
     },
   });
 
   const editTagsAllMutation = useMutation({
-    mutationFn: async (updatedTags) => {
+    mutationFn: async (updatedTags: EditableTagUpdate[]) => {
       if (user) {
         return editTagsAll(updatedTags);
       } else {
@@ -130,25 +133,29 @@ export function useTags(user, recipes = []) {
       }
     },
 
-    onMutate: async (updatedTags) => {
-      await queryClient.cancelQueries(["recipes"]);
+    onMutate: async (updatedTags: EditableTagUpdate[]) => {
+      await queryClient.cancelQueries({ queryKey: ["recipes"] });
 
-      const previousRecipes = queryClient.getQueryData(["recipes"]);
-      queryClient.setQueryData(["recipes"], (old) => {
+      const previousRecipes = queryClient.getQueryData<Recipe[]>(["recipes"]);
+
+      queryClient.setQueryData<Recipe[]>(["recipes"], (old) => {
         if (!old) return old;
+
         return old.map((recipe) => {
           return {
             ...recipe,
             tags: recipe.tags.map((tag) => {
               const updatedTag = updatedTags.find((t) => t.id === tag.id);
-              if (updatedTag) {
-                return {
-                  ...tag,
-                  name: updatedTag.name,
-                  color: updatedTag.color,
-                };
+
+              if (!updatedTag) {
+                return tag;
               }
-              return tag;
+
+              return {
+                ...tag,
+                name: updatedTag.name ?? tag.name,
+                color: updatedTag.color ?? tag.color,
+              };
             }),
           };
         });
@@ -164,11 +171,11 @@ export function useTags(user, recipes = []) {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries(["recipes"]);
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
     },
   });
 
-  function handleTagSelectedClick(tag) {
+  function handleTagSelectedClick(tag: Tag) {
     setSelectedTags((prev) => {
       const exists = prev.some((t) => t.id === tag.id);
       if (exists) {
