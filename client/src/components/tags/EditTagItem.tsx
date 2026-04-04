@@ -2,15 +2,27 @@ import { useState, useRef } from "react";
 import { X } from "lucide-react";
 import ColorPickerPortal from "../home/ColorPickerPortal";
 import TagChip from "./TagChip";
+import type { Tag } from "../../types/tag";
+
+type ColorChange = {
+  hex: string;
+};
+
+type EditTagItemProps = {
+  tag: Tag;
+  handleNameChange: (newName: string, tagId: number) => void;
+  handleColorChange: (color: ColorChange, tag: Tag) => void;
+  handleDelete: (tagId: number) => void;
+};
 
 function EditTagItem({
   tag,
   handleNameChange,
   handleColorChange,
   handleDelete,
-}) {
+}: EditTagItemProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   return (
     <div key={tag.id} className="flex w-fit items-center gap-1.5">
       <TagChip>
@@ -25,7 +37,7 @@ function EditTagItem({
           }}
         />
         <input
-          id={tag.id}
+          id={tag.id.toString()}
           type="text"
           className="border-secondary/50 text-primary placeholder:text-secondary/70 min-w-[4ch] border-0 border-b bg-transparent px-0 pb-0.5 leading-none outline-none"
           value={tag.name}
@@ -41,7 +53,7 @@ function EditTagItem({
             color={tag.color}
             tagName={tag.name}
             buttonRef={buttonRef}
-            onChange={(color) => handleColorChange(color, tag)}
+            onChange={(color: ColorChange) => handleColorChange(color, tag)}
             onClose={() => setIsPickerOpen(false)}
           />
         )}
@@ -49,7 +61,7 @@ function EditTagItem({
       <button
         type="button"
         onClick={() => {
-          handleDelete(tag);
+          handleDelete(tag.id);
         }}
         className="focus-visible:ring-accent/25 group border-accent/45 bg-accent/8 text-accent-hover hover:border-accent/55 hover:bg-accent/18 hover:text-accent-hover inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-full border px-2 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none"
       >
