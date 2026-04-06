@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
-import { Copy, X } from "lucide-react";
-import { useToast } from "../../hooks/useToast";
-import useModalAnchor from "../../hooks/useModalAnchor";
+import { Copy } from "lucide-react";
+import { useToast } from "../../../hooks/useToast";
+import useModalAnchor from "../../../hooks/useModalAnchor";
 
 function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
   const { showToast } = useToast();

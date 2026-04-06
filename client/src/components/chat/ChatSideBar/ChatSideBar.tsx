@@ -1,9 +1,31 @@
-import { useState, useEffect, memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { Link } from "react-router";
-import logo from "../../assets/logo.png";
+import type { UseMutationResult } from "@tanstack/react-query";
 import { X, PanelLeftClose, CirclePlus } from "lucide-react";
-import RecipeOptions from "../RecipeOptions";
-import UserOptions from "../UserOptions";
+import logo from "../../../assets/logo.png";
+import UserOptions from "../../UserOptions";
+import SideBarItem from "./SideBarItem";
+import type { Recipe } from "../../../types/recipe";
+import type { User } from "../../../types/user";
+
+type OpenDeleteModal = (
+  recipe: Recipe,
+  type: "version" | "all",
+  recipeVersion?: number | null,
+) => void;
+
+type ChatSideBarProps = {
+  recipes: Recipe[];
+  user: User | null;
+  logout: UseMutationResult<unknown, Error, void, unknown>;
+  isMobile: boolean;
+  isSideBarOpen: boolean;
+  isSidebarHydrated: boolean;
+  hasSidebarInteracted: boolean;
+  setIsSideBarOpen: (nextIsOpen: boolean) => void;
+  currentRecipe: Recipe | null;
+  openDeleteModal: OpenDeleteModal;
+};
 
 const ChatSideBar = memo(
   ({
@@ -17,7 +39,7 @@ const ChatSideBar = memo(
     setIsSideBarOpen,
     currentRecipe,
     openDeleteModal,
-  }) => {
+  }: ChatSideBarProps) => {
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
@@ -44,7 +66,7 @@ const ChatSideBar = memo(
       >
         <div className="flex items-center justify-between">
           <Link
-            to={`/`}
+            to="/"
             className="hover:bg-mantle-hover cursor-pointer rounded-lg p-1 duration-150"
           >
             <img src={logo} className="w-8" />
@@ -89,7 +111,7 @@ const ChatSideBar = memo(
         <div className="flex min-h-0 flex-1 flex-col gap-1">
           <h2 className="text-secondary">Recipes</h2>
           <div className="flex w-full flex-col overflow-y-auto">
-            {recipes?.map((recipe) => {
+            {recipes.map((recipe) => {
               return (
                 <SideBarItem
                   key={recipe.id}
@@ -126,34 +148,5 @@ const ChatSideBar = memo(
 );
 
 ChatSideBar.displayName = "ChatSideBar";
-
-const SideBarItem = memo(
-  ({ recipe, isActive, isMobile, setIsSideBarOpen, openDeleteModal }) => {
-    const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-    return (
-      <Link
-        to={`/chat/${recipe.id}`}
-        state={{ recipe }}
-        onClick={() => {
-          if (isMobile) {
-            setIsSideBarOpen(false);
-          }
-        }}
-        className={`hover:bg-mantle-hover flex cursor-pointer items-center justify-between rounded-lg px-2 py-1 duration-150 ${isActive ? "bg-overlay0" : ""} ${isOptionsOpen ? "bg-mantle-hover" : ""}`}
-      >
-        <p className="truncate">{recipe.title}</p>
-
-        <RecipeOptions
-          recipe={recipe}
-          isOptionsOpen={isOptionsOpen}
-          setIsOptionsOpen={setIsOptionsOpen}
-          openDeleteModal={openDeleteModal}
-        />
-      </Link>
-    );
-  },
-);
-
-SideBarItem.displayName = "SideBarItem";
 
 export default ChatSideBar;

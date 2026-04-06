@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { LoaderCircle } from "lucide-react";
+import { ArrowUp, LoaderCircle } from "lucide-react";
 
 function ChatAskInput({
   askMessage,

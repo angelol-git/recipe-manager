@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { useRecipes } from "../../hooks/useRecipes";
 import { X, Check, Plus } from "lucide-react";
-import TagChip from "../tags/TagChip";
+import { useRecipes } from "../../../hooks/useRecipes";
+import TagChip from "../../tags/TagChip";
 
 function ChatTags({ recipe }) {
   const newTagRef = useRef();

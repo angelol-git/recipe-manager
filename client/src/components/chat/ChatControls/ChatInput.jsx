@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, memo } from "react";
 import { useNavigate } from "react-router";
-import { useChat } from "../../hooks/useChat.jsx";
-import { useToast } from "../../hooks/useToast";
+import { useChat } from "../../../hooks/useChat.jsx";
+import { useToast } from "../../../hooks/useToast";
 import {
   ArrowUp,
   LoaderCircle,

@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import Markdown from "react-markdown";
-
 import { X } from "lucide-react";
 import ChatAskInput from "./ChatAskInput";
+
 function ChatAskModal({
   isAskModalOpen,
   setIsAskModalOpen,

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import ChatInput from "../../components/chat/ChatInput.jsx";
+import ChatInput from "../../components/chat/ChatControls/ChatInput.jsx";
 
 function NewChat() {
   // Hide shell once component is ready

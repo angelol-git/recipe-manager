@@ -1,14 +1,14 @@
 import { useEffect, useState, useMemo } from "react";
 import { Outlet, useParams } from "react-router";
+import ChatSideBar from "../../components/chat/ChatSideBar/ChatSideBar";
+import ChatHeader from "../../components/chat/ChatHeader/ChatHeader.jsx";
+import DeleteRecipePortal from "../../components/delete/DeleteRecipePortal.js";
+import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.js";
+import { useToast } from "../../hooks/useToast";
 import { useUser } from "../../hooks/useUser";
 import { useRecipes } from "../../hooks/useRecipes";
 import { useChatSidebar } from "../../hooks/useChatSidebar";
 import useIsMobile from "../../hooks/useIsMobile";
-import ChatSideBar from "../../components/chat/ChatSideBar";
-import ChatHeader from "../../components/chat/ChatHeader.jsx";
-import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.jsx";
-import DeleteRecipePortal from "../../components/delete/DeleteRecipePortal.jsx";
-import { useToast } from "../../hooks/useToast";
 
 const ChatLayout = () => {
   const { id } = useParams();
@@ -26,9 +26,10 @@ const ChatLayout = () => {
     return recipes.find((r) => r.id === id) || null;
   }, [recipes, id]);
 
-  const [recipeVersion, setRecipeVersion] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [hasSidebarInteracted, setHasSidebarInteracted] = useState(false);
+  const [recipeVersion, setRecipeVersion] = useState<Number>(0);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<Boolean>(false);
+  const [hasSidebarInteracted, setHasSidebarInteracted] =
+    useState<Boolean>(false);
 
   const { deleteModal, openDeleteModal, closeDeleteModal, handleDelete } =
     useDeleteRecipe({
@@ -37,7 +38,10 @@ const ChatLayout = () => {
         const isDeletingLastVersion =
           type === "version" && recipe?.versions?.length === 1;
 
-        if (isDeletingActiveRecipe && (type === "all" || isDeletingLastVersion)) {
+        if (
+          isDeletingActiveRecipe &&
+          (type === "all" || isDeletingLastVersion)
+        ) {
           return "/chat";
         }
 
@@ -45,7 +49,7 @@ const ChatLayout = () => {
       },
     });
 
-  const handleSidebarOpenChange = (nextIsOpen) => {
+  const handleSidebarOpenChange = (nextIsOpen: boolean) => {
     setHasSidebarInteracted(true);
     setIsSideBarOpen(nextIsOpen);
   };
@@ -84,7 +88,7 @@ const ChatLayout = () => {
     if (recipe?.versions?.length) {
       setRecipeVersion(recipe.versions.length - 1);
     } else {
-      setRecipeVersion(null);
+      setRecipeVersion(0);
     }
   }, [recipe?.id, recipe?.versions?.length]);
 
@@ -100,7 +104,7 @@ const ChatLayout = () => {
       className={`bg-base text-primary relative flex h-[100dvh] w-full overflow-hidden overscroll-contain`}
     >
       <ChatSideBar
-        recipes={recipes}
+        recipes={recipes ?? []}
         user={user}
         logout={logout}
         isMobile={isMobile}
@@ -131,7 +135,7 @@ const ChatLayout = () => {
           <Outlet context={contextValue} />
         </div>
       </main>
-      {deleteModal.isOpen && (
+      {deleteModal.isOpen && deleteModal.recipe && deleteModal.type && (
         <DeleteRecipePortal
           recipe={deleteModal.recipe}
           type={deleteModal.type}

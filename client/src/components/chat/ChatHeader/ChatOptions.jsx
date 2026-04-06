@@ -77,13 +77,6 @@ function ChatOptions({
                 onClick={() => {
                   setIsOptionsOpen(false);
                   openDeleteModal(recipe, "version", recipeVersion);
-
-                  // if (recipe.versions?.length === 1) {
-                  //   deleteRecipe(recipe.id);
-                  // } else {
-                  //   deleteRecipeVersion(recipe.id);
-                  // }
-                  // navigate("/");
                 }}
                 className="hover:bg-base-hover flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 duration-150"
               >
@@ -92,15 +85,11 @@ function ChatOptions({
               </button>
             </li>
 
-            {/* <div className="h-[1px] bg-secondary/60 my-1" /> */}
-
             <li>
               <button
                 onClick={() => {
                   setIsOptionsOpen(false);
                   openDeleteModal(recipe, "all", recipeVersion);
-                  // deleteRecipe(recipeId);
-                  // navigate("/");
                 }}
                 className="text-rose hover:bg-rose/10 flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 duration-150"
               >

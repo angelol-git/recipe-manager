@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
-import ChatReply from "../../components/chat/ChatReply.jsx";
-import ChatNavigation from "../../components/chat/ChatNavigation.jsx";
-import ChatInput from "../../components/chat/ChatInput.jsx";
+import ChatReply from "../../components/chat/ChatReply/ChatReply.jsx";
+import ChatNavigation from "../../components/chat/ChatControls/ChatNavigation.jsx";
+import ChatInput from "../../components/chat/ChatControls/ChatInput.jsx";
 import ChatEditModal from "../../components/chat/ChatEditModal/ChatEditModal.jsx";
-import ChatTags from "../../components/chat/ChatTags.jsx";
-import ChatAskModal from "../../components/chat/ChatAskModal.jsx";
+import ChatTags from "../../components/chat/ChatReply/ChatTags.jsx";
+import ChatAskModal from "../../components/chat/ChatAsk/ChatAskModal.jsx";
 import NotFound from "../NotFound.jsx";
 
 function Chat() {
