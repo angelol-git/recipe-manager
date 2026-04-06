@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-
-function getStoredSidebarState(userId) {
+import { User } from "../types/user";
+function getStoredSidebarState(userId: User["id"]) {
   const id = userId || "guest";
   try {
     const stored = localStorage.getItem(`recipe-is-sidebar-open-${id}`);
@@ -10,7 +10,11 @@ function getStoredSidebarState(userId) {
   }
 }
 
-export function useChatSidebar(user, isMobile, isUserLoading) {
+export function useChatSidebar(
+  user: User,
+  isMobile: boolean,
+  isUserLoading: boolean,
+) {
   const userId = user?.id || "guest";
   const [isSidebarHydrated, setIsSidebarHydrated] = useState(false);
 

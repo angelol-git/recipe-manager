@@ -1,31 +1,61 @@
-// hooks/useRecipeApi.js
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { sendCreateMessage } from "../api/chat";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage.js";
 import { useUser } from "./useUser";
+import type { Recipe, RecipeVersion } from "../types/recipe";
 
-export function useChat(showToast) {
+type ShowToast = (message: string, type: "success" | "error") => void;
+
+type CreateMessagePayload = {
+  message: string;
+  recipeId?: string;
+  recipeVersion?: RecipeVersion;
+};
+
+type CreateMessageResponse = {
+  reply: Recipe;
+};
+
+type MutationContext = {
+  previousRecipes?: Recipe[];
+};
+
+type ApiError = {
+  message?: string;
+  error?: string;
+};
+
+export function useChat(showToast: ShowToast) {
   const { user } = useUser();
   const queryClient = useQueryClient();
   const recipesQueryKey = ["recipes", user?.id || "guest_recipes"];
 
-  const sendCreateMessageMutation = useMutation({
-    mutationFn: async (payload) => {
+  const sendCreateMessageMutation = useMutation<
+    CreateMessageResponse,
+    ApiError,
+    CreateMessagePayload,
+    MutationContext
+  >({
+    mutationFn: async (
+      payload: CreateMessagePayload,
+    ): Promise<CreateMessageResponse> => {
       return sendCreateMessage(payload);
     },
 
-    onMutate: async () => {
+    onMutate: async (): Promise<MutationContext> => {
       await queryClient.cancelQueries({
         queryKey: recipesQueryKey,
       });
 
-      const previousRecipes = queryClient.getQueryData(recipesQueryKey);
+      const previousRecipes =
+        queryClient.getQueryData<Recipe[]>(recipesQueryKey);
 
       return { previousRecipes };
     },
 
-    onError: (err, variables, context) => {
-      showToast(err.error);
+    onError: (err, _variables, context) => {
+      showToast(err.message || err.error || "Something went wrong", "error");
+
       if (context?.previousRecipes) {
         queryClient.setQueryData(recipesQueryKey, context.previousRecipes);
       }
@@ -35,12 +65,11 @@ export function useChat(showToast) {
       const newRecipe = data.reply;
       const isNewRecipe = !variables.recipeId;
 
-      queryClient.setQueryData(recipesQueryKey, (old) => {
-        if (!old?.length) return [newRecipe];
-
+      queryClient.setQueryData<Recipe[]>(recipesQueryKey, (old = []) => {
         const existingIndex = old.findIndex(
           (recipe) => recipe.id === newRecipe.id,
         );
+
         if (existingIndex === -1) {
           return [...old, newRecipe];
         }
@@ -58,7 +87,7 @@ export function useChat(showToast) {
         addLocalRecipe(newRecipe);
       }
 
-      queryClient.invalidateQueries(recipesQueryKey);
+      queryClient.invalidateQueries({ queryKey: recipesQueryKey });
     },
   });
 

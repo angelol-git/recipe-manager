@@ -1,11 +1,20 @@
 import { useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Recipe } from "../../types/recipe";
 
-function DeletePortal({ recipe, type, onClose, onDelete }) {
-  const portalRef = useRef(null);
+type DeletePortalProps = {
+  recipe: Recipe;
+  type: "version" | "all";
+  onClose: () => void;
+  onDelete: () => void;
+};
+function DeletePortal({ recipe, type, onClose, onDelete }: DeletePortalProps) {
+  const portalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(event) {
+    function handleClickOutside(event: MouseEvent) {
+      if (!(event.target instanceof Node)) return;
+
       if (portalRef.current && !portalRef.current.contains(event.target)) {
         onClose();
       }
@@ -17,7 +26,7 @@ function DeletePortal({ recipe, type, onClose, onDelete }) {
   }, [onClose]);
 
   useEffect(() => {
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", handleKeyDown);
@@ -38,9 +47,8 @@ function DeletePortal({ recipe, type, onClose, onDelete }) {
           </div>
         ) : (
           <div>
-            This will{" "}
+            This will
             <span className="font-bold">
-              {" "}
               permanently delete {recipe?.title} and all recipe versions.
             </span>
           </div>
