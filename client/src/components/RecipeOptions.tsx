@@ -1,18 +1,33 @@
+import { useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { createPortal } from "react-dom";
-import { useEffect, useRef } from "react";
 import { CircleX, Share, Ellipsis } from "lucide-react";
+import type { Recipe } from "../types/recipe";
+
+type RecipeOptionsProps = {
+  recipe: Recipe;
+  isOptionsOpen: boolean;
+  setIsOptionsOpen: Dispatch<SetStateAction<boolean>>;
+  openDeleteModal: (
+    recipe: Recipe,
+    type: "version" | "all",
+    recipeVersion?: number | null,
+  ) => void;
+};
+
 function RecipeOptions({
   recipe,
   isOptionsOpen,
   setIsOptionsOpen,
   openDeleteModal,
-}) {
-  const buttonRef = useRef(null);
-  const portalRef = useRef(null);
-  //   console.log(buttonRef.current?.getBoundingClientRect());
+}: RecipeOptionsProps) {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const portalRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!isOptionsOpen) return;
-    function handleClickOutside(event) {
+    function handleClickOutside(event: MouseEvent) {
+      if (!(event.target instanceof Node)) return;
+
       if (
         buttonRef.current &&
         !buttonRef.current.contains(event.target) &&
@@ -53,8 +68,7 @@ function RecipeOptions({
             style={{
               position: "fixed",
               top: buttonRef.current?.getBoundingClientRect().bottom + "px",
-              left:
-                buttonRef.current?.getBoundingClientRect().left - 100 + "px",
+              left: `${buttonRef.current?.getBoundingClientRect().left ?? 0 - 100}px`,
             }}
             className="bg-base border-secondary/20 z-1000 w-42 rounded-lg border p-2 shadow-lg"
             role="menu"

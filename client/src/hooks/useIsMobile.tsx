@@ -7,10 +7,11 @@ function useIsMobile() {
   });
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width:1024px)");
-    function handleChange(event) {
+    function handleChange(event: MediaQueryListEvent) {
       setIsMobile(event.matches);
     }
-    handleChange(mediaQuery);
+
+    setIsMobile(mediaQuery.matches);
     mediaQuery.addEventListener("change", handleChange);
     return () => {
       mediaQuery.removeEventListener("change", handleChange);

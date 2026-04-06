@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties, type RefObject } from "react";
 
 const DESKTOP_BREAKPOINT = 1024;
 
-function useModalAnchor(anchorRef, isOpen) {
-  const [anchorStyle, setAnchorStyle] = useState(undefined);
+type ModalAnchorStyle = Pick<CSSProperties, "left" | "width">;
+
+function useModalAnchor(
+  anchorRef: RefObject<HTMLElement | null>,
+  isOpen: boolean,
+): ModalAnchorStyle | undefined {
+  const [anchorStyle, setAnchorStyle] = useState<ModalAnchorStyle | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (!isOpen) {
