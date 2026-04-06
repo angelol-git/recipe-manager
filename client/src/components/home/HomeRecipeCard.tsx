@@ -1,11 +1,32 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import RecipeOptions from "../RecipeOptions";
+import type { Recipe } from "../../types/recipe";
 
-function HomeRecipeCard({ recipe, openDeleteModal }) {
+type OpenDeleteModalProp = (
+  recipe: Recipe,
+  type: "version" | "all",
+  recipeVersion?: number | null,
+) => void;
+
+type HomeRecipeCardProps = {
+  recipe: Recipe;
+  openDeleteModal: OpenDeleteModalProp;
+};
+
+function HomeRecipeCard({ recipe, openDeleteModal }: HomeRecipeCardProps) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-  function formatDate(dateString) {
-    const options = { year: "numeric", month: "short", day: "numeric" };
+  function formatDate(dateString: Recipe["created_at"]) {
+    if (!dateString) {
+      return;
+    }
+
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    };
+
     return new Date(dateString).toLocaleDateString(undefined, options);
   }
   return (
