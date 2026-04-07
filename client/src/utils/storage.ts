@@ -1,22 +1,27 @@
 import {
   normalizeStoredRecipe,
   normalizeStoredRecipes,
-} from "./normalizeStoredRecipe.js";
+} from "./normalizeStoredRecipe";
+import type { Recipe } from "../types/recipe";
+import type { DraftTag, EditableTagUpdate, Tag } from "../types/tag";
+import type { UpdateRecipeInput } from "../api/recipes";
 
-function generateId() {
+function generateId(): string {
   return crypto.randomUUID();
 }
 
-export function getLocalRecipes() {
+export function getLocalRecipes(): Recipe[] {
   const data = localStorage.getItem("recipe-guest-recipes");
   if (!data) return [];
+
   try {
-    const parsed = JSON.parse(data);
+    const parsed: unknown = JSON.parse(data);
     if (!Array.isArray(parsed)) {
       console.warn("LocalStorage recipes is not an array, clearing");
       localStorage.removeItem("recipe-guest-recipes");
       return [];
     }
+
     const normalizedRecipes = normalizeStoredRecipes(parsed);
     localStorage.setItem(
       "recipe-guest-recipes",
@@ -30,7 +35,7 @@ export function getLocalRecipes() {
   }
 }
 
-export function addLocalRecipe(recipe) {
+export function addLocalRecipe(recipe: Recipe): Recipe {
   const recipes = getLocalRecipes();
   const normalizedRecipe = normalizeStoredRecipe(recipe);
   recipes.push(normalizedRecipe);
@@ -38,16 +43,13 @@ export function addLocalRecipe(recipe) {
   return normalizedRecipe;
 }
 
-export function addLocalRecipeVersion(recipe) {
+export function addLocalRecipeVersion(recipe: Recipe): Recipe {
   const recipes = getLocalRecipes();
   const normalizedRecipe = normalizeStoredRecipe(recipe);
   const existingIndex = recipes.findIndex((r) => r.id === normalizedRecipe.id);
 
-  if (existingIndex !== -1 && normalizedRecipe.versions?.length > 0) {
+  if (existingIndex !== -1 && normalizedRecipe.versions.length > 0) {
     const newVersion = normalizedRecipe.versions[0];
-    if (!Array.isArray(recipes[existingIndex].versions)) {
-      recipes[existingIndex].versions = [];
-    }
     recipes[existingIndex].versions.push(newVersion);
     localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   }
@@ -55,33 +57,31 @@ export function addLocalRecipeVersion(recipe) {
   return normalizedRecipe;
 }
 
-export function deleteLocalRecipeAll(id) {
+export function deleteLocalRecipeAll(id: string): void {
   const recipes = getLocalRecipes().filter((r) => r.id !== id);
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
 }
 
-export function deleteLocalRecipeVersion(recipeId, recipeVersionId) {
+export function deleteLocalRecipeVersion(
+  recipeId: string,
+  recipeVersionId: string,
+): void {
   const recipes = getLocalRecipes();
   const existingIndex = recipes.findIndex((r) => r.id === recipeId);
+
   if (existingIndex !== -1) {
-    if (Array.isArray(recipes[existingIndex].versions)) {
-      recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
-        (v) => v.id !== recipeVersionId,
-      );
-    }
+    recipes[existingIndex].versions = recipes[existingIndex].versions.filter(
+      (v) => v.id !== recipeVersionId,
+    );
     localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   }
 }
 
-export function updateLocalRecipe(recipe) {
+export function updateLocalRecipe(recipe: UpdateRecipeInput): void {
   const recipes = getLocalRecipes();
   const existingIndex = recipes.findIndex((r) => r.id === recipe.recipe_id);
 
   if (existingIndex === -1) return;
-
-  if (!Array.isArray(recipes[existingIndex].versions)) {
-    recipes[existingIndex].versions = [];
-  }
 
   const versionIndex = recipes[existingIndex].versions.findIndex(
     (v) => v.id === recipe.id,
@@ -107,7 +107,10 @@ export function updateLocalRecipe(recipe) {
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
 }
 
-export function addLocalRecipeTag(recipeId, newTag) {
+export function addLocalRecipeTag(
+  recipeId: string,
+  newTag: DraftTag,
+): { success: boolean; error?: string; tag?: Tag } {
   const recipes = getLocalRecipes();
   const recipeIndex = recipes.findIndex((r) => r.id === recipeId);
 
@@ -117,10 +120,6 @@ export function addLocalRecipeTag(recipeId, newTag) {
 
   const recipe = recipes[recipeIndex];
 
-  if (!Array.isArray(recipe.tags)) {
-    recipe.tags = [];
-  }
-
   const existingTagOnRecipe = recipe.tags.find(
     (t) => t.name?.toLowerCase() === newTag.name?.toLowerCase(),
   );
@@ -129,13 +128,9 @@ export function addLocalRecipeTag(recipeId, newTag) {
     return { success: false, error: "Tag already exists on this recipe" };
   }
 
-  let tagToUse = null;
-  for (const r of recipes) {
-    if (!Array.isArray(r.tags)) {
-      r.tags = [];
-      continue;
-    }
-    const existingTag = r.tags.find(
+  let tagToUse: Tag | null = null;
+  for (const currentRecipe of recipes) {
+    const existingTag = currentRecipe.tags.find(
       (t) => t.name?.toLowerCase() === newTag.name?.toLowerCase(),
     );
     if (existingTag) {
@@ -158,36 +153,36 @@ export function addLocalRecipeTag(recipeId, newTag) {
   return { success: true, tag: tagToUse };
 }
 
-export function deleteLocalTagsAll(tagIds) {
+export function deleteLocalTagsAll(
+  tagIds: Array<Tag["id"]>,
+): { success: true } {
   const recipes = getLocalRecipes();
 
   recipes.forEach((recipe) => {
-    if (Array.isArray(recipe.tags)) {
-      recipe.tags = recipe.tags.filter((t) => !tagIds.includes(t.id));
-    } else {
-      recipe.tags = [];
-    }
+    recipe.tags = recipe.tags.filter((t) => !tagIds.includes(t.id));
   });
 
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));
   return { success: true };
 }
 
-export function editLocalTagsAll(updatedTags) {
+export function editLocalTagsAll(
+  updatedTags: EditableTagUpdate[],
+): { success: true } {
   const recipes = getLocalRecipes();
 
   recipes.forEach((recipe) => {
-    if (Array.isArray(recipe.tags)) {
-      recipe.tags = recipe.tags.map((tag) => {
-        const updatedTag = updatedTags.find((t) => t.id === tag.id);
-        if (updatedTag) {
-          return { ...tag, name: updatedTag.name, color: updatedTag.color };
-        }
-        return tag;
-      });
-    } else {
-      recipe.tags = [];
-    }
+    recipe.tags = recipe.tags.map((tag) => {
+      const updatedTag = updatedTags.find((t) => t.id === tag.id);
+      if (updatedTag) {
+        return {
+          ...tag,
+          name: updatedTag.name ?? tag.name,
+          color: updatedTag.color ?? tag.color,
+        };
+      }
+      return tag;
+    });
   });
 
   localStorage.setItem("recipe-guest-recipes", JSON.stringify(recipes));

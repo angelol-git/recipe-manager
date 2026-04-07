@@ -4,7 +4,7 @@ import {
   type CreateMessagePayload,
   type CreateMessageResponse,
 } from "../api/chat";
-import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage.js";
+import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage";
 import { useUser } from "./useUser";
 import type { Recipe } from "../types/recipe";
 

@@ -15,7 +15,7 @@ import {
   deleteLocalRecipeVersion,
   updateLocalRecipe,
   addLocalRecipeTag,
-} from "../utils/storage.js";
+} from "../utils/storage";
 import type { Recipe } from "../types/recipe";
 import type { DraftTag, Tag } from "../types/tag";
 

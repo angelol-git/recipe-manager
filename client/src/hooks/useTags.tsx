@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTagsAll, editTagsAll } from "../api/tags.js";
-import { deleteLocalTagsAll, editLocalTagsAll } from "../utils/storage.js";
+import { deleteLocalTagsAll, editLocalTagsAll } from "../utils/storage";
 import type { Tag, EditableTagUpdate } from "../types/tag";
 import type { User } from "../types/user";
 import type { Recipe } from "../types/recipe";
