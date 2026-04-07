@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Outlet, useParams } from "react-router";
 import ChatSideBar from "../../components/chat/ChatSideBar/ChatSideBar";
-import ChatHeader from "../../components/chat/ChatHeader/ChatHeader.jsx";
+import ChatHeader from "../../components/chat/ChatHeader/ChatHeader.js";
 import DeleteRecipePortal from "../../components/delete/DeleteRecipePortal.js";
 import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.js";
 import { useToast } from "../../hooks/useToast";

@@ -1,9 +1,22 @@
+import { RefObject } from "react";
 import { createPortal } from "react-dom";
 import { Copy } from "lucide-react";
 import { useToast } from "../../../hooks/useToast";
 import useModalAnchor from "../../../hooks/useModalAnchor";
 
-function ChatPromptModal({ isOpen, onClose, sourcePrompt, anchorRef }) {
+type ChatPromptModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  sourcePrompt: string;
+  anchorRef: RefObject<HTMLDivElement | null>;
+};
+
+function ChatPromptModal({
+  isOpen,
+  onClose,
+  sourcePrompt,
+  anchorRef,
+}: ChatPromptModalProps) {
   const { showToast } = useToast();
   const anchorStyle = useModalAnchor(anchorRef, isOpen);
 

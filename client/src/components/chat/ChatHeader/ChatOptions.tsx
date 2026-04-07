@@ -1,18 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { CircleX, Share, Ellipsis, Trash2, SquarePen } from "lucide-react";
+import type { Recipe } from "../../../types/recipe";
+import { Dispatch, SetStateAction } from "react";
+
+type OpenDeleteModal = (
+  recipe: Recipe,
+  type: "version" | "all",
+  recipeVersion?: number | null,
+) => void;
+
+type ChatOptionsProps = {
+  recipe: Recipe;
+  recipeVersion: number;
+  setIsEditModalOpen: Dispatch<SetStateAction<boolean>>;
+  openDeleteModal: OpenDeleteModal;
+};
 
 function ChatOptions({
   recipe,
   recipeVersion,
   setIsEditModalOpen,
   openDeleteModal,
-}) {
+}: ChatOptionsProps) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isOptionsOpen) return;
-    function handleClickOutside(e) {
+    function handleClickOutside(e: MouseEvent) {
+      if (!(e.target instanceof Node)) return;
+
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setIsOptionsOpen(false);
       }

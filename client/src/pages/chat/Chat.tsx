@@ -1,13 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Dispatch, SetStateAction } from "react";
 import { useOutletContext } from "react-router";
-import ChatReply from "../../components/chat/ChatReply/ChatReply.jsx";
-import ChatNavigation from "../../components/chat/ChatControls/ChatNavigation.jsx";
+import ChatReply from "../../components/chat/ChatReply/ChatReply.js";
+import ChatNavigation from "../../components/chat/ChatControls/ChatNavigation.js";
 import ChatInput from "../../components/chat/ChatControls/ChatInput.jsx";
 import ChatEditModal from "../../components/chat/ChatEditModal/ChatEditModal.jsx";
 import ChatTags from "../../components/chat/ChatReply/ChatTags.jsx";
 import ChatAskModal from "../../components/chat/ChatAsk/ChatAskModal.jsx";
 import NotFound from "../NotFound.jsx";
+import { Recipe } from "../../types/recipe.js";
 
+type ChatOutletContext = {
+  recipe: Recipe;
+  recipeVersion: number;
+  setRecipeVersion: Dispatch<SetStateAction<number>>;
+  isEditModalOpen: boolean;
+  setIsEditModalOpen: Dispatch<SetStateAction<boolean>>;
+  isLoading: boolean;
+};
 function Chat() {
   const {
     recipe,
@@ -16,13 +25,13 @@ function Chat() {
     isEditModalOpen,
     setIsEditModalOpen,
     isLoading,
-  } = useOutletContext();
+  } = useOutletContext<ChatOutletContext>();
 
-  const [isAskModalOpen, setIsAskModalOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [composerHeight, setComposerHeight] = useState(0);
-  const composerRef = useRef(null);
-  const replyPanelRef = useRef(null);
+  const [isAskModalOpen, setIsAskModalOpen] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+  const [composerHeight, setComposerHeight] = useState<number>(0);
+  const composerRef = useRef<HTMLDivElement | null>(null);
+  const replyPanelRef = useRef<HTMLDivElement | null>(null);
   const hasRecipeNavigation = recipe?.versions?.length > 1;
 
   useEffect(() => {

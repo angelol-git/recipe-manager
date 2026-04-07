@@ -1,22 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Check, Plus } from "lucide-react";
 import { useRecipes } from "../../../hooks/useRecipes";
+import type { Recipe } from "../../../types/recipe";
+import type { DraftTag } from "../../../types/tag";
 import TagChip from "../../tags/TagChip";
 
-function ChatTags({ recipe }) {
-  const newTagRef = useRef();
+type ChatTagsProps = {
+  recipe: Recipe | null;
+};
+
+function ChatTags({ recipe }: ChatTagsProps) {
+  const newTagRef = useRef<HTMLInputElement | null>(null);
   const { addRecipeTag } = useRecipes();
   const tags = recipe?.tags || [];
   const [isAddingTag, setIsAddingTag] = useState(false);
-  const [newTag, setNewTag] = useState({
-    id: "",
+  const [newTag, setNewTag] = useState<DraftTag>({
     name: "",
     color: "#FFB86C",
   });
 
   useEffect(() => {
     setIsAddingTag(false);
-    setNewTag({ id: "", name: "", color: "#FFB86C" });
+    setNewTag({ name: "", color: "#FFB86C" });
   }, [recipe?.id]);
 
   useEffect(() => {
@@ -32,7 +37,8 @@ function ChatTags({ recipe }) {
       recipeId: recipe.id,
       newTag: { ...newTag, name: newTag.name.trim() },
     });
-    setNewTag({ id: "", name: "", color: "#FFB86C" });
+
+    setNewTag({ name: "", color: "#FFB86C" });
     setIsAddingTag(false);
   }
 
@@ -68,7 +74,7 @@ function ChatTags({ recipe }) {
           <button
             type="button"
             onClick={() => {
-              setNewTag({ id: "", name: "", color: "#FFB86C" });
+              setNewTag({ name: "", color: "#FFB86C" });
               setIsAddingTag(false);
             }}
             className="focus-visible:ring-accent/25 group border-accent/35 bg-accent/8 text-accent hover:border-accent/45 hover:bg-accent/18 hover:text-accent-hover inline-flex min-h-6 min-w-6 cursor-pointer items-center justify-center rounded-full border px-2 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none"

@@ -1,25 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { Flame, Clock, Utensils, Info } from "lucide-react";
 
-function formatApproxValue(value) {
+type RecipeDetailsProp = {
+  calories: string;
+  total_time: string;
+  servings: string;
+};
+function formatApproxValue(value: string) {
   if (value === null || value === undefined || value === "") return "N/A";
   return `~${value}`;
 }
 
-function RecipeDetailsBar({ recipeDetails = {} }) {
+function RecipeDetailsBar(recipeDetails: RecipeDetailsProp) {
   const [isDetailsPopoverOpen, setIsDetailsPopoverOpen] = useState(false);
-  const detailsPopoverRef = useRef(null);
+  const detailsPopoverRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isDetailsPopoverOpen) return undefined;
 
-    function handlePointerDown(event) {
+    function handlePointerDown(event: MouseEvent) {
+      if (!(event.target instanceof Node)) return;
       if (!detailsPopoverRef.current?.contains(event.target)) {
         setIsDetailsPopoverOpen(false);
       }
     }
 
-    function handleKeyDown(event) {
+    function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setIsDetailsPopoverOpen(false);
       }
@@ -55,7 +61,10 @@ function RecipeDetailsBar({ recipeDetails = {} }) {
         <div>{formatApproxValue(recipeDetails.servings)}</div>
         servings
       </div>
-      <div ref={detailsPopoverRef} className="relative ml-auto flex items-center">
+      <div
+        ref={detailsPopoverRef}
+        className="relative ml-auto flex items-center"
+      >
         <button
           type="button"
           className="text-secondary/60 hover:text-secondary focus:text-secondary cursor-pointer"

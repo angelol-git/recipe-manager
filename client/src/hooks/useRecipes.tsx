@@ -16,7 +16,7 @@ import {
   addLocalRecipeTag,
 } from "../utils/storage.js";
 import type { Recipe, RecipeDetails } from "../types/recipe";
-import type { Tag } from "../types/tag";
+import type { DraftTag, Tag } from "../types/tag";
 
 type DeleteRecipeMutationProps = {
   recipeId: string;
@@ -25,7 +25,7 @@ type DeleteRecipeMutationProps = {
 
 type AddRecipeTagMutationInput = {
   recipeId: string;
-  newTag: Tag;
+  newTag: DraftTag;
 };
 
 type UpdateRecipeInput = {

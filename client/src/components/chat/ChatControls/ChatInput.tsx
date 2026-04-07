@@ -1,15 +1,34 @@
-import { useRef, useEffect, useState, memo } from "react";
+import {
+  useRef,
+  useEffect,
+  useState,
+  memo,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { useNavigate } from "react-router";
-import { useChat } from "../../../hooks/useChat.jsx";
-import { useToast } from "../../../hooks/useToast";
+import { useChat } from "../../../hooks/useChat.js";
+import { useToast } from "../../../hooks/useToast.js";
 import {
   ArrowUp,
   LoaderCircle,
   MessageCircleMore,
   Minimize2,
 } from "lucide-react";
-import ChatNavigation from "./ChatNavigation";
+import ChatNavigation from "./ChatNavigation.js";
+import { Recipe } from "../../../types/recipe.js";
 
+type ChatInputProps = {
+  recipe: Recipe;
+  recipeVersion: number;
+  setRecipeVersion: Dispatch<SetStateAction<number>>;
+  hasRecipeNavigation: boolean;
+  isChatOpen: boolean | null;
+  setIsChatOpen: Dispatch<SetStateAction<boolean>>;
+  isAskModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsAskModalOpen: Dispatch<SetStateAction<boolean>>;
+  variant: "new-chat" | "existing";
+};
 const ChatInput = memo(
   ({
     // Navigation props
@@ -20,23 +39,22 @@ const ChatInput = memo(
     //Optional
     isChatOpen = true,
     setIsChatOpen,
-    // isAskModalOpen,
+    isAskModalOpen,
     setIsAskModalOpen,
     variant = "new-chat",
-  }) => {
+  }: ChatInputProps) => {
     const [message, setMessage] = useState("");
     // eslint-disable-next-line no-unused-vars
     const [chatInputMode, setChatInputMode] = useState("Create");
     const [isExpanded, setIsExpanded] = useState(false);
-    const isExpandedRef = useRef();
-    const textAreaRef = useRef(null);
+    const isExpandedRef = useRef<HTMLDivElement | null>(null);
+    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+    const isActiveRef = useRef<boolean>(true);
     const { showToast } = useToast();
     const minHeight = 30;
     const maxHeight = 160;
     const isNewChat = variant === "new-chat";
     const navigate = useNavigate();
-    const isActiveRef = useRef(true);
-
     const { sendCreateMessage, isPending, isSuccess } = useChat(showToast);
     const canSend = message.trim().length > 0 && !isPending;
 
@@ -54,7 +72,8 @@ const ChatInput = memo(
     useEffect(() => {
       if (!isExpanded) return;
 
-      function handleClickOutside(e) {
+      function handleClickOutside(e: MouseEvent) {
+        if (!(e.target instanceof Node)) return;
         if (
           isExpandedRef.current &&
           !isExpandedRef.current.contains(e.target)
@@ -106,7 +125,11 @@ const ChatInput = memo(
           }
         } catch (err) {
           // console.log(err);
-          showToast(err.error, "error", 6000);
+          showToast(
+            (err as { error?: string }).error || "Something went wrong",
+            "error",
+            6000,
+          );
         }
       }
 
