@@ -10,6 +10,7 @@ type HomeTagsProps = {
   handleTagSelectedClick: (tag: Tag) => void;
   tagCounts: Record<number, number>;
   deleteTagsAll: (tagIds: number[]) => void;
+  isDeletingTags: boolean;
   editTagsAll: (updatedTags: EditableTagUpdate[]) => void;
 };
 
@@ -19,6 +20,7 @@ function HomeTags({
   handleTagSelectedClick,
   tagCounts,
   deleteTagsAll,
+  isDeletingTags,
   editTagsAll,
 }: HomeTagsProps) {
   const [tagsToBeDeleted, setTagsToBeDeleted] = useState([]);
@@ -59,6 +61,7 @@ function HomeTags({
               onClick={() => {
                 setIsEditTags(true);
               }}
+              disabled={isDeletingTags}
               className="text-secondary hover:bg-mantle-hover cursor-pointer rounded-lg px-2 py-1 text-sm underline transition-colors duration-150"
             >
               Edit
@@ -104,6 +107,7 @@ function HomeTags({
             <div className="flex gap-2">
               <button
                 onClick={handleTagDone}
+                disabled={isDeletingTags}
                 className="bg-accent hover:bg-accent-hover cursor-pointer rounded-lg px-2 py-1 text-sm text-white transition-colors duration-150"
               >
                 Done

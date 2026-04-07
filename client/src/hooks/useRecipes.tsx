@@ -6,7 +6,8 @@ import {
   deleteRecipe,
   updateRecipe,
   addRecipeTag,
-} from "../api/recipes.js";
+  type UpdateRecipeInput,
+} from "../api/recipes";
 import {
   getLocalRecipes,
   addLocalRecipe,
@@ -15,7 +16,7 @@ import {
   updateLocalRecipe,
   addLocalRecipeTag,
 } from "../utils/storage.js";
-import type { Recipe, RecipeDetails } from "../types/recipe";
+import type { Recipe } from "../types/recipe";
 import type { DraftTag, Tag } from "../types/tag";
 
 type DeleteRecipeMutationProps = {
@@ -26,18 +27,6 @@ type DeleteRecipeMutationProps = {
 type AddRecipeTagMutationInput = {
   recipeId: string;
   newTag: DraftTag;
-};
-
-export type UpdateRecipeInput = {
-  id: string;
-  recipe_id: string;
-  title: string;
-  tags: Tag[];
-  description: string;
-  instructions: string[];
-  ingredients: string[];
-  recipeDetails: RecipeDetails;
-  source_prompt: string;
 };
 
 export function useRecipes() {

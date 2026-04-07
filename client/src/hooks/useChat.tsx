@@ -1,20 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { sendCreateMessage } from "../api/chat";
+import {
+  sendCreateMessage,
+  type CreateMessagePayload,
+  type CreateMessageResponse,
+} from "../api/chat";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage.js";
 import { useUser } from "./useUser";
-import type { Recipe, RecipeVersion } from "../types/recipe";
+import type { Recipe } from "../types/recipe";
 
 type ShowToast = (message: string, type: "success" | "error") => void;
-
-type CreateMessagePayload = {
-  message: string;
-  recipeId?: string;
-  recipeVersion?: RecipeVersion;
-};
-
-type CreateMessageResponse = {
-  reply: Recipe;
-};
 
 type MutationContext = {
   previousRecipes?: Recipe[];

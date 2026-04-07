@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import UserOptions from "../components/UserOptions";
 import HomeTags from "../components/home/HomeTags";
 import HomeItems from "../components/home/HomeItems";
-import DeleteRecipePortal from "../components/delete/DeleteRecipePortal.jsx";
+import DeleteRecipePortal from "../components/delete/DeleteRecipePortal";
 import { useUser } from "../hooks/useUser";
 import { useRecipes } from "../hooks/useRecipes";
 import { useTags } from "../hooks/useTags";
-import { useDeleteRecipe } from "../hooks/useDeleteRecipe.jsx";
+import { useDeleteRecipe } from "../hooks/useDeleteRecipe";
 
 function Home() {
   const { user, logout, isLoading: isUserLoading } = useUser();
@@ -34,7 +34,7 @@ function Home() {
     }
   }, [isUserLoading, isRecipesLoading]);
 
-  const filteredRecipes = recipes?.filter((recipe) => {
+  const filteredRecipes = (recipes ?? []).filter((recipe) => {
     if (selectedTags.length === 0) return true;
 
     return recipe.tags.some((recipeTag) => {
@@ -68,7 +68,7 @@ function Home() {
           />
         </main>
       </div>
-      {deleteModal.isOpen && (
+      {deleteModal.isOpen && deleteModal.recipe && deleteModal.type && (
         <DeleteRecipePortal
           recipe={deleteModal.recipe}
           type={deleteModal.type}

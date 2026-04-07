@@ -2,7 +2,7 @@ import { Dispatch, FormEvent, RefObject, SetStateAction, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRecipes } from "../../../hooks/useRecipes";
 import { useDraftRecipe } from "../../../hooks/useDraftRecipe";
-import type { UpdateRecipeInput } from "../../../hooks/useRecipes";
+import type { UpdateRecipeInput } from "../../../api/recipes";
 import EditTitle from "./EditTitle";
 import EditTags from "./EditTags";
 import EditRecipeDetails from "./EditRecipeDetails";
