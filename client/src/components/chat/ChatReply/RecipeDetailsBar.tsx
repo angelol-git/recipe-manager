@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { Flame, Clock, Utensils, Info } from "lucide-react";
+import type {
+  RecipeDetails,
+  RecipeDetailValue,
+} from "../../../types/recipe";
 
-type RecipeDetailsProp = {
-  calories: string;
-  total_time: string;
-  servings: string;
+type RecipeDetailsBarProps = {
+  recipeDetails: RecipeDetails;
 };
-function formatApproxValue(value: string) {
+
+function formatApproxValue(value: RecipeDetailValue) {
   if (value === null || value === undefined || value === "") return "N/A";
   return `~${value}`;
 }
 
-function RecipeDetailsBar(recipeDetails: RecipeDetailsProp) {
+function RecipeDetailsBar({ recipeDetails }: RecipeDetailsBarProps) {
   const [isDetailsPopoverOpen, setIsDetailsPopoverOpen] = useState(false);
   const detailsPopoverRef = useRef<HTMLDivElement | null>(null);
 

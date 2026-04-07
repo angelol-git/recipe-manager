@@ -1,7 +1,7 @@
 import { useState, memo, RefObject } from "react";
 import ChatPromptModal from "./ChatPromptModal";
 import RecipeDetailsBar from "./RecipeDetailsBar";
-import { Recipe, RecipeVersion } from "../../../types/recipe";
+import { Recipe } from "../../../types/recipe";
 
 type ChatReplyProps = {
   recipe: Recipe;
