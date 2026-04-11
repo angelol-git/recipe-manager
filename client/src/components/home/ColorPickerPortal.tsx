@@ -8,12 +8,8 @@ import {
 import { createPortal } from "react-dom";
 import { SketchPicker, type ColorResult } from "react-color";
 
-type ColorString = {
-  hex: string;
-};
-
 type ColorPickerPortalProps = {
-  color: ColorString;
+  color: string;
   tagName: string;
   buttonRef: RefObject<HTMLButtonElement | null>;
   onChange: (color: ColorResult) => void;
@@ -120,7 +116,7 @@ function ColorPickerPortal({
       <h3 className="sr-only">Color picker for {tagName}</h3>
 
       <SketchPicker
-        color={color.hex}
+        color={color}
         onChangeComplete={onChange}
         presetColors={[
           "#8B9F87",

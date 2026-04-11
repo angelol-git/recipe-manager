@@ -60,6 +60,7 @@ function EditTagItem({
       </TagChip>
       <button
         type="button"
+        aria-label={`Delete ${tag.name} tag`}
         onClick={() => {
           handleDelete(tag);
         }}
