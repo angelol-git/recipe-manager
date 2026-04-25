@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { User } from "../types/user";
+
 function getStoredSidebarState(userId: User["id"]) {
   const id = userId || "guest";
   try {
@@ -11,7 +12,7 @@ function getStoredSidebarState(userId: User["id"]) {
 }
 
 export function useChatSidebar(
-  user: User,
+  user: User | null,
   isMobile: boolean,
   isUserLoading: boolean,
 ) {

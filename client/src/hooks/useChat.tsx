@@ -73,7 +73,7 @@ export function useChat(showToast: ShowToast) {
         );
       });
 
-      if (!isNewRecipe) {
+      if (!isNewRecipe && !user) {
         addLocalRecipeVersion(newRecipe);
       }
 
