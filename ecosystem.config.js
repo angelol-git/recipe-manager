@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "recipe-manager",
       cwd: "./server",
-      script: "./server.ts",
+      script: "./dist/server.js",
       autorestart: true,
       watch: false,
       max_memory_restart: "500M",
