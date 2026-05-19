@@ -11,7 +11,7 @@ vi.mock("react-router", () => ({
 }));
 
 vi.mock("./useRecipes", () => ({
-  useRecipes: () => ({
+  useRecipeMutations: () => ({
     deleteRecipe: mockDeleteRecipe,
     deleteRecipeVersion: mockDeleteRecipeVersion,
   }),

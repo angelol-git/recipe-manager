@@ -1,22 +1,23 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUser } from "./useUser.js";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchAllRecipes,
-  deleteRecipeVersion,
-  deleteRecipe,
-  updateRecipe,
   addRecipeTag,
+  deleteRecipe,
+  deleteRecipeVersion,
+  fetchRecipes,
+  updateRecipe,
+  type PaginatedRecipesResponse,
 } from "../api/recipes";
+import type { Recipe, UpdateRecipeInput } from "../types/recipe";
+import type { DraftTag } from "../types/tag";
 import {
-  getLocalRecipes,
   addLocalRecipe,
+  addLocalRecipeTag,
   deleteLocalRecipeAll,
   deleteLocalRecipeVersion,
+  getLocalRecipes,
   updateLocalRecipe,
-  addLocalRecipeTag,
 } from "../utils/storage";
-import type { Recipe, UpdateRecipeInput } from "../types/recipe";
-import type { DraftTag, Tag } from "../types/tag";
+import { useUser } from "./useUser.js";
 
 type DeleteRecipeMutationProps = {
   recipeId: string;
@@ -28,24 +29,15 @@ type AddRecipeTagMutationInput = {
   newTag: DraftTag;
 };
 
-export function useRecipes() {
+type UseRecipesParams = {
+  page: number;
+  pageSize: number;
+  selectedTagIds?: Array<string | number>;
+};
+
+export function useRecipeMutations() {
   const { user } = useUser();
   const queryClient = useQueryClient();
-  const recipesQueryKey = ["recipes", user?.id || "guest_recipes"] as const;
-
-  const allRecipesQuery = useQuery<Recipe[]>({
-    queryKey: recipesQueryKey,
-    queryFn: () => {
-      if (user) {
-        return fetchAllRecipes();
-      } else {
-        return getLocalRecipes();
-      }
-    },
-    staleTime: 1000 * 60 * 5,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-  });
 
   const deleteRecipeVersionMutation = useMutation({
     mutationFn: async ({
@@ -54,45 +46,12 @@ export function useRecipes() {
     }: DeleteRecipeMutationProps) => {
       if (user) {
         return deleteRecipeVersion(recipeVersionId);
-      } else {
-        return deleteLocalRecipeVersion(recipeId, recipeVersionId);
       }
+
+      return deleteLocalRecipeVersion(recipeId, recipeVersionId);
     },
-    onMutate: async ({ recipeId, recipeVersionId }) => {
-      //Pause any fetching result of the previous query, let our manual optimistic update finish first
-      if (user) {
-        await queryClient.cancelQueries({
-          queryKey: recipesQueryKey,
-        });
-
-        const previousRecipes =
-          queryClient.getQueryData<Recipe[]>(recipesQueryKey);
-        queryClient.setQueryData<Recipe[]>(recipesQueryKey, (old) => {
-          if (!old) return old;
-
-          return old.map((recipe) => {
-            if (recipe.id !== recipeId) return recipe;
-
-            return {
-              ...recipe,
-              versions: recipe.versions.filter((v) => v.id !== recipeVersionId),
-            };
-          });
-        });
-        return { previousRecipes };
-      }
-    },
-
-    onError: (err, variables, context) => {
-      if (context?.previousRecipes) {
-        queryClient.setQueryData(recipesQueryKey, context.previousRecipes);
-      }
-    },
-
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: recipesQueryKey,
-      });
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
     },
   });
 
@@ -100,100 +59,26 @@ export function useRecipes() {
     mutationFn: async (recipeId: string) => {
       if (user) {
         await deleteRecipe(recipeId);
-      } else {
-        deleteLocalRecipeAll(recipeId);
+        return;
       }
+
+      deleteLocalRecipeAll(recipeId);
     },
-
-    onMutate: async (recipeId: string) => {
-      if (user) {
-        await queryClient.cancelQueries({
-          queryKey: recipesQueryKey,
-        });
-
-        const previousRecipes =
-          queryClient.getQueryData<Recipe[]>(recipesQueryKey);
-        queryClient.setQueryData<Recipe[]>(recipesQueryKey, (old) => {
-          if (!old) return old;
-
-          return old.filter((recipe) => recipe.id !== recipeId);
-        });
-        return { previousRecipes };
-      }
-    },
-
-    onError: (err, variables, context) => {
-      if (context?.previousRecipes) {
-        queryClient.setQueryData(recipesQueryKey, context.previousRecipes);
-      }
-    },
-
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: recipesQueryKey,
-      });
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
     },
   });
 
   const updateRecipeMutation = useMutation({
     mutationFn: async (updatedRecipe: UpdateRecipeInput) => {
       if (user) {
-        return await updateRecipe(updatedRecipe);
-      } else {
-        return updateLocalRecipe(updatedRecipe);
+        return updateRecipe(updatedRecipe);
       }
+
+      return updateLocalRecipe(updatedRecipe);
     },
-
-    onMutate: async (updatedRecipe: UpdateRecipeInput) => {
-      if (user) {
-        await queryClient.cancelQueries({
-          queryKey: recipesQueryKey,
-        });
-
-        const previousRecipes =
-          queryClient.getQueryData<Recipe[]>(recipesQueryKey);
-
-        queryClient.setQueryData<Recipe[]>(recipesQueryKey, (old) => {
-          if (!old) return old;
-
-          return old.map((recipe) => {
-            if (recipe.id !== updatedRecipe.recipe_id) {
-              return recipe;
-            }
-
-            return {
-              ...recipe,
-              title: updatedRecipe.title,
-              tags: updatedRecipe.tags,
-              versions: recipe.versions.map((version) =>
-                version.id === updatedRecipe.id
-                  ? {
-                      ...version,
-                      description: updatedRecipe.description,
-                      instructions: updatedRecipe.instructions,
-                      ingredients: updatedRecipe.ingredients,
-                      recipeDetails: updatedRecipe.recipeDetails,
-                      source_prompt: updatedRecipe.source_prompt,
-                    }
-                  : version,
-              ),
-            };
-          });
-        });
-        return { previousRecipes };
-      }
-    },
-
-    onError: (err, variables, context) => {
-      if (context?.previousRecipes) {
-        queryClient.setQueryData(recipesQueryKey, context.previousRecipes);
-      }
-    },
-
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: recipesQueryKey,
-      });
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
     },
   });
 
@@ -201,21 +86,12 @@ export function useRecipes() {
     mutationFn: async ({ recipeId, newTag }: AddRecipeTagMutationInput) => {
       if (user) {
         return addRecipeTag(recipeId, newTag);
-      } else {
-        return addLocalRecipeTag(recipeId, newTag);
       }
+
+      return addLocalRecipeTag(recipeId, newTag);
     },
-
-    // onError: (err, variables, context) => {
-    //   if (context?.previousRecipes) {
-    //     queryClient.setQueryData(["recipes", user?.id || "guest_recipes"], context.previousRecipes);
-    //   }
-    // },
-
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: recipesQueryKey,
-      });
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
     },
   });
 
@@ -223,13 +99,77 @@ export function useRecipes() {
     mutationFn: async (recipe: Recipe) => {
       addLocalRecipe(recipe);
     },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+    },
   });
+
   return {
-    ...allRecipesQuery,
     addLocalRecipe: addLocalRecipeMutation.mutate,
-    deleteRecipeVersion: deleteRecipeVersionMutation.mutate,
-    deleteRecipe: deleteRecipeMutation.mutate,
-    updateRecipe: updateRecipeMutation.mutate,
     addRecipeTag: addRecipeTagMutation.mutate,
+    deleteRecipe: deleteRecipeMutation.mutate,
+    deleteRecipeVersion: deleteRecipeVersionMutation.mutate,
+    updateRecipe: updateRecipeMutation.mutate,
+  };
+}
+
+export function useRecipes({
+  page,
+  pageSize,
+  selectedTagIds = [],
+}: UseRecipesParams) {
+  const { user } = useUser();
+
+  const recipesQueryKey = [
+    "recipes",
+    user?.id || "guest_recipes",
+    page,
+    pageSize,
+    selectedTagIds,
+  ] as const;
+
+  const recipesQuery = useQuery<PaginatedRecipesResponse>({
+    queryKey: recipesQueryKey,
+    queryFn: async () => {
+      if (user) {
+        return fetchRecipes({ page, pageSize, selectedTagIds });
+      }
+
+      const allLocalRecipes = getLocalRecipes();
+      const filteredLocalRecipes =
+        selectedTagIds.length === 0
+          ? allLocalRecipes
+          : allLocalRecipes.filter((recipe) =>
+              recipe.tags.some((tag) => selectedTagIds.includes(tag.id)),
+            );
+      const totalItems = filteredLocalRecipes.length;
+      const totalPages = Math.ceil(totalItems / pageSize);
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+
+      return {
+        items: filteredLocalRecipes.slice(start, end),
+        page,
+        pageSize,
+        totalItems,
+        totalPages,
+      };
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  return {
+    ...recipesQuery,
+    pagination: recipesQuery.data
+      ? {
+          page: recipesQuery.data.page,
+          pageSize: recipesQuery.data.pageSize,
+          totalItems: recipesQuery.data.totalItems,
+          totalPages: recipesQuery.data.totalPages,
+        }
+      : null,
+    recipes: recipesQuery.data?.items ?? [],
   };
 }

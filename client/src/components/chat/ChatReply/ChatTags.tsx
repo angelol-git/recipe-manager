@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Check, Plus } from "lucide-react";
-import { useRecipes } from "../../../hooks/useRecipes";
+import { useRecipeMutations } from "../../../hooks/useRecipes";
 import type { Recipe } from "../../../types/recipe";
 import type { DraftTag } from "../../../types/tag";
 import TagChip from "../../tags/TagChip";
@@ -11,7 +11,7 @@ type ChatTagsProps = {
 
 function ChatTags({ recipe }: ChatTagsProps) {
   const newTagRef = useRef<HTMLInputElement | null>(null);
-  const { addRecipeTag } = useRecipes();
+  const { addRecipeTag } = useRecipeMutations();
   const tags = recipe?.tags || [];
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newTag, setNewTag] = useState<DraftTag>({

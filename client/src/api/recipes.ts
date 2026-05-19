@@ -4,14 +4,41 @@ import type { DraftTag } from "../types/tag";
 
 const backendUrl = API_BASE_URL;
 
-export async function fetchAllRecipes(): Promise<Recipe[]> {
-  const res = await fetch(`${backendUrl}/recipes/`, {
+type FetchRecipesParams = {
+  page: number;
+  pageSize: number;
+  selectedTagIds?: Array<string | number>;
+};
+
+export type PaginatedRecipesResponse = {
+  items: Recipe[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+};
+
+export async function fetchRecipes({
+  page,
+  pageSize,
+  selectedTagIds = [],
+}: FetchRecipesParams): Promise<PaginatedRecipesResponse> {
+  const searchParams = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
+  });
+
+  selectedTagIds.forEach((tagId) => {
+    searchParams.append("tagId", String(tagId));
+  });
+
+  const res = await fetch(`${backendUrl}/recipes/?${searchParams.toString()}`, {
     method: "GET",
     credentials: "include",
   });
 
   if (!res.ok) {
-    throw new Error("Failed to retrieve all recipes");
+    throw new Error("Failed to retrieve recipes");
   }
 
   return res.json();

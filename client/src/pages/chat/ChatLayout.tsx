@@ -13,7 +13,7 @@ import useIsMobile from "../../hooks/useIsMobile";
 const ChatLayout = () => {
   const { id } = useParams();
   const { user, logout, isLoading: isUserLoading } = useUser();
-  const { data: recipes, isLoading } = useRecipes();
+  const { recipes, isLoading } = useRecipes({ page: 1, pageSize: 1000 });
   const isMobile = useIsMobile();
   const { isSideBarOpen, setIsSideBarOpen, isSidebarHydrated } = useChatSidebar(
     user,
@@ -22,7 +22,7 @@ const ChatLayout = () => {
   );
   const { showToast } = useToast();
   const recipe = useMemo(() => {
-    if (!recipes || !id) return null;
+    if (!id) return null;
     return recipes.find((r) => r.id === id) || null;
   }, [recipes, id]);
 

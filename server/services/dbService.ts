@@ -1,13 +1,14 @@
 import db from "../db.js";
 import { v7 as uuidv7 } from "uuid";
 import type { ParsedAiRecipe } from "./aiService.js";
-import type { AddTagBody, TagInput, UpdateRecipeBody } from "../validation/recipeSchemas.js";
+import type {
+  AddTagBody,
+  TagInput,
+  UpdateRecipeBody,
+} from "../validation/recipeSchemas.js";
 
 type RecipeId = string;
 type UserId = string;
-type TagId = number;
-type MessageId = number;
-type RecipeVersionId = number | bigint;
 type SortOrder = "ASC" | "DESC";
 
 type JsonRecord = Record<string, unknown>;
@@ -33,7 +34,7 @@ type RecipeVersionRow = {
 };
 
 type RecipeTagRow = {
-  id: TagId;
+  id: number;
   name: string;
   color: string;
 };
@@ -46,18 +47,12 @@ type ExistingIdRow = {
   id: number;
 };
 
-type ExistingRecipeVersionRow = {
-  id: number;
-};
-
-type ExistingTagRow = {
-  id: number;
-  name: string;
-  color: string;
+type CountRow = {
+  count: number;
 };
 
 type AskMessageRow = {
-  id: MessageId;
+  id: number;
   user_id: UserId;
   recipe_id: RecipeId | null;
   role: string;
@@ -67,7 +62,7 @@ type AskMessageRow = {
 };
 
 type ErrorMessageRow = {
-  id: MessageId;
+  id: number;
   status: string | null;
   content: string;
   created_at: string;
@@ -99,7 +94,7 @@ type RecipeVersion = {
 };
 
 type RecipeTag = {
-  id: TagId;
+  id: number;
   name: string;
   color: string;
 };
@@ -112,14 +107,7 @@ type Recipe = {
   versions: RecipeVersion[];
 };
 
-type AskMessage = {
-  id: MessageId;
-  content: string;
-  created_at: string;
-  user_id: UserId;
-  status: string | null;
-  role: string;
-};
+type AskMessage = Omit<AskMessageRow, "recipe_id">;
 
 type StoredAiError = JsonRecord & {
   ai_model?: string;
@@ -130,7 +118,7 @@ type StoredAiError = JsonRecord & {
 };
 
 type RecipeError = {
-  id: MessageId;
+  id: number;
   status: string | null;
   created_at: string;
   ai_model?: string;
@@ -148,14 +136,24 @@ type UrlCacheLookupResult =
   | { success: true; urlContent: UrlCacheRow }
   | { success: false; error: string };
 
-type UpdateRecipeResult =
-  | { success: true }
-  | { success: false; error: string };
+type UpdateRecipeResult = { success: true } | { success: false; error: string };
 
 type TagMutationResult =
   | { success: true; tag?: RecipeTag }
   | { success: false; error: string };
 
+type GetRecipesByUserIdOptions = {
+  page: number;
+  pageSize: number;
+};
+
+type PaginatedRecipesResult = {
+  items: Recipe[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+};
 function safeParse<T>(jsonString: string, fallback: T): T {
   try {
     return JSON.parse(jsonString) as T;
@@ -218,7 +216,10 @@ function getRecipeTags(recipeId: RecipeId): RecipeTag[] {
   return tags.map(toRecipeTag);
 }
 
-function getRecipeVersions(recipeId: RecipeId, order: SortOrder = "ASC"): RecipeVersion[] {
+function getRecipeVersions(
+  recipeId: RecipeId,
+  order: SortOrder = "ASC",
+): RecipeVersion[] {
   const normalizedOrder: SortOrder = order === "DESC" ? "DESC" : "ASC";
 
   const versions = db
@@ -335,18 +336,41 @@ export function saveRecipeToDb(
   })();
 }
 
-export function getRecipesByUserId(userId: UserId): Recipe[] {
+export function getRecipesByUserId(
+  userId: UserId,
+  { page, pageSize }: GetRecipesByUserIdOptions,
+): PaginatedRecipesResult {
+  const offset = (page - 1) * pageSize;
+
+  const totalRow = db
+    .prepare(
+      `SELECT COUNT(*) as count
+      FROM recipes
+      WHERE user_id = ?`,
+    )
+    .get(userId) as CountRow | undefined;
+
+  const totalItems = totalRow?.count ?? 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
   const recipes = db
     .prepare(
       `SELECT id, title, created_at
        FROM recipes
        WHERE user_id = ?
-       ORDER BY created_at DESC`,
+       ORDER BY created_at DESC
+       LIMIT ? OFFSET ?`,
     )
-    .all(userId) as RecipeRow[];
+    .all(userId, pageSize, offset) as RecipeRow[];
 
   if (recipes.length === 0) {
-    return [];
+    return {
+      items: [],
+      page,
+      pageSize,
+      totalItems,
+      totalPages,
+    };
   }
 
   const recipeIds = recipes.map((recipe) => recipe.id);
@@ -383,13 +407,21 @@ export function getRecipesByUserId(userId: UserId): Recipe[] {
     tagsMap.set(tag.recipe_id, recipeTags);
   }
 
-  return recipes.map((recipe) => ({
+  const items = recipes.map((recipe) => ({
     id: recipe.id,
     title: recipe.title ?? "",
     created_at: recipe.created_at,
     versions: versionsMap.get(recipe.id) ?? [],
     tags: tagsMap.get(recipe.id) ?? [],
   }));
+
+  return {
+    items,
+    page,
+    pageSize,
+    totalItems,
+    totalPages,
+  };
 }
 
 export function getRecipeById(id: RecipeId, userId: UserId): Recipe | null {
@@ -452,7 +484,10 @@ export function deleteError(id: string | number, userId: UserId): boolean {
   return result.changes > 0;
 }
 
-export function deleteRecipeVersion(id: string | number, userId: UserId): boolean {
+export function deleteRecipeVersion(
+  id: string | number,
+  userId: UserId,
+): boolean {
   const version = db
     .prepare(
       `
@@ -461,7 +496,7 @@ export function deleteRecipeVersion(id: string | number, userId: UserId): boolea
     WHERE rv.id = ? AND r.user_id = ?
   `,
     )
-    .get(id, userId) as ExistingRecipeVersionRow | undefined;
+    .get(id, userId) as ExistingIdRow | undefined;
 
   if (!version) {
     return false;
@@ -560,11 +595,9 @@ export function updateRecipe(
         .get(userId, tag.name) as ExistingIdRow | undefined;
 
       if (existingTagByName) {
-        db.prepare(`UPDATE tags SET color = ? WHERE id = ? AND user_id = ?`).run(
-          tag.color,
-          existingTagByName.id,
-          userId,
-        );
+        db.prepare(
+          `UPDATE tags SET color = ? WHERE id = ? AND user_id = ?`,
+        ).run(tag.color, existingTagByName.id, userId);
         resolvedTagIds.push(existingTagByName.id);
         continue;
       }
@@ -606,7 +639,7 @@ export function addTagToRecipe(
 ): TagMutationResult {
   let tagRow = db
     .prepare(`SELECT * FROM tags WHERE user_id = ? AND name = ?`)
-    .get(userId, newTag.name) as ExistingTagRow | undefined;
+    .get(userId, newTag.name) as RecipeTagRow | undefined;
 
   if (!tagRow) {
     const result = db

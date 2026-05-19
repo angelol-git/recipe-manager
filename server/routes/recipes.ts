@@ -47,17 +47,28 @@ function requireUser(req: Request, res: Response): Express.UserPayload | null {
 }
 
 router.get("/", authMiddleware, async (req: Request, res: Response) => {
+
   const user = requireUser(req, res);
+
   if (!user) {
     return;
   }
+  const rawPage = req.query.page;
+  const rawPageSize = req.query.pageSize;
 
+const parsedPage = typeof rawPage === "string" ? Number.parseInt(rawPage, 10) : NaN;
+const parsedPageSize =
+  typeof rawPageSize === "string" ? Number.parseInt(rawPageSize, 10) : NaN;
+
+const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+const pageSize =
+  Number.isFinite(parsedPageSize) && parsedPageSize > 0 ? parsedPageSize : 8;
   try {
-    const recipes = getRecipesByUserId(user.id);
-    res.json(recipes);
+    const recipes = getRecipesByUserId(user.id, {page,pageSize});
+    return res.json(recipes);
   } catch (error) {
     console.error("DB error:", error);
-    res.status(500).json({ error: `DB error: ${String(error)}` });
+    return res.status(500).json({ error: `DB error: ${String(error)}` });
   }
 });
 

@@ -1,6 +1,6 @@
 import { Dispatch, FormEvent, RefObject, SetStateAction, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useRecipes } from "../../../hooks/useRecipes";
+import { useRecipeMutations } from "../../../hooks/useRecipes";
 import { useDraftRecipe } from "../../../hooks/useDraftRecipe";
 import EditTitle from "./EditTitle";
 import EditTags from "./EditTags";
@@ -28,7 +28,7 @@ function ChatEditModal({
 }: ChatEditModalProps) {
   const modalRef = useRef(null);
   const anchorStyle = useModalAnchor(anchorRef, isEditModalOpen);
-  const { updateRecipe } = useRecipes();
+  const { updateRecipe } = useRecipeMutations();
   const {
     draft,
     handleDraftString,

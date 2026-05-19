@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import UserOptions from "../components/UserOptions";
 import HomeTags from "../components/home/HomeTags";
 import HomeItems from "../components/home/HomeItems";
@@ -9,8 +9,17 @@ import { useTags } from "../hooks/useTags";
 import { useDeleteRecipe } from "../hooks/useDeleteRecipe";
 
 function Home() {
+  const [page, setPage] = useState(1);
   const { user, logout, isLoading: isUserLoading } = useUser();
-  const { data: recipes, isLoading: isRecipesLoading } = useRecipes();
+  const {
+    recipes,
+    pagination,
+    isLoading: isRecipesLoading,
+  } = useRecipes({
+    page,
+    pageSize: 8,
+  });
+
   const {
     uniqueTags,
     selectedTags,
@@ -44,6 +53,10 @@ function Home() {
     });
   });
 
+  useEffect(() => {
+    setPage(1);
+  }, [selectedTags]);
+
   return (
     <div className="text-primary bg-base flex min-h-screen flex-col items-center p-5 lg:p-10">
       <div className="flex w-full max-w-screen-lg flex-col gap-5">
@@ -65,6 +78,10 @@ function Home() {
           <HomeItems
             filteredRecipes={filteredRecipes}
             openDeleteModal={openDeleteModal}
+            page={page}
+            setPage={setPage}
+            totalPages={pagination?.totalPages ?? 0}
+            totalItems={pagination?.totalItems ?? 0}
           />
         </main>
       </div>

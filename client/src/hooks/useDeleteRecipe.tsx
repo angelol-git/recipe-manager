@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { useRecipes } from "./useRecipes";
+import { useRecipeMutations } from "./useRecipes";
 import type { Recipe } from "../types/recipe";
 
 type DeleteType = "version" | "all";
@@ -26,7 +26,7 @@ export function useDeleteRecipe(
   { getRedirectPath = () => "/" }: UseDeleteRecipeOptions = {},
 ) {
   const navigate = useNavigate();
-  const { deleteRecipe, deleteRecipeVersion } = useRecipes();
+  const { deleteRecipe, deleteRecipeVersion } = useRecipeMutations();
 
   const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
     isOpen: false,
