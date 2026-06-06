@@ -49,7 +49,7 @@ function DeletePortal({ recipe, type, onClose, onDelete }: DeletePortalProps) {
           <div>
             This will
             <span className="font-bold">
-              permanently delete {recipe?.title} and all recipe versions.
+              &nbsp;permanently delete {recipe?.title} and all recipe versions.
             </span>
           </div>
         )}
