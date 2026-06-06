@@ -101,11 +101,11 @@ const ChatSideBar = memo(
           className="w-full"
         >
           <Link
-            to="/chat"
+            to="/kitchen"
             className="hover:bg-mantle-hover flex items-center gap-2 rounded-lg p-2 duration-150"
           >
             <CirclePlus size={18} strokeWidth={1.5} className="stroke-icon" />
-            New Chat
+            New Recipe
           </Link>
         </button>
         <div className="flex min-h-0 flex-1 flex-col gap-1">

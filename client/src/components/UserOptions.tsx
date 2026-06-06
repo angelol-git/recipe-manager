@@ -139,7 +139,7 @@ function UserOptions({
                   Sign in to save your recipes
                 </p>
                 <p className="text-secondary text-sm">
-                  Sync your chats and recipe history.
+                  Sync your recipe workspace and history.
                 </p>
               </div>
               <div className="bg-base w-full rounded-lg">

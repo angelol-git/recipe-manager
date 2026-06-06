@@ -29,7 +29,7 @@ const SideBarItem = memo(
 
     return (
       <Link
-        to={`/chat/${recipe.id}`}
+        to={`/kitchen/${recipe.id}`}
         state={{ recipe }}
         onClick={() => {
           if (isMobile) {

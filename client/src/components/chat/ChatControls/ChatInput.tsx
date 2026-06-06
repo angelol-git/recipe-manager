@@ -125,7 +125,7 @@ const ChatInput = memo((props: ChatInputProps) => {
         if (!isActiveRef.current) return;
 
         if (isNewChat) {
-          navigate(`/chat/${result.reply.id}`);
+          navigate(`/kitchen/${result.reply.id}`);
         }
       } catch (err) {
         // console.log(err);
@@ -176,7 +176,7 @@ const ChatInput = memo((props: ChatInputProps) => {
             }
           }}
           className="text-icon-muted hover:bg-overlay0/50 absolute top-3 right-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors duration-150"
-          aria-label="Minimize chat"
+          aria-label="Minimize recipe assistant"
         >
           <Minimize2 size={16} strokeWidth={1.5} className="stroke-current" />
         </button>
@@ -250,12 +250,12 @@ const ChatInput = memo((props: ChatInputProps) => {
           props.setIsChatOpen(true);
         }
       }}
-      aria-label="Open chat"
+      aria-label="Open recipe assistant"
     >
       <span className="bg-accent flex h-9 w-9 items-center justify-center rounded-full text-white">
         <MessageCircleMore size={20} strokeWidth={1.5} />
       </span>
-      <span className="pr-1 text-sm font-medium">Open chat</span>
+      <span className="pr-1 text-sm font-medium">Open assistant</span>
     </button>
   );
 });

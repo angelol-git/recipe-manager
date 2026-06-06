@@ -3,7 +3,7 @@ import {
   sendCreateMessage,
   type CreateMessagePayload,
   type CreateMessageResponse,
-} from "../api/chat";
+} from "../api/kitchen";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage";
 import { useUser } from "./useUser";
 import type { Recipe } from "../types/recipe";

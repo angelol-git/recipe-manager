@@ -1,6 +1,6 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useChat } from "./useChat";
-import { sendCreateMessage } from "../api/chat";
+import { sendCreateMessage } from "../api/kitchen";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage";
 import type { Recipe } from "../types/recipe";
 import { createQueryClientWrapper } from "../test/queryClient";
@@ -8,7 +8,7 @@ import { createQueryClientWrapper } from "../test/queryClient";
 const mockShowToast = vi.fn();
 const mockUseUser = vi.fn();
 
-vi.mock("../api/chat", () => ({
+vi.mock("../api/kitchen", () => ({
   sendCreateMessage: vi.fn(),
 }));
 

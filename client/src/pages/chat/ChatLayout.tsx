@@ -42,7 +42,7 @@ const ChatLayout = () => {
           isDeletingActiveRecipe &&
           (type === "all" || isDeletingLastVersion)
         ) {
-          return "/chat";
+          return "/kitchen";
         }
 
         return null;

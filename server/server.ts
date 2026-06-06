@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import authRoutes from "./routes/auth.js";
 import recipeRoutes from "./routes/recipes.js";
-import chatRoutes from "./routes/chat.js";
+import kitchenRoutes from "./routes/kitchen.js";
 import tagRoutes from "./routes/tags.js";
 import cookieParser from "cookie-parser";
 import type { ErrorRequestHandler } from "express";
@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/tags", tagRoutes);
-app.use("/api/chat", chatRoutes);
+app.use("/api/kitchen", kitchenRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });

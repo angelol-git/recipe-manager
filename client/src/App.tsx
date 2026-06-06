@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router";
+import { Navigate, Routes, Route, useParams } from "react-router";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import ChatLayout from "./pages/chat/ChatLayout";
@@ -31,7 +31,7 @@ function App() {
       <ToastProvider>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/chat" element={<ChatLayout />}>
+          <Route path="/kitchen" element={<ChatLayout />}>
             <Route index element={<NewChat />} />
             <Route path=":id" element={<Chat />} />
           </Route>

@@ -31,7 +31,7 @@ function HomeRecipeCard({ recipe, openDeleteModal }: HomeRecipeCardProps) {
   }
   return (
     <Link
-      to={`/chat/${recipe.id}`}
+      to={`/kitchen/${recipe.id}`}
       key={recipe.id}
       className="group relative h-[250px] w-full cursor-pointer md:h-[275px] md:w-[230px] md:flex-shrink-0"
     >

@@ -5,7 +5,7 @@ AI-powered recipe app for importing, organizing, editing, and generating recipes
 ## Features
 
 - Import recipes from URLs with scraping and AI parsing
-- Generate or modify recipes through AI chat
+- Generate or refine recipes through a cooking assistant
 - Edit ingredients and instructions with drag-and-drop reordering
 - Organize recipes with custom color-coded tags
 - Sign in with Google to save recipes across sessions

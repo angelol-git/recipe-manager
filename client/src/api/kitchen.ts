@@ -1,7 +1,7 @@
 import API_BASE_URL from "../config/api";
 import type { Recipe, RecipeVersion } from "../types/recipe";
 
-const backendUrl = `${API_BASE_URL}/chat`;
+const backendUrl = `${API_BASE_URL}/kitchen`;
 
 export type CreateMessagePayload = {
   message: string;

@@ -3,7 +3,7 @@ import { performance } from "node:perf_hooks";
 
 function parseArgs(argv) {
   const options = {
-    url: "http://localhost:8080/api/chat/create",
+    url: "http://localhost:8080/api/kitchen/create",
     iterations: 2,
     concurrency: 1,
     message: `* 1 and 3/4 cups (219g) all-purpose flour (spoon & leveled)
