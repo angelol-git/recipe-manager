@@ -21,7 +21,7 @@ export type ParsedAiRecipe = AiRecipe & {
   ai_model: string;
   source_prompt: string;
   relation?: "reply" | "fork";
-  versionId?: number | bigint;
+  versionId?: string;
 };
 
 type AiValidationErrorType =
@@ -44,7 +44,9 @@ export type AiValidationMeta = {
   issues?: AiValidationIssue[];
 };
 
-type GenerateResponseResult = Awaited<ReturnType<typeof genAI.models.generateContent>>;
+type GenerateResponseResult = Awaited<
+  ReturnType<typeof genAI.models.generateContent>
+>;
 
 export function getModelName(): string {
   return model;
@@ -72,18 +74,6 @@ export async function generateResponse(
       temperature: 0.7,
     },
   });
-}
-
-function extractTextParts(response: GenerateResponseResult): string {
-  if (!Array.isArray(response?.candidates)) {
-    return "";
-  }
-
-  return response.candidates
-    .flatMap((candidate) => candidate?.content?.parts ?? [])
-    .map((part) => (typeof part?.text === "string" ? part.text : ""))
-    .join("")
-    .trim();
 }
 
 export function validateAiResponse(
@@ -174,62 +164,65 @@ export function createPrompt(
   recipeVersion: unknown = {},
   urlContent: unknown = {},
 ): string {
+  const serializedRecipeVersion = JSON.stringify(recipeVersion ?? null);
+  const serializedUrlContent =
+    typeof urlContent === "string"
+      ? urlContent
+      : urlContent
+        ? JSON.stringify(urlContent)
+        : "None";
+
   return `
-    Parse the culinary input into a single JSON object matching the provided response schema.
+    Return exactly one JSON object that matches the response schema.
 
-    Role: Expert culinary data engineer and nutritionist.
+    Role: expert recipe editor, importer, and nutrition-aware cooking assistant.
 
-    Primary task classification:
-    - First classify the input as exactly one of:
-      1. new_recipe_request
-      2. recipe_modification
-      3. recipe_url_import
-      4. unrelated_or_insufficient
-    - Only produce a populated recipe when the input clearly belongs to 1, 2, or 3.
-    - If there is any reasonable doubt, classify it as unrelated_or_insufficient.
+    Decide whether the input is:
+    - a new recipe request,
+    - a modification of Current State,
+    - a recipe import from Extracted Web Data,
+    - or unrelated / too weak to support a recipe.
 
-    Rules:
-    - Preserve the original recipe's primary measurement style whenever possible.
-    - For ingredient lines, dual units are the default expectation whenever the ingredient uses a measurable weight or volume. Format them as primary unit first, then the converted secondary unit in parentheses. Examples: "8 oz (225 g) butter", "1 cup (240 ml) milk", "1 lb (450 g) chicken", "2 tbsp (30 ml) olive oil".
-    - When parsing an imported recipe from the original source, preserve the source unit first and add the converted secondary unit in parentheses when the source uses weight or volume and does not already include a useful dual unit.
-    - When modifying, converting, scaling, or otherwise regenerating an existing recipe, keep or update ingredient quantities in dual-unit form for all weight- and volume-based ingredients instead of returning only one unit system.
-    - Do not remove a useful existing secondary unit. If the source already includes dual units, preserve them unless scaling or substitution requires updating them.
-    - Use rounded kitchen-friendly equivalents for the secondary unit, while keeping the primary quantity practical for cooks.
-    - Count-based ingredients that do not need conversion, such as "2 eggs", "3 garlic cloves", or "1 onion", do not need a parenthetical second unit unless the conversion is genuinely useful.
-    - Do not add a second unit when it would be misleading, overly precise, or unnatural for cooks, but for standard liquids, powders, dairy, fats, grains, sugars, meats, and produce sold by weight or volume, include dual units by default.
-    - If URL data is provided, prioritize structured recipe data such as JSON-LD or recipe schema.
-    - Return only valid JSON. No markdown. No conversational filler.
-    - The title must be 150 characters or fewer.
-    - Do not guess the user's intent from vague, short, generic, or placeholder text.
+    If the input is unrelated, ambiguous, placeholder text, or not clearly about recipes or cooking, return:
+    {"title":"","description":"","ingredients":[],"instructions":[],"servings":null,"calories":null,"total_time":null}
+
+    Core rules:
     - Do not invent a recipe just to satisfy the schema.
-
-    Modification handling:
-    - If Current State is provided, determine whether the user wants a modification or a new recipe.
-    - Treat scaling, substitutions, dietary changes, flavor changes, and method changes as modifications unless the prompt clearly asks for a new recipe.
-    - For scaling, adjust all ingredient quantities proportionally using: new servings / original servings.
-    - Keep calories per serving constant when only scaling servings.
-    - When scaling, recalculate total_time based on realistic elapsed cooking time, not a direct servings multiplier.
-    - Scaling usually changes prep time more than cook time. Passive oven, simmering, resting, chilling, and marinating time often stays the same.
-    - Only increase cook time when the larger quantity would realistically need longer to heat through, brown, reduce, or cook in multiple batches. When that happens, increase time modestly and conservatively.
-    - If the scaled recipe would no longer fit in the same pot, pan, tray, or air fryer basket, account for extra batch or round time instead of simply multiplying the full recipe time.
-    - Do not leave total_time unchanged by default when scaling. Re-estimate it from the method and equipment constraints.
+    - Return JSON only. No markdown or extra text.
+    - Keep title at 150 characters or fewer.
     - Preserve the recipe's core identity unless the user explicitly asks to change it.
-    - Update the title and description when a major modification was made.
+    - If Extracted Web Data contains structured recipe data, prefer it over weaker page text.
 
-    Relevancy guardrail:
-    - If the user prompt is gibberish or unrelated to recipes, cooking, food, ingredients, or culinary topics, return an empty recipe with:
-      title = ""
-      description = ""
-      ingredients = []
-      instructions = []
-      servings = null
-      calories = null
-      total_time = null
-    - Also return the same empty recipe when the input is too weak to support a recipe request, including examples like:
-      "test", "hello", "hi", "hey", "what's up", "asdf", "random", "123", or other short placeholder text.
-    - A valid new recipe request should clearly mention a dish, ingredient, cuisine, cooking goal, dietary preference, meal type, or recipe intent.
-    - A valid recipe modification should clearly refer to changing the Current State.
-    - Never convert unrelated or ambiguous text into a plausible recipe.
+    Ingredient rules:
+    - Every ingredient must be a structured object matching the schema.
+    - raw_text is the full display line.
+    - ingredient_name is only the ingredient name, without quantity, unit, or trailing notes.
+    - quantity_text and unit describe the primary quantity shown in raw_text.
+    - alternate_quantity_text and alternate_unit describe the secondary quantity in parentheses when present.
+    - quantity_value and alternate_quantity_value are numeric when practical, otherwise null.
+    - note captures trailing preparation or qualifier text; otherwise null.
+    - Use null, not empty strings, for missing optional fields.
+    - is_optional is true only when explicitly optional.
+
+    Instruction rules:
+    - Every instruction must be a structured object matching the schema.
+    - raw_text is the full human-readable instruction step as it should be displayed in the UI.
+    - Do not split a single instruction across multiple objects unless the recipe truly has multiple distinct steps.
+
+    Measurement rules:
+    - Preserve the source recipe's primary measurement style whenever practical.
+    - For measurable weight or volume-based ingredients, prefer dual units with the primary unit first and a rounded secondary unit in parentheses.
+    - Keep useful existing dual units when importing or modifying.
+    - Count-based ingredients usually do not need a secondary unit.
+    - Use "tsp" and "tbsp" instead of spelling them out.
+
+    Modification and scaling:
+    - If Current State exists, treat scaling, substitutions, dietary changes, flavor changes, and method changes as modifications unless the user clearly asks for a new recipe.
+    - Scale ingredient quantities proportionally.
+    - When only scaling servings, keep calories per serving constant.
+    - Re-estimate total_time realistically. Prep time may change more than cook time; passive cooking time often does not.
+    - Account for extra batches when larger volume would not fit the same equipment.
+    - Update title and description when the modification is substantial.
 
     Missing data:
     - Infer servings if missing.
@@ -238,8 +231,8 @@ export function createPrompt(
 
     Context:
     User Prompt: "${prompt}"
-    Extracted Web Data: ${urlContent || "None"}
-    Current State: ${JSON.stringify(recipeVersion)}
+    Extracted Web Data: ${serializedUrlContent}
+    Current State: ${serializedRecipeVersion}
   `;
 }
 
@@ -268,4 +261,16 @@ export function askPrompt(currentVersion: unknown, question: string): string {
 
     User question: "${question}"
     `;
+}
+
+function extractTextParts(response: GenerateResponseResult): string {
+  if (!Array.isArray(response?.candidates)) {
+    return "";
+  }
+
+  return response.candidates
+    .flatMap((candidate) => candidate?.content?.parts ?? [])
+    .map((part) => (typeof part?.text === "string" ? part.text : ""))
+    .join("")
+    .trim();
 }

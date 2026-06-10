@@ -20,10 +20,34 @@ const recipeDetailsSchema = z.object({
   calories: z.number().int().min(0).optional().nullable(),
 });
 
+const recipeIngredientSchema = z.object({
+  id: z.string(),
+  position: z.number().int().min(1),
+  raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+  ingredient_name: z
+    .string()
+    .transform((s) => s.trim())
+    .pipe(z.string().min(1)),
+  quantity_value: z.number().optional().nullable(),
+  quantity_text: z.string().optional().nullable(),
+  unit: z.string().optional().nullable(),
+  alternate_quantity_value: z.number().optional().nullable(),
+  alternate_quantity_text: z.string().optional().nullable(),
+  alternate_unit: z.string().optional().nullable(),
+  note: z.string().optional().nullable(),
+  is_optional: z.boolean().default(false),
+});
+
+const recipeInstructionSchema = z.object({
+  id: z.string(),
+  position: z.number().int().min(1),
+  raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+});
+
 export const updateRecipeSchema = z.object({
   body: z.object({
     updatedRecipe: z.object({
-      id: z.union([z.string(), z.number()]),
+      id: z.string(),
       title: z
         .string()
         .min(1)
@@ -36,14 +60,13 @@ export const updateRecipeSchema = z.object({
         .transform((s) => s.trim())
         .optional()
         .nullable(),
-      instructions: z
-        .array(z.string())
-        .min(1)
-        .transform((arr) => arr.map((s) => s.trim())),
-      ingredients: z
-        .array(z.string())
-        .min(1)
-        .transform((arr) => arr.map((s) => s.trim())),
+      instructions: z.array(recipeInstructionSchema).min(1),
+      ingredients: z.array(recipeIngredientSchema).min(1),
+      source_prompt: z
+        .string()
+        .transform((s) => s.trim())
+        .optional()
+        .default(""),
       tags: z.array(tagSchema).optional().default([]),
     }),
   }),
