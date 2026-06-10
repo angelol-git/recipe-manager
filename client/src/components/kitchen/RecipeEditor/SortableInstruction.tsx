@@ -3,23 +3,23 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { X, GripVertical } from "lucide-react";
 import type {
-  DraftArrayEditorProps,
   DraftTextItem,
+  DraftInstructionEditorProps,
 } from "../../../types/draftRecipe";
 
 type SortableInstructionProps = {
   id: DraftTextItem["id"];
   index: number;
   instruction: DraftTextItem;
-  handleDraftArrayUpdate: DraftArrayEditorProps["handleDraftArrayUpdate"];
-  handleDraftArrayDelete: DraftArrayEditorProps["handleDraftArrayDelete"];
+  handleDraftInstructionUpdate: DraftInstructionEditorProps["handleDraftInstructionUpdate"];
+  handleDraftArrayDelete: DraftInstructionEditorProps["handleDraftArrayDelete"];
 };
 
 function SortableInstruction({
   id,
   index,
   instruction,
-  handleDraftArrayUpdate,
+  handleDraftInstructionUpdate,
   handleDraftArrayDelete,
 }: SortableInstructionProps) {
   const {
@@ -74,14 +74,14 @@ function SortableInstruction({
         </div>
         <textarea
           className="text-primary w-full resize-none overflow-hidden bg-transparent leading-relaxed outline-none"
-          value={instruction.text}
+          value={instruction.raw_text}
           rows={1}
           aria-label={`Instruction step ${index + 1}`}
           onChange={(event) => {
             const el = event.target;
             el.style.height = "auto";
             el.style.height = `${el.scrollHeight}px`;
-            handleDraftArrayUpdate("instructions", event.target.value, index);
+            handleDraftInstructionUpdate(event.target.value, index);
           }}
           ref={(el) => {
             if (el) {

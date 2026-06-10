@@ -14,8 +14,48 @@ function createRecipe(overrides: Partial<Recipe> = {}): Recipe {
       {
         id: "version-1",
         description: "Original version",
-        ingredients: ["pasta", "salt"],
-        instructions: ["Boil water", "Cook pasta"],
+        ingredients: [
+          {
+            id: "ingredient-recipe-1-0",
+            position: 1,
+            raw_text: "pasta",
+            ingredient_name: "pasta",
+            quantity_value: null,
+            quantity_text: null,
+            unit: null,
+            alternate_quantity_value: null,
+            alternate_quantity_text: null,
+            alternate_unit: null,
+            note: null,
+            is_optional: false,
+          },
+          {
+            id: "ingredient-recipe-1-1",
+            position: 2,
+            raw_text: "salt",
+            ingredient_name: "salt",
+            quantity_value: null,
+            quantity_text: null,
+            unit: null,
+            alternate_quantity_value: null,
+            alternate_quantity_text: null,
+            alternate_unit: null,
+            note: null,
+            is_optional: false,
+          },
+        ],
+        instructions: [
+          {
+            id: "instruction-recipe-1-0",
+            position: 1,
+            raw_text: "Boil water",
+          },
+          {
+            id: "instruction-recipe-1-1",
+            position: 2,
+            raw_text: "Cook pasta",
+          },
+        ],
         recipeDetails: {
           calories: null,
           servings: 2,
@@ -26,8 +66,48 @@ function createRecipe(overrides: Partial<Recipe> = {}): Recipe {
       {
         id: "version-2",
         description: "Updated version",
-        ingredients: ["pasta", "olive oil"],
-        instructions: ["Heat pan", "Toss pasta"],
+        ingredients: [
+          {
+            id: "ingredient-recipe-1-0",
+            position: 1,
+            raw_text: "pasta",
+            ingredient_name: "pasta",
+            quantity_value: null,
+            quantity_text: null,
+            unit: null,
+            alternate_quantity_value: null,
+            alternate_quantity_text: null,
+            alternate_unit: null,
+            note: null,
+            is_optional: false,
+          },
+          {
+            id: "ingredient-recipe-1-1",
+            position: 2,
+            raw_text: "olive oil",
+            ingredient_name: "olive oil",
+            quantity_value: null,
+            quantity_text: null,
+            unit: null,
+            alternate_quantity_value: null,
+            alternate_quantity_text: null,
+            alternate_unit: null,
+            note: null,
+            is_optional: false,
+          },
+        ],
+        instructions: [
+          {
+            id: "instruction-recipe-1-0",
+            position: 1,
+            raw_text: "Heat pan",
+          },
+          {
+            id: "instruction-recipe-1-1",
+            position: 2,
+            raw_text: "Toss pasta",
+          },
+        ],
         recipeDetails: {
           calories: 450,
           servings: 4,
@@ -61,12 +141,30 @@ describe("useDraftRecipe", () => {
       tags: recipe.tags,
       description: "Updated version",
       ingredients: [
-        { id: "ingredient-recipe-1-0", text: "pasta" },
-        { id: "ingredient-recipe-1-1", text: "olive oil" },
+        expect.objectContaining({
+          id: "ingredient-recipe-1-0",
+          raw_text: "pasta",
+          ingredient_name: "pasta",
+          position: 1,
+        }),
+        expect.objectContaining({
+          id: "ingredient-recipe-1-1",
+          raw_text: "olive oil",
+          ingredient_name: "olive oil",
+          position: 2,
+        }),
       ],
       instructions: [
-        { id: "instruction-recipe-1-0", text: "Heat pan" },
-        { id: "instruction-recipe-1-1", text: "Toss pasta" },
+        {
+          id: "instruction-recipe-1-0",
+          position: 1,
+          raw_text: "Heat pan",
+        },
+        {
+          id: "instruction-recipe-1-1",
+          position: 2,
+          raw_text: "Toss pasta",
+        },
       ],
       recipeDetails: {
         calories: 450,
@@ -175,7 +273,7 @@ describe("useDraftRecipe", () => {
     const ingredients = result.current.draft?.ingredients ?? [];
 
     act(() => {
-      result.current.handleDraftArrayUpdate("instructions", "Dice onions", 0);
+      result.current.handleDraftInstructionUpdate("Dice onions", 0);
       result.current.handleDraftArrayPush("instructions", "Dice Tomatoes");
       result.current.handleDraftArrayDelete("instructions", 1);
       result.current.handleDraftArrayReorder("ingredients", [
@@ -185,14 +283,23 @@ describe("useDraftRecipe", () => {
     });
 
     expect(result.current.draft?.instructions).toEqual([
-      expect.objectContaining({ text: "Dice onions" }),
-      expect.objectContaining({ text: "Dice Tomatoes" }),
-      expect.objectContaining({ text: "sea salt" }),
+      expect.objectContaining({ raw_text: "Dice onions", position: 1 }),
+      expect.objectContaining({ raw_text: "Dice Tomatoes", position: 2 }),
     ]);
 
     expect(result.current.draft?.ingredients).toEqual([
-      { id: "ingredient-recipe-1-1", text: "salt" },
-      { id: "ingredient-recipe-1-0", text: "pasta" },
+      expect.objectContaining({
+        id: "ingredient-recipe-1-1",
+        raw_text: "salt",
+        ingredient_name: "salt",
+        position: 1,
+      }),
+      expect.objectContaining({
+        id: "ingredient-recipe-1-0",
+        raw_text: "pasta",
+        ingredient_name: "pasta",
+        position: 2,
+      }),
     ]);
   });
 });

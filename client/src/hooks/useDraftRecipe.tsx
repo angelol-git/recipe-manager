@@ -4,6 +4,7 @@ import type { EditableTag } from "../types/tag";
 import type { Recipe, RecipeDetails } from "../types/recipe";
 import type {
   DraftArrayField,
+  DraftIngredient,
   DraftRecipe,
   DraftStringField,
   DraftTextItem,
@@ -32,17 +33,11 @@ export function useDraftRecipe({
     const currentVersion = recipe.versions[recipeVersion];
     if (!currentVersion) return;
 
-    const instructionsWithIds = currentVersion.instructions.map(
-      (text, index: number) => ({
-        id: `instruction-${recipe.id}-${index}`,
-        text,
-      }),
-    );
-
     const ingredientsWithIds = currentVersion.ingredients.map(
-      (text, index: number) => ({
-        id: `ingredient-${recipe.id}-${index}`,
-        text,
+      (ingredient): DraftIngredient => ({
+        ...ingredient,
+        id: ingredient.id,
+        position: ingredient.position,
       }),
     );
 
@@ -54,7 +49,7 @@ export function useDraftRecipe({
       ...currentVersion,
       description: currentVersion.description || "",
       recipeDetails: currentVersion.recipeDetails || {},
-      instructions: instructionsWithIds,
+      instructions: currentVersion.instructions,
       ingredients: ingredientsWithIds,
     };
 
@@ -168,25 +163,33 @@ export function useDraftRecipe({
     });
   }
 
-  function handleDraftArrayUpdate(
-    field: DraftArrayField,
-    value: string,
-    targetIndex: number,
-  ) {
+  function handleDraftInstructionUpdate(value: string, targetIndex: number) {
     setDraft((prev) => {
       if (!prev) return prev;
 
       return {
         ...prev,
-        [field]: (prev[field] || []).map((item, index) => {
-          if (targetIndex === index) {
-            if (field === "instructions" || field === "ingredients") {
-              return { ...item, text: value };
-            }
-            return value;
-          } else {
-            return item;
-          }
+        instructions: (prev.instructions || []).map((item, index) => {
+          return targetIndex === index ? { ...item, raw_text: value } : item;
+        }),
+      };
+    });
+  }
+
+  function handleDraftIngredientUpdate(value: string, targetIndex: number) {
+    setDraft((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        ingredients: (prev.ingredients || []).map((item, index) => {
+          return targetIndex === index
+            ? {
+                ...item,
+                raw_text: value,
+                ingredient_name: value.trim() || item.ingredient_name,
+              }
+            : item;
         }),
       };
     });
@@ -194,30 +197,58 @@ export function useDraftRecipe({
 
   function handleDraftArrayReorder(
     field: DraftArrayField,
-    reorderedArray: DraftTextItem[],
+    reorderedArray: DraftTextItem[] | DraftIngredient[],
   ) {
     setDraft((prev) => {
       if (!prev) return prev;
 
       return {
         ...prev,
-        [field]: reorderedArray,
+        [field]:
+          field === "ingredients" || field === "instructions"
+            ? reorderedArray.map((item, index) => ({
+                ...item,
+                position: index + 1,
+              }))
+            : reorderedArray,
       };
     });
   }
 
+  //To Do: Update the edit form to handle new ingredient
   function handleDraftArrayPush(field: DraftArrayField, newValue: string) {
     setDraft((prev) => {
       if (!prev) return prev;
 
-      if (field === "instructions" || field === "ingredients") {
+      if (field === "instructions") {
         const newItem = {
           id: `${field.slice(0, -1)}-${prev.recipe_id}-${Date.now()}`,
-          text: newValue,
+          position: (prev.instructions || []).length + 1,
+          raw_text: newValue,
         };
         return {
           ...prev,
           [field]: [...(prev[field] || []), newItem],
+        };
+      }
+      if (field === "ingredients") {
+        const newItem: DraftIngredient = {
+          id: `ingredient-${prev.recipe_id}-${Date.now()}`,
+          position: (prev.ingredients || []).length + 1,
+          raw_text: newValue,
+          ingredient_name: newValue.trim(),
+          quantity_value: null,
+          quantity_text: null,
+          unit: null,
+          alternate_quantity_value: null,
+          alternate_quantity_text: null,
+          alternate_unit: null,
+          note: null,
+          is_optional: false,
+        };
+        return {
+          ...prev,
+          ingredients: [...(prev.ingredients || []), newItem],
         };
       }
       return {
@@ -231,11 +262,19 @@ export function useDraftRecipe({
     setDraft((prev) => {
       if (!prev) return prev;
 
+      const nextItems = (prev[field] || []).filter((item, index) => {
+        return index !== targetIndex;
+      });
+
       return {
         ...prev,
-        [field]: (prev[field] || []).filter((item, index) => {
-          return index !== targetIndex;
-        }),
+        [field]:
+          field === "ingredients" || field === "instructions"
+            ? nextItems.map((item, index) => ({
+                ...item,
+                position: index + 1,
+              }))
+            : nextItems,
       };
     });
   }
@@ -248,7 +287,8 @@ export function useDraftRecipe({
     handleDraftTagColor,
     handleDraftTagDelete,
     handleDraftTagAdd,
-    handleDraftArrayUpdate,
+    handleDraftInstructionUpdate,
+    handleDraftIngredientUpdate,
     handleDraftArrayDelete,
     handleDraftArrayPush,
     handleDraftArrayReorder,

@@ -1,10 +1,15 @@
-import type { Recipe, RecipeDetails, RecipeVersion } from "./recipe";
+import type {
+  Recipe,
+  RecipeDetails,
+  RecipeIngredient,
+  RecipeInstruction,
+  RecipeVersion,
+} from "./recipe";
 import type { EditableTag } from "./tag";
 
-export type DraftTextItem = {
-  id: string;
-  text: string;
-};
+export type DraftTextItem = RecipeInstruction;
+
+export type DraftIngredient = RecipeIngredient;
 
 export type DraftArrayField = "instructions" | "ingredients";
 
@@ -19,27 +24,24 @@ export type DraftRecipe = {
   description: RecipeVersion["description"];
   recipeDetails: RecipeDetails;
   instructions: DraftTextItem[];
-  ingredients: DraftTextItem[];
+  ingredients: DraftIngredient[];
   source_prompt: RecipeVersion["source_prompt"];
 };
 
 export type DraftArrayEditorProps = {
   draft: DraftRecipe | null;
-  handleDraftArrayUpdate: (
-    field: DraftArrayField,
-    value: string,
-    targetIndex: number,
-  ) => void;
-  handleDraftArrayDelete: (
-    field: DraftArrayField,
-    targetIndex: number,
-  ) => void;
-  handleDraftArrayPush: (
-    field: DraftArrayField,
-    newValue: string,
-  ) => void;
+  handleDraftArrayDelete: (field: DraftArrayField, targetIndex: number) => void;
+  handleDraftArrayPush: (field: DraftArrayField, newValue: string) => void;
   handleDraftArrayReorder: (
     field: DraftArrayField,
-    reorderedArray: DraftTextItem[],
+    reorderedArray: DraftTextItem[] | DraftIngredient[],
   ) => void;
+};
+
+export type DraftInstructionEditorProps = DraftArrayEditorProps & {
+  handleDraftInstructionUpdate: (value: string, targetIndex: number) => void;
+};
+
+export type DraftIngredientEditorProps = DraftArrayEditorProps & {
+  handleDraftIngredientUpdate: (value: string, targetIndex: number) => void;
 };

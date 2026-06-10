@@ -7,15 +7,18 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDraftSortableList } from "../../../hooks/useDraftSortableList";
-import type { DraftArrayEditorProps } from "../../../types/draftRecipe";
+import type { DraftIngredientEditorProps } from "../../../types/draftRecipe";
 
+/*
+ * TO DO: Need to update ingredients form to support new structure
+ */
 function EditIngredients({
   draft,
-  handleDraftArrayUpdate,
+  handleDraftIngredientUpdate,
   handleDraftArrayDelete,
   handleDraftArrayPush,
   handleDraftArrayReorder,
-}: DraftArrayEditorProps) {
+}: DraftIngredientEditorProps) {
   const ingredients = draft?.ingredients || [];
   const [isAddingIngredient, setIsAddingIngredient] = useState(false);
   const [newIngredient, setNewIngredient] = useState("");
@@ -77,7 +80,7 @@ function EditIngredients({
                 index={index}
                 ingredient={ingredient}
                 handleDraftArrayDelete={handleDraftArrayDelete}
-                handleDraftArrayUpdate={handleDraftArrayUpdate}
+                handleDraftIngredientUpdate={handleDraftIngredientUpdate}
               />
             ))}
             {isAddingIngredient && (

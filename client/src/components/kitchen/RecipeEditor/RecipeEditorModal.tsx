@@ -37,7 +37,8 @@ function RecipeEditorModal({
     handleDraftTagColor,
     handleDraftTagDelete,
     handleDraftTagAdd,
-    handleDraftArrayUpdate,
+    handleDraftInstructionUpdate,
+    handleDraftIngredientUpdate,
     handleDraftArrayDelete,
     handleDraftArrayPush,
     handleDraftArrayReorder,
@@ -51,7 +52,6 @@ function RecipeEditorModal({
     event.preventDefault();
     if (!draft) return;
 
-    // Convert instructions from objects back to strings for saving
     const recipeToSave: UpdateRecipeInput = {
       id: draft.id,
       recipe_id: draft.recipe_id,
@@ -60,8 +60,8 @@ function RecipeEditorModal({
       description: draft.description,
       recipeDetails: draft.recipeDetails,
       source_prompt: draft.source_prompt,
-      instructions: (draft.instructions || []).map((item) => item.text),
-      ingredients: (draft.ingredients || []).map((item) => item.text),
+      instructions: draft.instructions || [],
+      ingredients: draft.ingredients || [],
     };
     updateRecipe(recipeToSave);
     setIsEditModalOpen(false);
@@ -116,14 +116,14 @@ function RecipeEditorModal({
             />
             <EditIngredients
               draft={draft}
-              handleDraftArrayUpdate={handleDraftArrayUpdate}
+              handleDraftIngredientUpdate={handleDraftIngredientUpdate}
               handleDraftArrayDelete={handleDraftArrayDelete}
               handleDraftArrayPush={handleDraftArrayPush}
               handleDraftArrayReorder={handleDraftArrayReorder}
             />
             <EditInstructions
               draft={draft}
-              handleDraftArrayUpdate={handleDraftArrayUpdate}
+              handleDraftInstructionUpdate={handleDraftInstructionUpdate}
               handleDraftArrayDelete={handleDraftArrayDelete}
               handleDraftArrayPush={handleDraftArrayPush}
               handleDraftArrayReorder={handleDraftArrayReorder}

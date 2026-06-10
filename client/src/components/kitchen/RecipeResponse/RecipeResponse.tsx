@@ -1,7 +1,11 @@
 import { useState, memo, RefObject } from "react";
 import RecipePromptModal from "./RecipePromptModal";
 import RecipeDetailsBar from "./RecipeDetailsBar";
-import type { Recipe, RecipeDetails } from "../../../types/recipe";
+import type {
+  Recipe,
+  RecipeDetails,
+  RecipeIngredient,
+} from "../../../types/recipe";
 
 const EMPTY_RECIPE_DETAILS: RecipeDetails = {
   calories: null,
@@ -14,6 +18,53 @@ type RecipeResponseProps = {
   recipeVersion: number;
   modalAnchorRef: RefObject<HTMLDivElement | null>;
 };
+
+function renderIngredient(ingredient: RecipeIngredient) {
+  const hasPrimaryMeasurement =
+    ingredient.quantity_text != null || ingredient.quantity_value != null;
+
+  const hasAlternateMeasurement =
+    ingredient.alternate_quantity_text != null ||
+    ingredient.alternate_quantity_value != null;
+
+  return (
+    <div className="grid grid-cols-[90px_1fr] items-start gap-1">
+      <div className="flex flex-col">
+        {hasPrimaryMeasurement && (
+          <span>
+            <span>
+              {ingredient.quantity_text ??
+                ingredient.quantity_value?.toString()}
+            </span>
+            {ingredient.unit && <span className="ml-1">{ingredient.unit}</span>}
+          </span>
+        )}
+        {hasAlternateMeasurement && (
+          <div className="text-secondary text-xs">
+            <span>(</span>
+            <span>
+              {ingredient.alternate_quantity_text ??
+                ingredient.alternate_quantity_value?.toString()}
+            </span>
+            {ingredient.alternate_unit && (
+              <span className="ml-1">{ingredient.alternate_unit}</span>
+            )}
+            <span>)</span>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col items-start">
+        {ingredient.ingredient_name && (
+          <span>{ingredient.ingredient_name}</span>
+        )}
+        {ingredient.note && (
+          <span className="text-secondary text-xs">({ingredient.note})</span>
+        )}
+        {ingredient.is_optional && <span>optional</span>}
+      </div>
+    </div>
+  );
+}
 
 const RecipeResponse = memo(
   ({ recipe, recipeVersion, modalAnchorRef }: RecipeResponseProps) => {
@@ -47,9 +98,9 @@ const RecipeResponse = memo(
             >
               Ingredients
             </h3>
-            <ul className="list-disc pt-2 pl-4">
+            <ul className="flex flex-col gap-2 pt-2">
               {ingredients.map((item, index) => (
-                <li key={`${recipe?.id}-ingredient-${index}`}>{item}</li>
+                <li key={item.id}>{renderIngredient(item)}</li>
               ))}
             </ul>
           </section>
@@ -68,12 +119,9 @@ const RecipeResponse = memo(
             </h3>
             <ol className="flex list-decimal flex-col gap-2 pt-2">
               {instructions.map((item, index) => (
-                <li
-                  key={`${recipe?.id}-instruction-${index}`}
-                  className="flex gap-2"
-                >
+                <li key={item.id} className="flex gap-2">
                   <span className="font-lora font-semibold">{index + 1}.</span>
-                  {item}
+                  {item.raw_text}
                 </li>
               ))}
             </ol>

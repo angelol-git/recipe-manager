@@ -10,11 +10,12 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import type {
   DraftArrayEditorProps,
   DraftArrayField,
+  DraftIngredient,
   DraftTextItem,
 } from "../types/draftRecipe";
 
 type UseDraftSortableListProps = {
-  items: DraftTextItem[];
+  items: DraftTextItem[] | DraftIngredient[];
   field: DraftArrayField;
   handleDraftArrayReorder: DraftArrayEditorProps["handleDraftArrayReorder"];
 };

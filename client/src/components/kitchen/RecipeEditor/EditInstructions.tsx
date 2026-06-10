@@ -7,15 +7,15 @@ import {
 } from "@dnd-kit/sortable";
 import SortableInstruction from "./SortableInstruction";
 import { useDraftSortableList } from "../../../hooks/useDraftSortableList";
-import type { DraftArrayEditorProps } from "../../../types/draftRecipe";
+import type { DraftInstructionEditorProps } from "../../../types/draftRecipe";
 
 function EditInstructions({
   draft,
-  handleDraftArrayUpdate,
+  handleDraftInstructionUpdate,
   handleDraftArrayDelete,
   handleDraftArrayPush,
   handleDraftArrayReorder,
-}: DraftArrayEditorProps) {
+}: DraftInstructionEditorProps) {
   const instructions = draft?.instructions || [];
   const [isAddingInstruction, setIsAddingInstruction] = useState(false);
   const [newInstruction, setNewInstruction] = useState("");
@@ -76,7 +76,7 @@ function EditInstructions({
                 id={instruction.id}
                 index={index}
                 instruction={instruction}
-                handleDraftArrayUpdate={handleDraftArrayUpdate}
+                handleDraftInstructionUpdate={handleDraftInstructionUpdate}
                 handleDraftArrayDelete={handleDraftArrayDelete}
               />
             ))}

@@ -1,12 +1,45 @@
 import { z } from "zod";
-import type { Recipe, RecipeVersion } from "../types/recipe";
+import type {
+  Recipe,
+  RecipeIngredient,
+  RecipeInstruction,
+  RecipeVersion,
+} from "../types/recipe";
 import type { Tag } from "../types/tag";
 
-const storedListSchema = z
+const storedInstructionSchema = z.object({
+  id: z.union([z.string(), z.number()]).optional(),
+  position: z.number().optional(),
+  raw_text: z.string().optional(),
+  text: z.string().optional(),
+});
+
+function toRecipeInstruction(
+  instruction: z.infer<typeof storedInstructionSchema>,
+  index: number,
+): RecipeInstruction {
+  return {
+    id: String(instruction.id ?? crypto.randomUUID()),
+    position: instruction.position ?? index + 1,
+    raw_text: instruction.raw_text ?? instruction.text ?? "",
+  };
+}
+
+const storedInstructionsSchema = z
   .union([z.array(z.unknown()), z.string(), z.undefined(), z.null()])
-  .transform((value): string[] => {
+  .transform((value): RecipeInstruction[] => {
     if (Array.isArray(value)) {
-      return value.map((item) => String(item ?? ""));
+      return value.map((item, index) => {
+        if (typeof item === "string") {
+          return {
+            id: crypto.randomUUID(),
+            position: index + 1,
+            raw_text: item,
+          };
+        }
+
+        return toRecipeInstruction(storedInstructionSchema.parse(item), index);
+      });
     }
 
     if (typeof value === "string") {
@@ -17,13 +50,128 @@ const storedListSchema = z
       try {
         const parsed: unknown = JSON.parse(trimmed);
         if (Array.isArray(parsed)) {
-          return parsed.map((item) => String(item ?? ""));
+          return storedInstructionsSchema.parse(parsed);
         }
       } catch {
-        return [value];
+        return [
+          {
+            id: crypto.randomUUID(),
+            position: 1,
+            raw_text: value,
+          },
+        ];
       }
 
-      return [value];
+      return [
+        {
+          id: crypto.randomUUID(),
+          position: 1,
+          raw_text: value,
+        },
+      ];
+    }
+
+    return [];
+  });
+
+//TO DO: ??
+const storedIngredientSchema = z.object({
+  id: z.union([z.string(), z.number()]).optional(),
+  position: z.number().optional(),
+  raw_text: z.string().optional(),
+  ingredient_name: z.string().optional(),
+  quantity_value: z.number().nullable().optional(),
+  quantity_text: z.string().nullable().optional(),
+  unit: z.string().nullable().optional(),
+  alternate_quantity_value: z.number().nullable().optional(),
+  alternate_quantity_text: z.string().nullable().optional(),
+  alternate_unit: z.string().nullable().optional(),
+  note: z.string().nullable().optional(),
+  is_optional: z.boolean().optional(),
+  text: z.string().optional(),
+});
+
+function toRecipeIngredient(
+  ingredient: z.infer<typeof storedIngredientSchema>,
+  index: number,
+): RecipeIngredient {
+  return {
+    id: String(ingredient.id ?? crypto.randomUUID()),
+    position: ingredient.position ?? index + 1,
+    raw_text:
+      ingredient.raw_text ??
+      ingredient.text ??
+      ingredient.ingredient_name ??
+      "",
+    ingredient_name:
+      ingredient.ingredient_name ??
+      ingredient.raw_text ??
+      ingredient.text ??
+      "",
+    quantity_value: ingredient.quantity_value ?? null,
+    quantity_text: ingredient.quantity_text ?? null,
+    unit: ingredient.unit ?? null,
+    alternate_quantity_value: ingredient.alternate_quantity_value ?? null,
+    alternate_quantity_text: ingredient.alternate_quantity_text ?? null,
+    alternate_unit: ingredient.alternate_unit ?? null,
+    note: ingredient.note ?? null,
+    is_optional: ingredient.is_optional ?? false,
+  };
+}
+
+const storedIngredientsSchema = z
+  .union([z.array(z.unknown()), z.string(), z.undefined(), z.null()])
+  .transform((value): RecipeIngredient[] => {
+    if (Array.isArray(value)) {
+      return value.map((item, index) => {
+        if (typeof item === "string") {
+          return {
+            id: crypto.randomUUID(),
+            position: index + 1,
+            raw_text: item,
+            ingredient_name: item,
+            quantity_value: null,
+            quantity_text: null,
+            unit: null,
+            alternate_quantity_value: null,
+            alternate_quantity_text: null,
+            alternate_unit: null,
+            note: null,
+            is_optional: false,
+          };
+        }
+
+        return toRecipeIngredient(storedIngredientSchema.parse(item), index);
+      });
+    }
+
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed) return [];
+
+      try {
+        const parsed: unknown = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return storedIngredientsSchema.parse(parsed);
+        }
+      } catch {
+        return [
+          {
+            id: crypto.randomUUID(),
+            position: 1,
+            raw_text: value,
+            ingredient_name: value,
+            quantity_value: null,
+            quantity_text: null,
+            unit: null,
+            alternate_quantity_value: null,
+            alternate_quantity_text: null,
+            alternate_unit: null,
+            note: null,
+            is_optional: false,
+          },
+        ];
+      }
     }
 
     return [];
@@ -45,27 +193,25 @@ const storedRecipeVersionSchema = z
   .object({
     id: z.union([z.string(), z.number()]).optional(),
     description: z.string().optional(),
-    ingredients: storedListSchema.optional(),
-    instructions: storedListSchema.optional(),
+    ingredients: storedIngredientsSchema.optional(),
+    instructions: storedInstructionsSchema.optional(),
     source_prompt: z.string().optional(),
     recipeDetails: recipeDetailsSchema.partial().nullable().optional(),
   })
-  .transform(
-    (version): RecipeVersion => {
-      return {
-        id: String(version.id ?? ""),
-        recipeDetails: {
-          calories: version.recipeDetails?.calories ?? null,
-          servings: version.recipeDetails?.servings ?? null,
-          total_time: version.recipeDetails?.total_time ?? null,
-        },
-        description: version.description ?? "",
-        ingredients: version.ingredients ?? [],
-        instructions: version.instructions ?? [],
-        source_prompt: version.source_prompt ?? "",
-      };
-    },
-  );
+  .transform((version): RecipeVersion => {
+    return {
+      id: String(version.id ?? ""),
+      recipeDetails: {
+        calories: version.recipeDetails?.calories ?? null,
+        servings: version.recipeDetails?.servings ?? null,
+        total_time: version.recipeDetails?.total_time ?? null,
+      },
+      description: version.description ?? "",
+      ingredients: version.ingredients ?? [],
+      instructions: version.instructions ?? [],
+      source_prompt: version.source_prompt ?? "",
+    };
+  });
 
 const storedRecipeSchema = z
   .object({
