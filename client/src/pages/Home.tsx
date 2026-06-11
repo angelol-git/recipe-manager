@@ -30,8 +30,7 @@ function Home() {
     editTagsAll,
   } = useTags(user, recipes);
 
-  const { deleteModal, openDeleteModal, closeDeleteModal, handleDelete } =
-    useDeleteRecipe();
+  const { deleteModal, closeDeleteModal, handleDelete } = useDeleteRecipe();
 
   useEffect(() => {
     document.title = `Recipes`;
@@ -77,7 +76,6 @@ function Home() {
 
           <HomeItems
             filteredRecipes={filteredRecipes}
-            openDeleteModal={openDeleteModal}
             page={page}
             setPage={setPage}
             totalPages={pagination?.totalPages ?? 0}

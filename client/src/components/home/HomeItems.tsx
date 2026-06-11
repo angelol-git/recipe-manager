@@ -3,15 +3,8 @@ import { Link } from "react-router";
 import HomeRecipeCard from "./HomeRecipeCard";
 import type { Recipe } from "../../types/recipe";
 
-type OpenDeleteModalProp = (
-  recipe: Recipe,
-  type: "version" | "all",
-  recipeVersion?: number | null,
-) => void;
-
 type HomeItemsProps = {
   filteredRecipes: Recipe[];
-  openDeleteModal: OpenDeleteModalProp;
   page: number;
   setPage: Dispatch<SetStateAction<number>>;
   totalPages: number;
@@ -20,7 +13,6 @@ type HomeItemsProps = {
 
 function HomeItems({
   filteredRecipes,
-  openDeleteModal,
   page,
   setPage,
   totalPages,
@@ -42,13 +34,7 @@ function HomeItems({
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:flex md:flex-wrap lg:gap-6">
         {filteredRecipes?.map((recipe) => {
-          return (
-            <HomeRecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              openDeleteModal={openDeleteModal}
-            />
-          );
+          return <HomeRecipeCard key={recipe.id} recipe={recipe} />;
         })}
       </div>
       {totalPages > 1 && (
