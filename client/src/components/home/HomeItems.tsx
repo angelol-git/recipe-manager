@@ -32,7 +32,7 @@ function HomeItems({
           + Recipe
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:flex md:flex-wrap lg:gap-6">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:min-h-[calc(275px*2+1rem)] md:auto-rows-[275px] md:grid-cols-4 lg:min-h-[calc(275px*2+1.5rem)] lg:gap-6">
         {filteredRecipes?.map((recipe) => {
           return <HomeRecipeCard key={recipe.id} recipe={recipe} />;
         })}
@@ -43,7 +43,7 @@ function HomeItems({
             type="button"
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={isPreviousDisabled}
-            className="focus-visible:ring-accent/25 border-accent/45 bg-base hover:border-accent/55 inline-flex min-h-9 items-center justify-center rounded-full border px-4 py-2 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="focus-visible:ring-accent/25 border-accent/45 bg-base hover:border-accent/55 inline-flex min-h-9 cursor-pointer items-center justify-center rounded-full border px-4 py-2 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             Previous
           </button>
@@ -54,7 +54,7 @@ function HomeItems({
             type="button"
             onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
             disabled={isNextDisabled}
-            className="focus-visible:ring-accent/25 border-accent/45 bg-base hover:border-accent/55 inline-flex min-h-9 items-center justify-center rounded-full border px-4 py-2 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="focus-visible:ring-accent/25 border-accent/45 bg-base hover:border-accent/55 inline-flex min-h-9 cursor-pointer items-center justify-center rounded-full border px-4 py-2 text-sm shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             Next
           </button>
