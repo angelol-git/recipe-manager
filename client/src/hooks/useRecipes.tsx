@@ -156,7 +156,6 @@ export function useRecipes({
       };
     },
     staleTime: 1000 * 60 * 5,
-    refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
 

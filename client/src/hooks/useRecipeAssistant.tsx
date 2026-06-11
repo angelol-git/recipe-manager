@@ -4,14 +4,16 @@ import {
   type RecipePromptPayload,
   type RecipePromptResponse,
 } from "../api/kitchen";
+import type { PaginatedRecipesResponse } from "../api/recipes";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage";
 import { useUser } from "./useUser";
-import type { Recipe } from "../types/recipe";
 
 type ShowToast = (message: string, type: "success" | "error") => void;
 
 type MutationContext = {
-  previousRecipes?: Recipe[];
+  previousRecipeQueries: Array<
+    [readonly unknown[], PaginatedRecipesResponse | undefined]
+  >;
 };
 
 type ApiError = {
@@ -22,7 +24,7 @@ type ApiError = {
 export function useRecipeAssistant(showToast: ShowToast) {
   const { user } = useUser();
   const queryClient = useQueryClient();
-  const recipesQueryKey = ["recipes", user?.id || "guest_recipes"];
+  const recipesQueryKeyPrefix = ["recipes", user?.id || "guest_recipes"];
 
   const submitRecipePromptMutation = useMutation<
     RecipePromptResponse,
@@ -38,20 +40,23 @@ export function useRecipeAssistant(showToast: ShowToast) {
 
     onMutate: async (): Promise<MutationContext> => {
       await queryClient.cancelQueries({
-        queryKey: recipesQueryKey,
+        queryKey: recipesQueryKeyPrefix,
       });
 
-      const previousRecipes =
-        queryClient.getQueryData<Recipe[]>(recipesQueryKey);
+      const previousRecipeQueries =
+        queryClient.getQueriesData<PaginatedRecipesResponse>({
+          queryKey: recipesQueryKeyPrefix,
+        });
 
-      return { previousRecipes };
+      return { previousRecipeQueries };
     },
 
     onError: (err, _variables, context) => {
       showToast(err.message || err.error || "Something went wrong", "error");
 
-      if (context?.previousRecipes) {
-        queryClient.setQueryData(recipesQueryKey, context.previousRecipes);
+      for (const [queryKey, previousData] of context?.previousRecipeQueries ??
+        []) {
+        queryClient.setQueryData(queryKey, previousData);
       }
     },
 
@@ -59,19 +64,37 @@ export function useRecipeAssistant(showToast: ShowToast) {
       const newRecipe = data.recipe;
       const isNewRecipe = !variables.recipeId;
 
-      queryClient.setQueryData<Recipe[]>(recipesQueryKey, (old = []) => {
-        const existingIndex = old.findIndex(
-          (recipe) => recipe.id === newRecipe.id,
-        );
+      //Update all query caches with the new recipe from a user or guest
+      queryClient.setQueriesData(
+        { queryKey: recipesQueryKeyPrefix },
+        (oldData: PaginatedRecipesResponse | undefined) => {
+          if (!oldData) {
+            return oldData;
+          }
 
-        if (existingIndex === -1) {
-          return [...old, newRecipe];
-        }
+          const existingIndex = oldData.items.findIndex(
+            (recipe) => recipe.id === newRecipe.id,
+          );
 
-        return old.map((recipe) =>
-          recipe.id === newRecipe.id ? newRecipe : recipe,
-        );
-      });
+          if (existingIndex === -1) {
+            return {
+              ...oldData,
+              items: [...oldData.items, newRecipe],
+              totalItems:
+                typeof oldData.totalItems === "number"
+                  ? oldData.totalItems + 1
+                  : oldData.totalItems,
+            };
+          }
+
+          return {
+            ...oldData,
+            items: oldData.items.map((recipe) =>
+              recipe.id === newRecipe.id ? newRecipe : recipe,
+            ),
+          };
+        },
+      );
 
       if (!isNewRecipe && !user) {
         addLocalRecipeVersion(newRecipe);
@@ -81,7 +104,7 @@ export function useRecipeAssistant(showToast: ShowToast) {
         addLocalRecipe(newRecipe);
       }
 
-      queryClient.invalidateQueries({ queryKey: recipesQueryKey });
+      queryClient.invalidateQueries({ queryKey: recipesQueryKeyPrefix });
     },
   });
 

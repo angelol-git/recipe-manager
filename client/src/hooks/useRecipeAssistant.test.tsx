@@ -1,6 +1,7 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useRecipeAssistant } from "./useRecipeAssistant";
 import { submitRecipePrompt } from "../api/kitchen";
+import type { PaginatedRecipesResponse } from "../api/recipes";
 import { addLocalRecipe, addLocalRecipeVersion } from "../utils/storage";
 import type { Recipe } from "../types/recipe";
 import { createQueryClientWrapper } from "../test/queryClient";
@@ -54,6 +55,20 @@ function createRecipe({
   };
 }
 
+function createPaginatedRecipesResponse(
+  items: Recipe[],
+  overrides: Partial<PaginatedRecipesResponse> = {},
+): PaginatedRecipesResponse {
+  return {
+    items,
+    page: 1,
+    pageSize: 8,
+    totalItems: items.length,
+    totalPages: items.length > 0 ? 1 : 0,
+    ...overrides,
+  };
+}
+
 describe("useRecipeAssistant", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -85,9 +100,11 @@ describe("useRecipeAssistant", () => {
       }),
     ];
 
-    const recipesQueryKey = ["recipes", "guest_recipes"];
-
-    queryClient.setQueryData(recipesQueryKey, previousRecipes);
+    const recipesQueryKey = ["recipes", "guest_recipes", 1, 8, []];
+    queryClient.setQueryData(
+      recipesQueryKey,
+      createPaginatedRecipesResponse(previousRecipes),
+    );
 
     vi.mocked(submitRecipePrompt).mockRejectedValue({
       message: "Failed to submit prompt",
@@ -112,7 +129,9 @@ describe("useRecipeAssistant", () => {
       "error",
     );
 
-    expect(queryClient.getQueryData(recipesQueryKey)).toEqual(previousRecipes);
+    expect(queryClient.getQueryData(recipesQueryKey)).toEqual(
+      createPaginatedRecipesResponse(previousRecipes),
+    );
   });
 
   it("appends a new guest recipe to local storage", async () => {
@@ -134,8 +153,11 @@ describe("useRecipeAssistant", () => {
       description: "Soup version",
     });
 
-    const recipesQueryKey = ["recipes", "guest_recipes"];
-    queryClient.setQueryData(recipesQueryKey, existingRecipes);
+    const paginatedRecipesQueryKey = ["recipes", "guest_recipes", 1, 8, []];
+    queryClient.setQueryData(
+      paginatedRecipesQueryKey,
+      createPaginatedRecipesResponse(existingRecipes),
+    );
 
     vi.mocked(submitRecipePrompt).mockResolvedValue({
       recipe: newRecipe,
@@ -152,14 +174,17 @@ describe("useRecipeAssistant", () => {
     });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(recipesQueryKey)).toEqual([
-        existingRecipes[0],
-        newRecipe,
-      ]);
+      expect(queryClient.getQueryData(paginatedRecipesQueryKey)).toEqual({
+        items: [existingRecipes[0], newRecipe],
+        page: 1,
+        pageSize: 8,
+        totalItems: 2,
+        totalPages: 1,
+      });
     });
 
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: recipesQueryKey,
+      queryKey: ["recipes", "guest_recipes"],
     });
 
     expect(addLocalRecipe).toHaveBeenCalledWith(newRecipe);
@@ -185,6 +210,12 @@ describe("useRecipeAssistant", () => {
       recipe: newRecipe,
     });
 
+    const paginatedRecipesQueryKey = ["recipes", "user-1", 1, 8, []];
+    queryClient.setQueryData(
+      paginatedRecipesQueryKey,
+      createPaginatedRecipesResponse([]),
+    );
+
     const { result } = renderHook(() => useRecipeAssistant(mockShowToast), {
       wrapper,
     });
@@ -196,9 +227,13 @@ describe("useRecipeAssistant", () => {
     });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(["recipes", "user-1"])).toEqual([
-        newRecipe,
-      ]);
+      expect(queryClient.getQueryData(paginatedRecipesQueryKey)).toEqual({
+        items: [newRecipe],
+        page: 1,
+        pageSize: 8,
+        totalItems: 1,
+        totalPages: 0,
+      });
     });
 
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -243,7 +278,11 @@ describe("useRecipeAssistant", () => {
       ],
     };
 
-    queryClient.setQueryData(["recipes", "user-1"], [existingRecipe]);
+    const paginatedRecipesQueryKey = ["recipes", "user-1", 1, 8, []];
+    queryClient.setQueryData(
+      paginatedRecipesQueryKey,
+      createPaginatedRecipesResponse([existingRecipe]),
+    );
 
     vi.mocked(submitRecipePrompt).mockResolvedValue({
       recipe: updatedRecipe,
@@ -262,9 +301,13 @@ describe("useRecipeAssistant", () => {
     });
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(["recipes", "user-1"])).toEqual([
-        updatedRecipe,
-      ]);
+      expect(queryClient.getQueryData(paginatedRecipesQueryKey)).toEqual({
+        items: [updatedRecipe],
+        page: 1,
+        pageSize: 8,
+        totalItems: 1,
+        totalPages: 1,
+      });
     });
 
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
