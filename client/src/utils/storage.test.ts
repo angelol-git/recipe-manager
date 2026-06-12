@@ -72,6 +72,28 @@ describe("getLocalRecipes", () => {
     expect(recipes[0].title).toBe("Blueberry Cake");
   });
 
+  it("returns guest recipes with newest recipes first", () => {
+    seedGuestRecipes([
+      makeRecipe({
+        id: "recipe-older",
+        title: "Older Recipe",
+        created_at: "2026-04-01T12:00:00.000Z",
+      }),
+      makeRecipe({
+        id: "recipe-newer",
+        title: "Newer Recipe",
+        created_at: "2026-05-01T12:00:00.000Z",
+      }),
+    ]);
+
+    const recipes = getLocalRecipes();
+
+    expect(recipes.map((recipe) => recipe.id)).toEqual([
+      "recipe-newer",
+      "recipe-older",
+    ]);
+  });
+
   it("clears localStorage when stored JSON is invalid", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 

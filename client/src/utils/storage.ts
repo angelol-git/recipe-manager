@@ -21,7 +21,26 @@ export function getLocalRecipes(): Recipe[] {
       return [];
     }
 
+    //TO DO: currently sorted by latest first for guest users
     const normalizedRecipes = normalizeStoredRecipes(parsed);
+    normalizedRecipes.sort((left, right) => {
+      const leftTimestamp = Date.parse(left.created_at ?? "");
+      const rightTimestamp = Date.parse(right.created_at ?? "");
+
+      if (Number.isNaN(leftTimestamp) && Number.isNaN(rightTimestamp)) {
+        return 0;
+      }
+
+      if (Number.isNaN(leftTimestamp)) {
+        return 1;
+      }
+
+      if (Number.isNaN(rightTimestamp)) {
+        return -1;
+      }
+
+      return rightTimestamp - leftTimestamp;
+    });
     localStorage.setItem(
       "recipe-guest-recipes",
       JSON.stringify(normalizedRecipes),
@@ -152,9 +171,9 @@ export function addLocalRecipeTag(
   return { success: true, tag: tagToUse };
 }
 
-export function deleteLocalTagsAll(
-  tagIds: Array<Tag["id"]>,
-): { success: true } {
+export function deleteLocalTagsAll(tagIds: Array<Tag["id"]>): {
+  success: true;
+} {
   const recipes = getLocalRecipes();
 
   recipes.forEach((recipe) => {
@@ -165,9 +184,9 @@ export function deleteLocalTagsAll(
   return { success: true };
 }
 
-export function editLocalTagsAll(
-  updatedTags: EditableTagUpdate[],
-): { success: true } {
+export function editLocalTagsAll(updatedTags: EditableTagUpdate[]): {
+  success: true;
+} {
   const recipes = getLocalRecipes();
 
   recipes.forEach((recipe) => {

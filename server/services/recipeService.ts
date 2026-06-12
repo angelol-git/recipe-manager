@@ -215,7 +215,7 @@ export function getRecipesByUserId(
 }
 
 export function getRecipeById(id: RecipeId, userId: UserId): Recipe | null {
-  return buildRecipeResponse(id, userId, "DESC");
+  return buildRecipeResponse(id, userId, "ASC");
 }
 
 export function deleteRecipeVersion(id: VersionId, userId: UserId): boolean {
