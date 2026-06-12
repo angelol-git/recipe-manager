@@ -28,7 +28,7 @@ function renderIngredient(ingredient: RecipeIngredient) {
     ingredient.alternate_quantity_value != null;
 
   return (
-    <div className="grid grid-cols-[90px_1fr] items-start gap-1">
+    <>
       <div className="flex flex-col">
         {hasPrimaryMeasurement && (
           <span>
@@ -62,7 +62,7 @@ function renderIngredient(ingredient: RecipeIngredient) {
         )}
         {ingredient.is_optional && <span>optional</span>}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -84,7 +84,6 @@ const RecipeResponse = memo(
     return (
       <div role="log" aria-live="polite" className="flex flex-col gap-2">
         <RecipeDetailsBar recipeDetails={recipeDetails} />
-
         <p className="mb-4 break-inside-avoid">{description}</p>
 
         {ingredients.length > 0 && (
@@ -98,14 +97,15 @@ const RecipeResponse = memo(
             >
               Ingredients
             </h3>
-            <ul className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2">
+            <ul className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 pt-2 sm:grid-cols-[max-content_1fr_max-content_1fr]">
               {ingredients.map((item) => (
-                <li key={item.id}>{renderIngredient(item)}</li>
+                <li key={item.id} className="contents">
+                  {renderIngredient(item)}
+                </li>
               ))}
             </ul>
           </section>
         )}
-
         {instructions.length > 0 && (
           <section
             aria-labelledby="instructions-heading"
@@ -127,7 +127,6 @@ const RecipeResponse = memo(
             </ol>
           </section>
         )}
-
         {source_prompt && (
           <div className="text-secondary mt-4 flex max-w-full justify-between gap-4 text-sm">
             <div className="flex w-full max-w-full min-w-0 flex-col items-start gap-2 py-2">
@@ -150,7 +149,6 @@ const RecipeResponse = memo(
             )}
           </div>
         )}
-
         <RecipePromptModal
           isOpen={isPromptModalOpen}
           onClose={() => setIsPromptModalOpen(false)}
