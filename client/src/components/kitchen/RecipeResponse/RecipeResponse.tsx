@@ -29,37 +29,37 @@ function renderIngredient(ingredient: RecipeIngredient) {
 
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex items-center gap-1">
         {hasPrimaryMeasurement && (
-          <span>
-            <span>
-              {ingredient.quantity_text ??
-                ingredient.quantity_value?.toString()}
-            </span>
+          <div>
+            {ingredient.quantity_text ?? ingredient.quantity_value?.toString()}
             {ingredient.unit && <span className="ml-1">{ingredient.unit}</span>}
-          </span>
+          </div>
         )}
         {hasAlternateMeasurement && (
           <div className="text-secondary text-xs">
-            <span>(</span>
-            <span>
-              {ingredient.alternate_quantity_text ??
-                ingredient.alternate_quantity_value?.toString()}
-            </span>
+            (
+            {ingredient.alternate_quantity_text ??
+              ingredient.alternate_quantity_value?.toString()}
             {ingredient.alternate_unit && (
               <span className="ml-1">{ingredient.alternate_unit}</span>
             )}
-            <span>)</span>
+            )
           </div>
         )}
       </div>
       <div className="flex flex-col items-start">
         {ingredient.ingredient_name && (
-          <span>{ingredient.ingredient_name}</span>
+          <div>
+            {ingredient.ingredient_name}{" "}
+            {ingredient.note && (
+              <span className="text-secondary text-xs">
+                ({ingredient.note})
+              </span>
+            )}
+          </div>
         )}
-        {ingredient.note && (
-          <span className="text-secondary text-xs">({ingredient.note})</span>
-        )}
+
         {ingredient.is_optional && <span>optional</span>}
       </div>
     </>
@@ -83,6 +83,9 @@ const RecipeResponse = memo(
 
     return (
       <div role="log" aria-live="polite" className="flex flex-col gap-2">
+        <h1 className="font-lora line-clamp-2 max-w-screen-md text-3xl leading-snug font-semibold md:text-4xl">
+          {recipe?.title}
+        </h1>
         <RecipeDetailsBar recipeDetails={recipeDetails} />
         <p className="mb-4 break-inside-avoid">{description}</p>
 
@@ -97,7 +100,7 @@ const RecipeResponse = memo(
             >
               Ingredients
             </h3>
-            <ul className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 pt-2 sm:grid-cols-[max-content_1fr_max-content_1fr]">
+            <ul className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 pt-2">
               {ingredients.map((item) => (
                 <li key={item.id} className="contents">
                   {renderIngredient(item)}
