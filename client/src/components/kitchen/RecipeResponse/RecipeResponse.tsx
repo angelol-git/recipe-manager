@@ -98,7 +98,7 @@ const RecipeResponse = memo(
             >
               Ingredients
             </h3>
-            <ul className="grid grid-cols-1 gap-1 pt-2 sm:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2">
               {ingredients.map((item) => (
                 <li key={item.id}>{renderIngredient(item)}</li>
               ))}
