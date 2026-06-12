@@ -201,6 +201,13 @@ export function createPrompt(
     - alternate_quantity_text and alternate_unit describe the secondary quantity in parentheses when present.
     - quantity_value and alternate_quantity_value are numeric when practical, otherwise null.
     - note captures trailing preparation or qualifier text; otherwise null.
+    - Format mixed fractions as "1 1/2", not "1 and 1/2" or "1 & 1/2".
+    - Preserve the source recipe's primary measurement style whenever practical.
+    - For measurable weight or volume-based ingredients, prefer dual units with the primary unit first and a rounded secondary unit in parentheses.
+    - Keep useful existing dual units when importing or modifying.
+    - Count-based ingredients usually do not need a secondary unit.
+    - Normalize spelled-out measurement units to standard abbreviations in raw_text, unit, and alternate_unit when practical.
+    - Examples: teaspoon/teaspoons -> "tsp", tablespoon/tablespoons -> "tbsp", kilogram/kilograms -> "kg", gram/grams -> "g", liter/liters -> "L", milliliter/milliliters -> "mL".
     - Use null, not empty strings, for missing optional fields.
     - is_optional is true only when explicitly optional.
 
@@ -208,13 +215,6 @@ export function createPrompt(
     - Every instruction must be a structured object matching the schema.
     - raw_text is the full human-readable instruction step as it should be displayed in the UI.
     - Do not split a single instruction across multiple objects unless the recipe truly has multiple distinct steps.
-
-    Measurement rules:
-    - Preserve the source recipe's primary measurement style whenever practical.
-    - For measurable weight or volume-based ingredients, prefer dual units with the primary unit first and a rounded secondary unit in parentheses.
-    - Keep useful existing dual units when importing or modifying.
-    - Count-based ingredients usually do not need a secondary unit.
-    - Use "tsp" and "tbsp" instead of spelling them out.
 
     Modification and scaling:
     - If Current State exists, treat scaling, substitutions, dietary changes, flavor changes, and method changes as modifications unless the user clearly asks for a new recipe.

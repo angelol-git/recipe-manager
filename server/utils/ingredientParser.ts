@@ -4,6 +4,8 @@
  *
  * TODO: Remove or reduce this once structured ingredient output is returned
  * directly from the AI, if that path proves reliable enough.
+ *
+ * 1 and 1/2 cups should convert to 1 1/2 cups
  */
 export type ParsedIngredient = {
   raw_text: string;
