@@ -34,7 +34,7 @@ function renderIngredient(ingredient: RecipeIngredient) {
     <RoughStrike
       completed={ingredient.completed}
       singleLine
-      className="inline-flex w-fit items-center gap-1 justify-self-start self-start align-top"
+      className="inline-flex w-fit items-center gap-1 self-start justify-self-start align-top"
     >
       {hasPrimaryMeasurement && (
         <span>
@@ -217,7 +217,7 @@ const RecipeResponse = memo(
                       type="button"
                       onClick={() => toggleIngredientCompletion(item.id)}
                       aria-pressed={item.completed}
-                      className="hover:bg-base-hover col-span-2 grid cursor-pointer grid-cols-subgrid items-start rounded-lg px-2 py-1 text-left transition-colors duration-150"
+                      className="hover:bg-base-hover col-span-2 grid cursor-pointer grid-cols-subgrid items-start rounded-lg px-1 text-left transition-colors duration-150"
                     >
                       {measurementCell}
                       {textCell}
@@ -257,7 +257,7 @@ const RecipeResponse = memo(
                     type="button"
                     onClick={() => toggleInstructionCompletion(item.id)}
                     aria-pressed={item.completed}
-                    className="hover:bg-base-hover relative w-full cursor-pointer rounded-lg px-2 py-1 text-left transition-colors duration-150"
+                    className="hover:bg-base-hover relative w-full cursor-pointer rounded-lg px-1 py-1 text-left transition-colors duration-150"
                   >
                     <div className="flex gap-2">
                       <span className="font-lora font-semibold">

@@ -7,7 +7,7 @@ type KitchenOptionsProps = {
 
 function KitchenOptions({ isEditing, setIsEditing }: KitchenOptionsProps) {
   return isEditing ? (
-    <div className="flex gap-4 text-sm">
+    <div className="flex gap-6 text-sm">
       <button
         onClick={() => {
           setIsEditing(false);
@@ -19,7 +19,7 @@ function KitchenOptions({ isEditing, setIsEditing }: KitchenOptionsProps) {
       <div className="cursor-pointer underline">Save</div>
     </div>
   ) : (
-    <div className="flex gap-4 text-sm">
+    <div className="flex gap-6 text-sm">
       <button
         onClick={() => {
           setIsEditing(true);
