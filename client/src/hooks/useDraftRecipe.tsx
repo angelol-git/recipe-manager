@@ -275,6 +275,7 @@ export function useDraftRecipe({
           id: `${field.slice(0, -1)}-${prev.recipe_id}-${Date.now()}`,
           position: (prev.instructions || []).length + 1,
           raw_text: newValue,
+          completed: false,
         };
         return {
           ...prev,
@@ -286,6 +287,7 @@ export function useDraftRecipe({
           id: `ingredient-${prev.recipe_id}-${Date.now()}`,
           position: (prev.ingredients || []).length + 1,
           raw_text: newValue,
+          completed: false,
           ingredient_name: newValue.trim(),
           quantity_value: null,
           quantity_text: null,

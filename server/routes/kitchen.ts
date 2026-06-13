@@ -97,12 +97,14 @@ router.post(
               (instruction, index) => ({
                 id: uuidv7(),
                 position: index + 1,
+                completed: false,
                 ...instruction,
               }),
             ),
             ingredients: parsedRecipe.ingredients.map((ingredient, index) => ({
               id: uuidv7(),
               position: index + 1,
+              completed: false,
               ...ingredient,
             })),
             source_prompt: parsedRecipe.source_prompt,

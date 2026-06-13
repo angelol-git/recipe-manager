@@ -24,6 +24,7 @@ const recipeIngredientSchema = z.object({
   id: z.string(),
   position: z.number().int().min(1),
   raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+  completed: z.boolean().default(false),
   ingredient_name: z
     .string()
     .transform((s) => s.trim())
@@ -42,6 +43,7 @@ const recipeInstructionSchema = z.object({
   id: z.string(),
   position: z.number().int().min(1),
   raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+  completed: z.boolean().default(false),
 });
 
 export const updateRecipeSchema = z.object({

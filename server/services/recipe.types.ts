@@ -4,6 +4,7 @@ export type RecipeIngredient = {
   id: string;
   position: number;
   raw_text: string;
+  completed: boolean;
   ingredient_name: string;
   quantity_value: number | null;
   quantity_text: string | null;
@@ -19,6 +20,7 @@ export type RecipeInstruction = {
   id: string;
   position: number;
   raw_text: string;
+  completed: boolean;
 };
 
 export type RecipeVersion = {

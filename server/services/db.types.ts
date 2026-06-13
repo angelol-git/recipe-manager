@@ -27,6 +27,7 @@ export type IngredientRow = {
   recipe_version_id: VersionId;
   position: number;
   raw_text: string;
+  completed: number;
   ingredient_name: string;
   quantity_value: number | null;
   quantity_text: string | null;
@@ -43,6 +44,7 @@ export type InstructionRow = {
   recipe_version_id: VersionId;
   position: number;
   raw_text: string;
+  completed: number;
 };
 
 export type RecipeTagRow = {

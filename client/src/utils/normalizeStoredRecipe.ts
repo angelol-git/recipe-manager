@@ -12,6 +12,7 @@ const storedInstructionSchema = z.object({
   position: z.number().optional(),
   raw_text: z.string().optional(),
   text: z.string().optional(),
+  completed: z.boolean().optional(),
 });
 
 function toRecipeInstruction(
@@ -22,6 +23,7 @@ function toRecipeInstruction(
     id: String(instruction.id ?? crypto.randomUUID()),
     position: instruction.position ?? index + 1,
     raw_text: instruction.raw_text ?? instruction.text ?? "",
+    completed: instruction.completed ?? false,
   };
 }
 
@@ -35,6 +37,7 @@ const storedInstructionsSchema = z
             id: crypto.randomUUID(),
             position: index + 1,
             raw_text: item,
+            completed: false,
           };
         }
 
@@ -58,6 +61,7 @@ const storedInstructionsSchema = z
             id: crypto.randomUUID(),
             position: 1,
             raw_text: value,
+            completed: false,
           },
         ];
       }
@@ -67,6 +71,7 @@ const storedInstructionsSchema = z
           id: crypto.randomUUID(),
           position: 1,
           raw_text: value,
+          completed: false,
         },
       ];
     }
@@ -79,6 +84,7 @@ const storedIngredientSchema = z.object({
   id: z.union([z.string(), z.number()]).optional(),
   position: z.number().optional(),
   raw_text: z.string().optional(),
+  completed: z.boolean().optional(),
   ingredient_name: z.string().optional(),
   quantity_value: z.number().nullable().optional(),
   quantity_text: z.string().nullable().optional(),
@@ -103,6 +109,7 @@ function toRecipeIngredient(
       ingredient.text ??
       ingredient.ingredient_name ??
       "",
+    completed: ingredient.completed ?? false,
     ingredient_name:
       ingredient.ingredient_name ??
       ingredient.raw_text ??
@@ -129,6 +136,7 @@ const storedIngredientsSchema = z
             id: crypto.randomUUID(),
             position: index + 1,
             raw_text: item,
+            completed: false,
             ingredient_name: item,
             quantity_value: null,
             quantity_text: null,
@@ -160,6 +168,7 @@ const storedIngredientsSchema = z
             id: crypto.randomUUID(),
             position: 1,
             raw_text: value,
+            completed: false,
             ingredient_name: value,
             quantity_value: null,
             quantity_text: null,
