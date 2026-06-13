@@ -73,7 +73,7 @@ function SortableIngredients({
           const el = event.target;
           el.style.height = "auto";
           el.style.height = `${el.scrollHeight}px`;
-          handleDraftIngredientUpdate(event.target.value, index);
+          handleDraftIngredientUpdate("raw_text", event.target.value, index);
         }}
         ref={(el) => {
           if (el) {

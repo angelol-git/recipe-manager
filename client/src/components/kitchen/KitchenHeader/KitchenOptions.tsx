@@ -1,11 +1,24 @@
 import { Dispatch, SetStateAction } from "react";
 
-function KitchenOptions({
-  setIsEditing,
-}: {
+type KitchenOptionsProps = {
+  isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
-}) {
-  return (
+};
+
+function KitchenOptions({ isEditing, setIsEditing }: KitchenOptionsProps) {
+  return isEditing ? (
+    <div className="flex gap-4 text-sm">
+      <button
+        onClick={() => {
+          setIsEditing(false);
+        }}
+        className="cursor-pointer underline"
+      >
+        Cancel
+      </button>
+      <div className="cursor-pointer underline">Save</div>
+    </div>
+  ) : (
     <div className="flex gap-4 text-sm">
       <button
         onClick={() => {

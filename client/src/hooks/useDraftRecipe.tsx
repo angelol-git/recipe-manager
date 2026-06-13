@@ -4,6 +4,7 @@ import type { EditableTag } from "../types/tag";
 import type { Recipe, RecipeDetails } from "../types/recipe";
 import type {
   DraftArrayField,
+  DraftIngredientField,
   DraftIngredient,
   DraftRecipe,
   DraftStringField,
@@ -176,20 +177,69 @@ export function useDraftRecipe({
     });
   }
 
-  function handleDraftIngredientUpdate(value: string, targetIndex: number) {
+  function buildIngredientRawText(ingredient: DraftIngredient) {
+    const primaryQuantity =
+      ingredient.quantity_text?.trim() ||
+      ingredient.quantity_value?.toString() ||
+      "";
+    const primaryUnit = ingredient.unit?.trim() || "";
+    const ingredientName = ingredient.ingredient_name?.trim() || "";
+    const note = ingredient.note?.trim() || "";
+    const optional = ingredient.is_optional ? "optional" : "";
+
+    return [primaryQuantity, primaryUnit, ingredientName, note, optional]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+  }
+
+  function parseIngredientNumber(value: string) {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return null;
+
+    const numericValue = Number(trimmedValue);
+    return Number.isFinite(numericValue) ? numericValue : null;
+  }
+
+  function handleDraftIngredientUpdate(
+    field: DraftIngredientField,
+    value: string | boolean,
+    targetIndex: number,
+  ) {
     setDraft((prev) => {
       if (!prev) return prev;
 
       return {
         ...prev,
         ingredients: (prev.ingredients || []).map((item, index) => {
-          return targetIndex === index
-            ? {
-                ...item,
-                raw_text: value,
-                ingredient_name: value.trim() || item.ingredient_name,
-              }
-            : item;
+          if (targetIndex !== index) {
+            return item;
+          }
+
+          const nextItem = { ...item };
+
+          if (field === "is_optional") {
+            nextItem.is_optional = Boolean(value);
+          } else if (
+            field === "quantity_value" ||
+            field === "alternate_quantity_value"
+          ) {
+            nextItem[field] =
+              typeof value === "string" ? parseIngredientNumber(value) : null;
+          } else if (field === "quantity_text") {
+            const nextValue = typeof value === "string" ? value : String(value);
+            nextItem.quantity_text = nextValue;
+            nextItem.quantity_value = parseIngredientNumber(nextValue);
+          } else if (field === "alternate_quantity_text") {
+            const nextValue = typeof value === "string" ? value : String(value);
+            nextItem.alternate_quantity_text = nextValue;
+            nextItem.alternate_quantity_value = parseIngredientNumber(nextValue);
+          } else {
+            nextItem[field] = typeof value === "string" ? value : String(value);
+          }
+
+          nextItem.raw_text = buildIngredientRawText(nextItem);
+          return nextItem;
         }),
       };
     });
@@ -215,7 +265,7 @@ export function useDraftRecipe({
     });
   }
 
-  //To Do: Update the edit form to handle new ingredient
+  //TO DO : Update the edit form to handle new ingredient
   function handleDraftArrayPush(field: DraftArrayField, newValue: string) {
     setDraft((prev) => {
       if (!prev) return prev;

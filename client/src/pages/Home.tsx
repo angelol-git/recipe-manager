@@ -57,7 +57,7 @@ function Home() {
   }, [selectedTags]);
 
   return (
-    <div className="text-primary bg-base flex min-h-screen flex-col items-center p-5 lg:p-10">
+    <div className="text-primary bg-base flex min-h-screen flex-col items-center p-6 lg:p-10">
       <div className="flex w-full max-w-screen-lg flex-col gap-5">
         <header className="flex items-center justify-between">
           <h1 className="font-lora text-4xl font-medium">Recipes</h1>

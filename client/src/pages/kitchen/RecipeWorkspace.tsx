@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router";
 import RecipeResponse from "../../components/kitchen/RecipeResponse/RecipeResponse.js";
 import RecipeVersionNavigation from "../../components/kitchen/AssistantComposer/RecipeVersionNavigation.js";
 import AssistantComposer from "../../components/kitchen/AssistantComposer/AssistantComposer";
-// import RecipeEditorModal from "../../components/kitchen/RecipeEditor/RecipeEditorModal.jsx";
+import RecipeEditForm from "../../components/kitchen/RecipeEditMode/RecipeEditForm.jsx";
 import RecipeTags from "../../components/kitchen/RecipeResponse/RecipeTags.jsx";
 import NotFound from "../NotFound.jsx";
 import { Recipe } from "../../types/recipe.js";
@@ -13,18 +13,11 @@ type KitchenOutletContext = {
   recipeVersion: number;
   setRecipeVersion: Dispatch<SetStateAction<number>>;
   isEditing: boolean;
-  setIsEditing: Dispatch<SetStateAction<boolean>>;
   isLoading: boolean;
 };
 function RecipeWorkspace() {
-  const {
-    recipe,
-    recipeVersion,
-    setRecipeVersion,
-    isEditing,
-    setIsEditing,
-    isLoading,
-  } = useOutletContext<KitchenOutletContext>();
+  const { recipe, recipeVersion, setRecipeVersion, isEditing, isLoading } =
+    useOutletContext<KitchenOutletContext>();
 
   const [isQuestionsModalOpen, setIsQuestionsModalOpen] =
     useState<boolean>(false);
@@ -67,27 +60,35 @@ function RecipeWorkspace() {
   return (
     <div className="relative flex h-full min-h-0 flex-col">
       <div className="ios-scroll min-h-0 flex-1 overflow-y-auto">
-        <div
-          ref={replyPanelRef}
-          className="mx-auto w-full max-w-screen-md px-4 pt-2"
-          style={{ paddingBottom: `${composerHeight + 16}px` }}
-        >
-          <RecipeTags recipe={recipe} />
-          <RecipeResponse
-            recipe={recipe}
-            recipeVersion={recipeVersion}
-            modalAnchorRef={replyPanelRef}
-          />
-        </div>
+        {!isEditing ? (
+          //TO DO: do I still need dynamic padding bottom?
+          <div
+            ref={replyPanelRef}
+            className="mx-auto w-full max-w-screen-md px-4 pt-2"
+            style={{ paddingBottom: `${composerHeight + 16}px` }}
+          >
+            <RecipeTags recipe={recipe} />
+            <RecipeResponse
+              recipe={recipe}
+              recipeVersion={recipeVersion}
+              modalAnchorRef={replyPanelRef}
+            />
+          </div>
+        ) : (
+          //TO DO: Maybe RecipeEditForm modal for mobile and inline editing for desktop
+          //TO DO: When the user switches to edit mode need to maintain the current scrolling position
+          <div
+            ref={replyPanelRef}
+            className="mx-auto w-full max-w-screen-md px-4 pt-2"
+          >
+            <RecipeEditForm
+              recipe={recipe}
+              recipeVersion={recipeVersion}
+              isEditing={isEditing}
+            />
+          </div>
+        )}
       </div>
-
-      {/* <RecipeEditorModal
-        recipe={recipe}
-        recipeVersion={recipeVersion}
-        isEditModalOpen={isEditModalOpen}
-        setIsEditModalOpen={setIsEditModalOpen}
-        anchorRef={replyPanelRef}
-      /> */}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
         <div

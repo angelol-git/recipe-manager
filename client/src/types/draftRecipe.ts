@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import type {
   Recipe,
   RecipeDetails,
@@ -14,6 +15,18 @@ export type DraftIngredient = RecipeIngredient;
 export type DraftArrayField = "instructions" | "ingredients";
 
 export type DraftStringField = "title" | "description" | "source_prompt";
+
+export type DraftIngredientField =
+  | "raw_text"
+  | "ingredient_name"
+  | "quantity_value"
+  | "quantity_text"
+  | "unit"
+  | "alternate_quantity_value"
+  | "alternate_quantity_text"
+  | "alternate_unit"
+  | "note"
+  | "is_optional";
 
 export type DraftRecipe = {
   id: RecipeVersion["id"];
@@ -43,5 +56,9 @@ export type DraftInstructionEditorProps = DraftArrayEditorProps & {
 };
 
 export type DraftIngredientEditorProps = DraftArrayEditorProps & {
-  handleDraftIngredientUpdate: (value: string, targetIndex: number) => void;
+  handleDraftIngredientUpdate: (
+    field: DraftIngredientField,
+    value: string | boolean,
+    targetIndex: number,
+  ) => void;
 };
