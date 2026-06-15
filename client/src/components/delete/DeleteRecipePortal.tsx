@@ -49,40 +49,44 @@ function DeletePortal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-recipe-title"
-        className="bg-base text-primary flex w-full max-w-[24rem] flex-col gap-6 rounded-[1.5rem] px-6 py-7"
+        className="bg-base text-primary flex w-full max-w-[24rem] flex-col gap-6 rounded-[1rem] p-6"
       >
-        <div className="space-y-4">
+        <div className="flex flex-col gap-3">
           <h2
             id="delete-recipe-title"
-            className="font-lora text-2xl font-medium"
+            className="font-lora text-xl font-medium"
           >
             Remove this recipe?
           </h2>
           {type === "version" ? (
-            <p className="text-secondary font-lora text-base">
-              This removes version{" "}
-              <span className="text-primary inline-block font-medium">
-                {recipeVersion !== null ? recipeVersion + 1 : ""}
-              </span>{" "}
-              of{" "}
-              <span className="text-primary inline-block font-medium">
-                {recipe?.title}
-              </span>
-              .
+            <p className="text-secondary flex flex-col gap-0.5">
+              <div>
+                This removes version{" "}
+                <span className="text-primary font-lora font-medium">
+                  {recipeVersion !== null ? recipeVersion + 1 : ""}
+                </span>{" "}
+                of{" "}
+              </div>
+              <div>
+                <span className="text-primary font-lora font-medium">
+                  {recipe?.title}
+                </span>
+                .
+              </div>
             </p>
           ) : (
-            <p className="text-secondary font-lora text-base">
-              This permanently removes{" "}
-              <span className="text-primary block font-medium">
+            <p className="text-secondary flex flex-col gap-0.5">
+              <div>This permanently removes </div>
+              <div className="text-primary font-lora font-medium">
                 {recipe?.title}
-              </span>
-              <span>
+              </div>
+              <div>
                 and all of its{" "}
-                <span className="text-primary text-center font-medium">
+                <span className="text-primary font-lora items-center font-medium">
                   {versionCount}{" "}
                 </span>
-                {versionCount === 1 ? "version" : "versions"}
-              </span>
+                {versionCount === 1 ? "version" : "versions"}.
+              </div>
             </p>
           )}
         </div>
