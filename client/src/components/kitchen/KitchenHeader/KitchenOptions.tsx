@@ -1,11 +1,15 @@
 import { Dispatch, SetStateAction } from "react";
+import type { Recipe } from "../../../types/recipe";
 
 type KitchenOptionsProps = {
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
 };
 
-function KitchenOptions({ isEditing, setIsEditing }: KitchenOptionsProps) {
+function KitchenOptions({
+  isEditing,
+  setIsEditing,
+}: KitchenOptionsProps) {
   return isEditing ? (
     <div className="flex gap-6 text-sm">
       <button

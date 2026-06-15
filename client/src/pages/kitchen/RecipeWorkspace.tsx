@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, Dispatch, SetStateAction } from "react";
 import { useOutletContext } from "react-router";
+import type { OpenDeleteModal } from "../../hooks/useDeleteRecipe.js";
 import RecipeResponse from "../../components/kitchen/RecipeResponse/RecipeResponse.js";
 import RecipeVersionNavigation from "../../components/kitchen/AssistantComposer/RecipeVersionNavigation.js";
 import AssistantComposer from "../../components/kitchen/AssistantComposer/AssistantComposer";
@@ -12,12 +13,19 @@ type KitchenOutletContext = {
   recipe: Recipe;
   recipeVersion: number;
   setRecipeVersion: Dispatch<SetStateAction<number>>;
+  openDeleteModal: OpenDeleteModal;
   isEditing: boolean;
   isLoading: boolean;
 };
 function RecipeWorkspace() {
-  const { recipe, recipeVersion, setRecipeVersion, isEditing, isLoading } =
-    useOutletContext<KitchenOutletContext>();
+  const {
+    recipe,
+    recipeVersion,
+    setRecipeVersion,
+    openDeleteModal,
+    isEditing,
+    isLoading,
+  } = useOutletContext<KitchenOutletContext>();
 
   const [isQuestionsModalOpen, setIsQuestionsModalOpen] =
     useState<boolean>(false);
@@ -34,6 +42,15 @@ function RecipeWorkspace() {
   }, [recipe]);
 
   useEffect(() => {
+    if (!isEditing) return;
+
+    setIsAssistantOpen(false);
+    setIsQuestionsModalOpen(false);
+  }, [isEditing]);
+
+  useEffect(() => {
+    if (isEditing) return;
+
     const node = composerRef.current;
     if (!node) return;
 
@@ -51,7 +68,7 @@ function RecipeWorkspace() {
       observer.disconnect();
       window.removeEventListener("resize", updateComposerHeight);
     };
-  }, [isAssistantOpen, hasRecipeNavigation]);
+  }, [isEditing, isAssistantOpen, hasRecipeNavigation]);
 
   if (!recipe && !isLoading) {
     return <NotFound />;
@@ -61,7 +78,6 @@ function RecipeWorkspace() {
     <div className="relative flex h-full min-h-0 flex-col">
       <div className="ios-scroll min-h-0 flex-1 overflow-y-auto">
         {!isEditing ? (
-          //TO DO: do I still need dynamic padding bottom?
           <div
             ref={replyPanelRef}
             className="mx-auto w-full max-w-screen-md px-4 pt-2"
@@ -85,46 +101,49 @@ function RecipeWorkspace() {
               recipe={recipe}
               recipeVersion={recipeVersion}
               isEditing={isEditing}
+              openDeleteModal={openDeleteModal}
             />
           </div>
         )}
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0">
-        <div
-          ref={composerRef}
-          className="pb-safe mx-auto w-full max-w-screen-md px-2 pt-2"
-        >
-          <div className="flex items-center justify-between gap-3">
-            {hasRecipeNavigation && !isAssistantOpen && (
-              <div className="pointer-events-auto shrink-0">
-                <RecipeVersionNavigation
+      {!isEditing && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0">
+          <div
+            ref={composerRef}
+            className="pb-safe mx-auto w-full max-w-screen-md px-2 pt-2"
+          >
+            <div className="flex items-center justify-between gap-3">
+              {hasRecipeNavigation && !isAssistantOpen && (
+                <div className="pointer-events-auto shrink-0">
+                  <RecipeVersionNavigation
+                    recipe={recipe}
+                    recipeVersion={recipeVersion}
+                    setRecipeVersion={setRecipeVersion}
+                  />
+                </div>
+              )}
+              <div
+                className={`pointer-events-auto flex justify-end ${
+                  isAssistantOpen ? "flex-1" : "ml-auto shrink-0"
+                }`}
+              >
+                <AssistantComposer
                   recipe={recipe}
                   recipeVersion={recipeVersion}
                   setRecipeVersion={setRecipeVersion}
+                  hasRecipeNavigation={hasRecipeNavigation}
+                  isAssistantOpen={isAssistantOpen}
+                  setIsAssistantOpen={setIsAssistantOpen}
+                  isQuestionsModalOpen={isQuestionsModalOpen}
+                  setIsQuestionsModalOpen={setIsQuestionsModalOpen}
+                  variant="existing"
                 />
               </div>
-            )}
-            <div
-              className={`pointer-events-auto flex justify-end ${
-                isAssistantOpen ? "flex-1" : "ml-auto shrink-0"
-              }`}
-            >
-              <AssistantComposer
-                recipe={recipe}
-                recipeVersion={recipeVersion}
-                setRecipeVersion={setRecipeVersion}
-                hasRecipeNavigation={hasRecipeNavigation}
-                isAssistantOpen={isAssistantOpen}
-                setIsAssistantOpen={setIsAssistantOpen}
-                isQuestionsModalOpen={isQuestionsModalOpen}
-                setIsQuestionsModalOpen={setIsQuestionsModalOpen}
-                variant="existing"
-              />
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

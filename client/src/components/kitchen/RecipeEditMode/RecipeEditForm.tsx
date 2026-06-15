@@ -1,4 +1,5 @@
 import { memo } from "react";
+import type { OpenDeleteModal } from "../../../hooks/useDeleteRecipe";
 import { useDraftRecipe } from "../../../hooks/useDraftRecipe";
 import type { Recipe, RecipeDetails } from "../../../types/recipe";
 import RecipeEditTitle from "./RecipeEditTitle";
@@ -6,6 +7,7 @@ import RecipeEditDetailsBar from "./RecipeEditDetailsBar";
 import RecipeEditDescription from "./RecipeEditDescription";
 import RecipeEditIngredients from "./RecipeEditIngredients";
 import RecipeEditInstructions from "./RecipeEditInstructions";
+import RecipeEditControls from "./RecipeEditControls";
 
 const EMPTY_RECIPE_DETAILS: RecipeDetails = {
   calories: null,
@@ -17,6 +19,7 @@ type RecipeEditFormProps = {
   recipe: Recipe;
   recipeVersion: number;
   isEditing: boolean;
+  openDeleteModal: OpenDeleteModal;
 };
 
 // function renderIngredient(ingredient: RecipeIngredient) {
@@ -67,7 +70,12 @@ type RecipeEditFormProps = {
 // }
 
 const RecipeEditForm = memo(
-  ({ recipe, recipeVersion, isEditing }: RecipeEditFormProps) => {
+  ({
+    recipe,
+    recipeVersion,
+    isEditing,
+    openDeleteModal,
+  }: RecipeEditFormProps) => {
     const {
       draft,
       handleDraftDetail,
@@ -91,7 +99,7 @@ const RecipeEditForm = memo(
     const recipeIngredients = draft?.ingredients || [];
     const recipeInstructions = draft?.instructions || [];
     return (
-      <div role="log" aria-live="polite" className="flex flex-col gap-2">
+      <div role="log" aria-live="polite" className="flex flex-col gap-2 pb-12">
         <RecipeEditTitle
           recipeTitle={recipeTitle}
           handleDraftString={handleDraftString}
@@ -118,6 +126,11 @@ const RecipeEditForm = memo(
           handleDraftInstructionUpdate={handleDraftInstructionUpdate}
           handleDraftArrayDelete={handleDraftArrayDelete}
           handleDraftArrayPush={handleDraftArrayPush}
+        />
+        <RecipeEditControls
+          recipe={recipe}
+          recipeVersion={recipeVersion}
+          openDeleteModal={openDeleteModal}
         />
 
         {/*

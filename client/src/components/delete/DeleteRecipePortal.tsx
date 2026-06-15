@@ -5,13 +5,23 @@ import { Recipe } from "../../types/recipe";
 type DeletePortalProps = {
   recipe: Recipe;
   type: "version" | "all";
+  versionCount: number;
+  recipeVersion?: number | null;
   onClose: () => void;
   onDelete: () => void;
 };
-function DeletePortal({ recipe, type, onClose, onDelete }: DeletePortalProps) {
+function DeletePortal({
+  recipe,
+  type,
+  versionCount,
+  recipeVersion = null,
+  onClose,
+  onDelete,
+}: DeletePortalProps) {
   const portalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    //TODO: I am re creating this function multiple times.
     function handleClickOutside(event: MouseEvent) {
       if (!(event.target instanceof Node)) return;
 
@@ -33,37 +43,60 @@ function DeletePortal({ recipe, type, onClose, onDelete }: DeletePortalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
   return createPortal(
-    <div className="fixed inset-0 z-150 flex items-center justify-center bg-black/30">
+    <div className="fixed inset-0 z-150 flex items-center justify-center bg-black/20 p-4">
       <div
         ref={portalRef}
         role="dialog"
         aria-modal="true"
-        className="m-4 flex w-full max-w-[450px] flex-col gap-4 rounded-2xl bg-white p-4"
+        aria-labelledby="delete-recipe-title"
+        className="bg-base text-primary flex w-full max-w-[24rem] flex-col gap-6 rounded-[1.5rem] px-6 py-7"
       >
-        <div>Delete recipe?</div>
-        {type === "version" ? (
-          <div>
-            This will delete <span className="font-bold">{recipe?.title}</span>
-          </div>
-        ) : (
-          <div>
-            This will
-            <span className="font-bold">
-              &nbsp;permanently delete {recipe?.title} and all recipe versions.
-            </span>
-          </div>
-        )}
+        <div className="space-y-4">
+          <h2
+            id="delete-recipe-title"
+            className="font-lora text-2xl font-medium"
+          >
+            Remove this recipe?
+          </h2>
+          {type === "version" ? (
+            <p className="text-secondary font-lora text-base">
+              This removes version{" "}
+              <span className="text-primary inline-block font-medium">
+                {recipeVersion !== null ? recipeVersion + 1 : ""}
+              </span>{" "}
+              of{" "}
+              <span className="text-primary inline-block font-medium">
+                {recipe?.title}
+              </span>
+              .
+            </p>
+          ) : (
+            <p className="text-secondary font-lora text-base">
+              This permanently removes{" "}
+              <span className="text-primary block font-medium">
+                {recipe?.title}
+              </span>
+              <span>
+                and all of its{" "}
+                <span className="text-primary text-center font-medium">
+                  {versionCount}{" "}
+                </span>
+                {versionCount === 1 ? "version" : "versions"}
+              </span>
+            </p>
+          )}
+        </div>
 
-        <div className="flex justify-end gap-4">
+        <div className="flex items-center justify-end gap-5">
           <button
             onClick={onClose}
-            className="bg-mantle hover:bg-mantle-hover cursor-pointer rounded-xl px-3 py-2 transition-colors duration-150"
+            className="text-secondary hover:text-primary cursor-pointer text-sm underline underline-offset-4 transition-colors duration-150"
           >
             Cancel
           </button>
           <button
             onClick={onDelete}
-            className="bg-rose hover:bg-rose/80 cursor-pointer rounded-xl px-3 py-2 text-white transition-colors duration-150"
+            className="text-rose hover:text-rose/75 cursor-pointer text-sm font-medium underline underline-offset-4 transition-colors duration-150"
           >
             Delete
           </button>

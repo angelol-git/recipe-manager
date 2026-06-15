@@ -3,7 +3,12 @@ import { useNavigate } from "react-router";
 import { useRecipeMutations } from "./useRecipes";
 import type { Recipe } from "../types/recipe";
 
-type DeleteType = "version" | "all";
+export type DeleteType = "version" | "all";
+export type OpenDeleteModal = (
+  recipe: Recipe,
+  type: DeleteType,
+  recipeVersion?: number | null,
+) => void;
 
 type DeleteModalState = {
   isOpen: boolean;
@@ -22,9 +27,9 @@ type UseDeleteRecipeOptions = {
   getRedirectPath?: (args: GetRedirectPathArgs) => string | null;
 };
 
-export function useDeleteRecipe(
-  { getRedirectPath = () => "/" }: UseDeleteRecipeOptions = {},
-) {
+export function useDeleteRecipe({
+  getRedirectPath = () => "/",
+}: UseDeleteRecipeOptions = {}) {
   const navigate = useNavigate();
   const { deleteRecipe, deleteRecipeVersion } = useRecipeMutations();
 
@@ -35,8 +40,8 @@ export function useDeleteRecipe(
     recipeVersion: null,
   });
 
-  const openDeleteModal = useCallback(
-    (recipe: Recipe, type: DeleteType, recipeVersion: number | null = null) => {
+  const openDeleteModal = useCallback<OpenDeleteModal>(
+    (recipe, type, recipeVersion = null) => {
       setDeleteModal({ isOpen: true, type, recipe, recipeVersion });
     },
     [],

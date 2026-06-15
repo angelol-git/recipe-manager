@@ -72,7 +72,6 @@ const KitchenLayout = () => {
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <KitchenHeader
           recipe={recipe}
-          recipeVersion={recipeVersion}
           isEditing={isEditing}
           setIsEditing={setIsEditing}
         />
@@ -84,6 +83,8 @@ const KitchenLayout = () => {
         <DeleteRecipePortal
           recipe={deleteModal.recipe}
           type={deleteModal.type}
+          versionCount={deleteModal.recipe.versions.length}
+          recipeVersion={deleteModal.recipeVersion}
           onClose={closeDeleteModal}
           onDelete={handleDelete}
         />

@@ -6,7 +6,6 @@ import type { Recipe } from "../../../types/recipe";
 
 type KitchenHeaderProps = {
   recipe: Recipe | null;
-  recipeVersion: number;
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
 };
@@ -34,7 +33,10 @@ const KitchenHeader = ({
             </Link>
           )}
           {recipe && (
-            <KitchenOptions isEditing={isEditing} setIsEditing={setIsEditing} />
+            <KitchenOptions
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+            />
           )}
         </div>
       </div>

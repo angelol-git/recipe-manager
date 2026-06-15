@@ -1,17 +1,14 @@
 import { useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { createPortal } from "react-dom";
 import { CircleX, Share, Ellipsis } from "lucide-react";
+import type { OpenDeleteModal } from "../hooks/useDeleteRecipe";
 import type { Recipe } from "../types/recipe";
 
 type RecipeOptionsProps = {
   recipe: Recipe;
   isOptionsOpen: boolean;
   setIsOptionsOpen: Dispatch<SetStateAction<boolean>>;
-  openDeleteModal: (
-    recipe: Recipe,
-    type: "version" | "all",
-    recipeVersion?: number | null,
-  ) => void;
+  openDeleteModal: OpenDeleteModal;
 };
 
 function RecipeOptions({
