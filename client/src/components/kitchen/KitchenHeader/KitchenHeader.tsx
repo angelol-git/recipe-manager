@@ -27,16 +27,13 @@ const KitchenHeader = ({
           {!isEditing && (
             <Link
               to="/"
-              className="hover:bg-mantle-hover w-min cursor-pointer rounded-lg p-1 duration-150"
+              className="hover:bg-mantle-hover w-min cursor-pointer rounded-lg p-1 underline duration-150"
             >
               <ArrowLeft strokeWidth={1.5} className="stroke-icon" size={18} />
             </Link>
           )}
           {recipe && (
-            <KitchenOptions
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-            />
+            <KitchenOptions isEditing={isEditing} setIsEditing={setIsEditing} />
           )}
         </div>
       </div>

@@ -88,7 +88,7 @@ function HomeTags({
                 setIsEditTags(true);
               }}
               disabled={isDeletingTags}
-              className="text-secondary hover:bg-mantle-hover cursor-pointer rounded-lg px-2 py-1 text-sm underline transition-colors duration-150"
+              className="text-secondary hover:text-primary hover:bg-mantle-hover font-ibm-plex-mono cursor-pointer rounded-full px-3 py-1 text-xs tracking-[0.08em] uppercase transition-colors duration-150"
             >
               Edit
             </button>

@@ -1,26 +1,24 @@
 import { Dispatch, SetStateAction } from "react";
-import type { Recipe } from "../../../types/recipe";
 
 type KitchenOptionsProps = {
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
 };
 
-function KitchenOptions({
-  isEditing,
-  setIsEditing,
-}: KitchenOptionsProps) {
+function KitchenOptions({ isEditing, setIsEditing }: KitchenOptionsProps) {
   return isEditing ? (
     <div className="flex gap-6 text-sm">
       <button
         onClick={() => {
           setIsEditing(false);
         }}
-        className="cursor-pointer underline"
+        className="font-ibm-plex-mono cursor-pointer tracking-[0.08em] uppercase"
       >
         Cancel
       </button>
-      <div className="cursor-pointer underline">Save</div>
+      <div className="font-ibm-plex-mono cursor-pointer tracking-[0.08em] uppercase">
+        Save
+      </div>
     </div>
   ) : (
     <div className="flex gap-6 text-sm">
@@ -28,11 +26,13 @@ function KitchenOptions({
         onClick={() => {
           setIsEditing(true);
         }}
-        className="cursor-pointer underline"
+        className="font-ibm-plex-mono cursor-pointer tracking-[0.08em] uppercase"
       >
         Edit
       </button>
-      <div className="cursor-pointer underline">Share</div>
+      <div className="font-ibm-plex-mono cursor-pointer tracking-[0.08em] uppercase">
+        Share
+      </div>
     </div>
   );
 }

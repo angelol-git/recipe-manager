@@ -281,7 +281,7 @@ const RecipeResponse = memo(
             <div className="flex w-full max-w-full min-w-0 flex-col items-start gap-2 py-2">
               <button
                 onClick={() => setIsPromptModalOpen(true)}
-                className="hover:bg-base-hover cursor-pointer rounded-lg p-1 underline transition-colors duration-150"
+                className="hover:bg-base-hover font-ibm-plex-mono cursor-pointer rounded-lg p-1 underline transition-colors duration-150"
               >
                 View Prompt
               </button>
