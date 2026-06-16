@@ -17,7 +17,7 @@ function RecipeEditControls({
       <button
         type="button"
         onClick={() => openDeleteModal(recipe, "all")}
-        className="text-rose hover:text-rose cursor-pointer underline underline-offset-2 transition-colors duration-150"
+        className="text-rose hover:text-rose font-ibm-plex-mono cursor-pointer uppercase transition-colors duration-150"
       >
         Delete Recipe
       </button>
@@ -25,7 +25,7 @@ function RecipeEditControls({
         <button
           type="button"
           onClick={() => openDeleteModal(recipe, "version", recipeVersion)}
-          className="text-rose hover:text-rose cursor-pointer underline underline-offset-2 transition-colors duration-150"
+          className="text-rose hover:text-rose font-ibm-plex-mono cursor-pointer uppercase transition-colors duration-150"
         >
           Delete Current Version
         </button>

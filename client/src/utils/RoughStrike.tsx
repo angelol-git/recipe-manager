@@ -148,14 +148,14 @@ export function RoughStrike({
       if (firstLineOnly) {
         const firstLineSegment = getFirstLineSegment(textRects, containerRect);
         if (firstLineSegment) {
-          drawSegment(firstLineSegment, 1);
+          drawSegment(firstLineSegment, 1.2);
         }
         return;
       }
 
       //Draw multiple lines through the ingredients
       for (const rect of textRects) {
-        drawSegment(toLineSegment(rect, containerRect), 1);
+        drawSegment(toLineSegment(rect, containerRect), 1.2);
       }
     };
 
