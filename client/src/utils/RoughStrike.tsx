@@ -17,7 +17,10 @@ type LineSegment = {
 
 const LINE_STYLE = {
   stroke: "currentColor",
-  strokeWidth: 1.5,
+  strokeWidth: 2,
+  disableMultiStroke: true,
+  preserveVertices: true,
+  bowing: 1.1,
 };
 
 function getTextNodes(node: Node): Text[] {
