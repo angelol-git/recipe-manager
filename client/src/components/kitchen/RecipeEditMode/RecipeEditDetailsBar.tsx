@@ -39,6 +39,7 @@ function RecipeEditDetailsBar({
       <h3 className="font-lora text-secondary mb-2 text-lg font-medium">
         Recipe Details
       </h3>
+      {/* TO DO: For mobile this flex-col one item at a time */}
       <div
         role="group"
         aria-label="Editable recipe details"
@@ -48,7 +49,7 @@ function RecipeEditDetailsBar({
           <label
             key={field}
             htmlFor={field}
-            className="font-lora flex items-center gap-1 font-medium italic text-green-900/80"
+            className="font-lora flex items-center gap-1 font-medium text-green-900/80 italic"
           >
             {prefix && <span>{prefix}</span>}
             <input
@@ -60,7 +61,7 @@ function RecipeEditDetailsBar({
               value={recipeDetails[field] ?? ""}
               onChange={(event) => handleDraftDetail(field, event.target.value)}
               placeholder={placeholder}
-              className="text-primary min-w-[2ch] max-w-[5ch] border-0 border-b border-green-900/18 bg-transparent px-0.5 text-center outline-none placeholder:text-green-900/35 focus:border-green-900/45"
+              className="text-primary max-w-[5ch] min-w-[2ch] border-0 border-b border-green-900/18 bg-transparent px-0.5 text-center outline-none placeholder:text-green-900/35 focus:border-green-900/45"
             />
             {!prefix && <span>{label}</span>}
             {suffix && <span>{suffix}</span>}

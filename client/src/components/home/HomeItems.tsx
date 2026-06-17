@@ -24,7 +24,8 @@ function HomeItems({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4">
-        <div className="font-semibold">Items({totalItems})</div>
+        <div className="font-semibold">Recipes({totalItems})</div>
+        {/* TO DO: This button should probably be renamed to something  */}
         <Link
           to="/kitchen"
           className="focus-visible:ring-accent/25 border-accent/45 bg-accent/8 text-accent-hover hover:border-accent/55 hover:bg-accent/18 hover:text-accent-hover inline-flex min-h-8 cursor-pointer items-center justify-center rounded-full border px-3 py-1 text-sm leading-none shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none"

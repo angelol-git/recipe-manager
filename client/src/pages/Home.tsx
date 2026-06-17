@@ -83,16 +83,6 @@ function Home() {
           />
         </main>
       </div>
-      {deleteModal.isOpen && deleteModal.recipe && deleteModal.type && (
-        <DeleteRecipePortal
-          recipe={deleteModal.recipe}
-          type={deleteModal.type}
-          versionCount={deleteModal.recipe.versions.length}
-          recipeVersion={deleteModal.recipeVersion}
-          onClose={closeDeleteModal}
-          onDelete={handleDelete}
-        />
-      )}
     </div>
   );
 }
