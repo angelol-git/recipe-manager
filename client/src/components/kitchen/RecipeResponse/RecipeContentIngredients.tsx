@@ -43,7 +43,7 @@ function renderIngredient(ingredient: RecipeIngredient) {
   );
 
   const textCell = (
-    <div className="relative min-w-0 pl-5">
+    <div className="relative min-w-0">
       {ingredient.completed && (
         <RoughStrike
           completed
@@ -98,7 +98,7 @@ function RecipeContentIngredients({
           </button>
         )}
       </div>
-      <ul className="grid grid-cols-[minmax(0,max-content)_minmax(0,1fr)] gap-x-4 gap-y-2 pt-2">
+      <ul className="grid-cols[max-content_1fr] grid gap-2 gap-x-4 pt-2">
         {ingredients.map((item) => {
           const { measurementCell, textCell } = renderIngredient(item);
 
@@ -108,7 +108,7 @@ function RecipeContentIngredients({
                 type="button"
                 onClick={() => onToggleCompletion(item.id)}
                 aria-pressed={item.completed}
-                className="hover:bg-base-hover col-span-2 grid min-w-0 cursor-pointer grid-cols-subgrid items-start rounded-lg px-1 text-left transition-colors duration-150"
+                className="hover:bg-base-hover col-span-2 grid min-h-8 min-w-0 cursor-pointer grid-cols-subgrid items-start rounded-lg px-1 py-1.5 text-left transition-colors duration-150"
               >
                 {measurementCell}
                 {textCell}
