@@ -17,18 +17,12 @@ type DeleteModalState = {
   recipeVersion: number | null;
 };
 
-type GetRedirectPathArgs = {
-  type: DeleteType | null;
-  recipe: Recipe | null;
-  recipeVersion: number | null;
-};
-
 type UseDeleteRecipeOptions = {
-  getRedirectPath?: (args: GetRedirectPathArgs) => string | null;
+  onDeleteVersion?: (nextRecipeVersion: number) => void;
 };
 
 export function useDeleteRecipe({
-  getRedirectPath = () => "/",
+  onDeleteVersion,
 }: UseDeleteRecipeOptions = {}) {
   const navigate = useNavigate();
   const { deleteRecipe, deleteRecipeVersion } = useRecipeMutations();
@@ -53,28 +47,21 @@ export function useDeleteRecipe({
 
   const handleDelete = useCallback(() => {
     const { type, recipe, recipeVersion } = deleteModal;
-    const redirectPath = getRedirectPath({ type, recipe, recipeVersion });
 
     if (!type || !recipe) {
       closeDeleteModal();
       return;
     }
 
-    if (type === "version") {
-      if (recipe.versions.length === 1) {
-        deleteRecipe(recipe.id);
-      } else if (recipeVersion !== null) {
-        deleteRecipeVersion({
-          recipeId: recipe.id,
-          recipeVersionId: recipe.versions[recipeVersion].id,
-        });
-      }
+    if (type === "version" && recipeVersion !== null) {
+      deleteRecipeVersion({
+        recipeId: recipe.id,
+        recipeVersionId: recipe.versions[recipeVersion].id,
+      });
+      onDeleteVersion?.(Math.max(recipeVersion - 1, 0));
     } else {
       deleteRecipe(recipe.id);
-    }
-
-    if (redirectPath) {
-      navigate(redirectPath);
+      navigate("/");
     }
 
     closeDeleteModal();
@@ -82,7 +69,7 @@ export function useDeleteRecipe({
     deleteModal,
     deleteRecipe,
     deleteRecipeVersion,
-    getRedirectPath,
+    onDeleteVersion,
     navigate,
     closeDeleteModal,
   ]);

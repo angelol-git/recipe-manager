@@ -20,20 +20,7 @@ const KitchenLayout = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const { deleteModal, openDeleteModal, closeDeleteModal, handleDelete } =
     useDeleteRecipe({
-      getRedirectPath: ({ type, recipe }) => {
-        const isDeletingActiveRecipe = recipe?.id === id;
-        const isDeletingLastVersion =
-          type === "version" && recipe?.versions?.length === 1;
-
-        if (
-          isDeletingActiveRecipe &&
-          (type === "all" || isDeletingLastVersion)
-        ) {
-          return "/kitchen";
-        }
-
-        return null;
-      },
+      onDeleteVersion: setRecipeVersion,
     });
 
   const contextValue = useMemo(

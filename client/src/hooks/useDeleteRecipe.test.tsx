@@ -5,6 +5,7 @@ import type { Recipe } from "../types/recipe";
 const mockNavigate = vi.fn();
 const mockDeleteRecipe = vi.fn();
 const mockDeleteRecipeVersion = vi.fn();
+const mockOnDeleteVersion = vi.fn();
 
 vi.mock("react-router", () => ({
   useNavigate: () => mockNavigate,
@@ -89,11 +90,7 @@ describe("useDeleteRecipe", () => {
   });
 
   it("deletes the full recipe, navigates, and closes the modal for type all", () => {
-    const { result } = renderHook(() =>
-      useDeleteRecipe({
-        getRedirectPath: () => "/recipes",
-      }),
-    );
+    const { result } = renderHook(() => useDeleteRecipe());
 
     act(() => {
       result.current.openDeleteModal(recipe, "all");
@@ -105,7 +102,7 @@ describe("useDeleteRecipe", () => {
 
     expect(mockDeleteRecipe).toHaveBeenCalledWith("recipe-1");
     expect(mockDeleteRecipeVersion).not.toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith("/recipes");
+    expect(mockNavigate).toHaveBeenCalledWith("/");
 
     expect(result.current.deleteModal).toEqual({
       isOpen: false,
@@ -115,37 +112,10 @@ describe("useDeleteRecipe", () => {
     });
   });
 
-  it("deletes the full recipe when deleting a version from a single-version recipe", () => {
+  it("deletes the recipe version and returns to the previous version", () => {
     const { result } = renderHook(() =>
       useDeleteRecipe({
-        getRedirectPath: () => "/recipes",
-      }),
-    );
-
-    act(() => {
-      result.current.openDeleteModal(recipe, "version", 0);
-    });
-
-    act(() => {
-      result.current.handleDelete();
-    });
-
-    expect(mockDeleteRecipe).toHaveBeenCalledWith("recipe-1");
-    expect(mockDeleteRecipeVersion).not.toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith("/recipes");
-
-    expect(result.current.deleteModal).toEqual({
-      isOpen: false,
-      type: "version",
-      recipe,
-      recipeVersion: 0,
-    });
-  });
-
-  it("deletes the recipe version when deleting a version from a multi-version recipe", () => {
-    const { result } = renderHook(() =>
-      useDeleteRecipe({
-        getRedirectPath: () => "/recipes",
+        onDeleteVersion: mockOnDeleteVersion,
       }),
     );
 
@@ -162,6 +132,8 @@ describe("useDeleteRecipe", () => {
       recipeId: "recipe-1",
       recipeVersionId: "version-2",
     });
+    expect(mockOnDeleteVersion).toHaveBeenCalledWith(0);
+    expect(mockNavigate).not.toHaveBeenCalled();
 
     expect(result.current.deleteModal).toEqual({
       isOpen: false,

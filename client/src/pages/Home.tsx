@@ -5,7 +5,6 @@ import HomeItems from "../components/home/HomeItems";
 import { useUser } from "../hooks/useUser";
 import { useRecipes } from "../hooks/useRecipes";
 import { useTags } from "../hooks/useTags";
-import { useDeleteRecipe } from "../hooks/useDeleteRecipe";
 
 function Home() {
   const [page, setPage] = useState(1);
