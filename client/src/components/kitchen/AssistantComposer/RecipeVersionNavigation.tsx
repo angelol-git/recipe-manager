@@ -31,27 +31,28 @@ const RecipeVersionNavigation = memo(
     }
 
     return (
-      <div className="border-secondary/15 bg-mantle flex h-11 shrink-0 items-center gap-2 rounded-full border px-2">
+      <div className="border-accent bg-accent text-white flex h-10 shrink-0 items-center gap-1 rounded-full border px-1">
         <button
           onClick={handlePrevious}
           disabled={recipeVersion === 0}
-          className="text-secondary flex h-8 w-6 cursor-pointer items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-30"
+          className="hover:bg-white/12 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Previous version"
         >
-          <ChevronLeft size={18} strokeWidth={1.75} />
+          <ChevronLeft size={15} strokeWidth={1.6} />
         </button>
 
-        <span className="text-secondary min-w-14 text-center text-sm font-medium tabular-nums">
+        <span className="font-ibm-plex-mono min-w-[3.5rem] text-center text-[11px] tracking-[0.12em] uppercase tabular-nums">
           {recipeVersion + 1}
-          <span className="text-icon-muted">/{totalVersions}</span>
+          <span className="mx-1 text-white/75">/</span>
+          {totalVersions}
         </span>
         <button
           onClick={handleNext}
           disabled={recipeVersion === totalVersions - 1}
-          className="text-secondary flex h-8 w-6 cursor-pointer items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-30"
+          className="hover:bg-white/12 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Next version"
         >
-          <ChevronRight size={18} strokeWidth={1.75} />
+          <ChevronRight size={15} strokeWidth={1.6} />
         </button>
       </div>
     );
