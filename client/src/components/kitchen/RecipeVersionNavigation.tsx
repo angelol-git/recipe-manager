@@ -1,6 +1,6 @@
 import { memo, Dispatch, SetStateAction } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { Recipe } from "../../../types/recipe";
+import { Recipe } from "../../types/recipe";
 
 type RecipeVersionNavigationProps = {
   recipe: Recipe;

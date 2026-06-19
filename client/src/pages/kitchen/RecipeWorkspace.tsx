@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, Dispatch, SetStateAction } from "react";
 import { useOutletContext } from "react-router";
 import type { OpenDeleteModal } from "../../hooks/useDeleteRecipe.js";
 import RecipeContent from "../../components/kitchen/RecipeResponse/RecipeContent.js";
-import RecipeVersionNavigation from "../../components/kitchen/AssistantComposer/RecipeVersionNavigation.js";
+import RecipeVersionNavigation from "../../components/kitchen/RecipeVersionNavigation.js";
 import AssistantComposer from "../../components/kitchen/AssistantComposer/AssistantComposer";
 import RecipeEditForm from "../../components/kitchen/RecipeEditMode/RecipeEditForm.jsx";
 import RecipeContentTags from "../../components/kitchen/RecipeResponse/RecipeContentTags.jsx";
