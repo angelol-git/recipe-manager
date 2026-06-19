@@ -1,9 +1,9 @@
-import { useEffect, useState, memo, type RefObject } from "react";
-import RecipeContentPromptModal from "./RecipeContentPromptModal";
+import { useEffect, useState, memo } from "react";
 import RecipeContentDetails from "./RecipeContentDetails";
-import RecipeContentFooter from "./RecipeContentFooter";
 import RecipeContentIngredients from "./RecipeContentIngredients";
 import RecipeContentInstructions from "./RecipeContentInstructions";
+import RecipeContentSource from "./RecipeContentSource";
+import RecipeContentVersionInfo from "./RecipeContentVersionInfo";
 import type {
   Recipe,
   RecipeDetails,
@@ -20,12 +20,10 @@ const EMPTY_RECIPE_DETAILS: RecipeDetails = {
 type RecipeContentProps = {
   recipe: Recipe;
   recipeVersion: number;
-  modalAnchorRef: RefObject<HTMLDivElement | null>;
 };
 
 const RecipeContent = memo(
-  ({ recipe, recipeVersion, modalAnchorRef }: RecipeContentProps) => {
-    const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  ({ recipe, recipeVersion }: RecipeContentProps) => {
     const current = recipe?.versions?.[recipeVersion];
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [instructions, setInstructions] = useState<RecipeInstruction[]>([]);
@@ -33,7 +31,7 @@ const RecipeContent = memo(
     const {
       recipeDetails = EMPTY_RECIPE_DETAILS,
       description = "",
-      source_prompt = "",
+      source = null,
     } = current ?? {};
 
     useEffect(() => {
@@ -99,17 +97,12 @@ const RecipeContent = memo(
           onToggleCompletion={toggleInstructionCompletion}
           onResetCompletion={resetInstructionCompletion}
         />
-        <RecipeContentFooter
-          sourcePrompt={source_prompt}
+        <RecipeContentSource
+          source={source}
+        />
+        <RecipeContentVersionInfo
           recipeVersion={recipeVersion}
           versionCount={recipe.versions.length}
-          onViewPrompt={() => setIsPromptModalOpen(true)}
-        />
-        <RecipeContentPromptModal
-          isOpen={isPromptModalOpen}
-          onClose={() => setIsPromptModalOpen(false)}
-          sourcePrompt={source_prompt || ""}
-          anchorRef={modalAnchorRef}
         />
       </div>
     );

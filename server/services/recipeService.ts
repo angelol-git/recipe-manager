@@ -20,6 +20,7 @@ import type {
   Recipe,
   RecipeIngredient,
   RecipeInstruction,
+  RecipeSource,
   RecipeTag,
   RecipeVersion,
 } from "./recipe.types.js";
@@ -27,6 +28,7 @@ import type { UpdateRecipeBody } from "../validation/recipeSchemas.js";
 import { normalizeIngredientUnit } from "../utils/ingredientParser.js";
 
 type UpdateRecipeInput = UpdateRecipeBody["updatedRecipe"];
+
 type GetRecipesByUserIdOptions = {
   page: number;
   pageSize: number;
@@ -47,11 +49,9 @@ export function saveRecipeToDb(
   {
     userId,
     recipeId,
-    sourceUrl,
   }: {
     userId: UserId;
     recipeId?: RecipeId | null;
-    sourceUrl?: string | null;
   },
 ): Recipe | null {
   return db.transaction(() => {
@@ -60,9 +60,9 @@ export function saveRecipeToDb(
     //New recipe
     if (!recipeId) {
       db.prepare(
-        `INSERT INTO recipes (id, user_id, title, source_url)
-         VALUES (?, ?, ?, ?)`,
-      ).run(recipeRecordId, userId, parsedRecipe.title, sourceUrl ?? null);
+        `INSERT INTO recipes (id, user_id, title)
+         VALUES (?, ?, ?)`,
+      ).run(recipeRecordId, userId, parsedRecipe.title);
     } else {
       db.prepare(
         `UPDATE recipes
@@ -74,6 +74,7 @@ export function saveRecipeToDb(
 
     const newVersionId = uuidv7();
     const versionNumber = getNextVersionNumber(recipeRecordId);
+    const source = parseRecipeSource(parsedRecipe.source_input);
 
     db.prepare(
       `INSERT INTO recipe_versions (
@@ -84,10 +85,12 @@ export function saveRecipeToDb(
          total_time,
          calories,
          description,
-         source_prompt,
+         source_type,
+         source_value,
+         source_summary,
          ai_model,
          relation
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       newVersionId,
       recipeRecordId,
@@ -96,7 +99,9 @@ export function saveRecipeToDb(
       parsedRecipe.total_time,
       parsedRecipe.calories,
       parsedRecipe.description,
-      parsedRecipe.source_prompt,
+      source?.type ?? null,
+      source?.value ?? null,
+      source?.summary ?? null,
       parsedRecipe.ai_model,
       parsedRecipe.relation ?? "reply",
     );
@@ -159,7 +164,7 @@ export function getRecipesByUserId(
   const versions = db
     .prepare(
       `SELECT id, recipe_id, version_number, servings, total_time, calories,
-              description, source_prompt, ai_model, created_at
+              description, source_type, source_value, source_summary, ai_model, created_at
        FROM recipe_versions
        WHERE recipe_id IN (${recipeIds.map(() => "?").join(", ")})
        ORDER BY recipe_id ASC, version_number ASC`,
@@ -287,7 +292,9 @@ export function updateRecipe(
            total_time = ?,
            calories = ?,
            description = ?,
-           source_prompt = ?,
+           source_type = ?,
+           source_value = ?,
+           source_summary = ?,
            updated_at = CURRENT_TIMESTAMP
        WHERE id = ? AND recipe_id = ?`,
     ).run(
@@ -295,7 +302,9 @@ export function updateRecipe(
       updatedRecipe.recipeDetails.total_time ?? null,
       updatedRecipe.recipeDetails.calories ?? null,
       updatedRecipe.description ?? null,
-      updatedRecipe.source_prompt ?? null,
+      updatedRecipe.source?.type ?? null,
+      updatedRecipe.source?.value ?? null,
+      updatedRecipe.source?.summary ?? null,
       String(updatedRecipe.id),
       id,
     );
@@ -485,7 +494,7 @@ function mapRecipeVersions(
     description: version.description ?? "",
     instructions: instructionsMap.get(version.id) ?? [],
     ingredients: ingredientsMap.get(version.id) ?? [],
-    source_prompt: version.source_prompt ?? "",
+    source: toRecipeSource(version),
     ai_model: version.ai_model ?? null,
     created_at: version.created_at,
     version_number: version.version_number,
@@ -501,7 +510,7 @@ function getRecipeVersions(
   const versions = db
     .prepare(
       `SELECT id, recipe_id, version_number, servings, total_time, calories,
-              description, source_prompt, ai_model, created_at
+              description, source_type, source_value, source_summary, ai_model, created_at
        FROM recipe_versions
        WHERE recipe_id = ?
        ORDER BY version_number ${normalizedOrder}`,
@@ -538,6 +547,22 @@ function buildRecipeResponse(
     created_at: recipe.created_at,
     tags: getRecipeTags(id),
     versions: getRecipeVersions(id, versionOrder),
+  };
+}
+
+function toRecipeSource(version: RecipeVersionRow): RecipeSource | null {
+  if (
+    version.source_type == null ||
+    version.source_value == null ||
+    version.source_summary == null
+  ) {
+    return null;
+  }
+
+  return {
+    type: version.source_type,
+    value: version.source_value,
+    summary: version.source_summary,
   };
 }
 
@@ -679,4 +704,55 @@ function replaceRecipeVersionIngredientsAndSteps(
 
   insertIngredientRows(recipeVersionId, ingredients);
   insertInstructionRows(recipeVersionId, instructions);
+}
+
+export function parseRecipeSource(
+  input: string | null | undefined,
+): RecipeSource | null {
+  const value = input?.trim();
+  if (!value) {
+    return null;
+  }
+
+  /*
+   * source_type = "url"
+   * source_value = "https://sallysbakingaddiction.com/best-banana-bread-recipe/"
+   * source_summary = "sallysbakingaddiction.com"
+   */
+  try {
+    const url = new URL(value);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return {
+        type: "url",
+        value,
+        summary: url.hostname.replace(/^www\./, ""),
+      };
+    }
+  } catch {
+    // not a URL
+  }
+
+  /*
+   * source_type = "raw_text"
+   * source_value = "(full pasted banana bread recipe...)"
+   * source_summary = "Imported from pasted recipe text"
+   */
+  if (value.includes("\n") || value.length > 200) {
+    return {
+      type: "raw_text",
+      value,
+      summary: "Imported from pasted recipe text",
+    };
+  }
+
+  /*
+   * source_type = "instruction"
+   * source_value = "Double this recipe"
+   * source_summary = "Double this recipe"
+   */
+  return {
+    type: "instruction",
+    value,
+    summary: value,
+  };
 }

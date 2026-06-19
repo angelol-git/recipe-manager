@@ -3,6 +3,7 @@ import type {
   Recipe,
   RecipeIngredient,
   RecipeInstruction,
+  RecipeSource,
   RecipeVersion,
 } from "../types/recipe";
 import type { Tag } from "../types/tag";
@@ -198,6 +199,41 @@ const tagSchema = z.object({
   color: z.string(),
 }) satisfies z.ZodType<Tag>;
 
+const recipeSourceSchema = z.object({
+  type: z.enum(["url", "instruction", "raw_text"]),
+  value: z.string(),
+  summary: z.string(),
+}) satisfies z.ZodType<RecipeSource>;
+
+function inferLegacySource(sourcePrompt: string): RecipeSource {
+  try {
+    const url = new URL(sourcePrompt);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return {
+        type: "url",
+        value: sourcePrompt,
+        summary: url.hostname.replace(/^www\./, ""),
+      };
+    }
+  } catch {
+    // Fall back to non-URL source inference.
+  }
+
+  if (sourcePrompt.includes("\n") || sourcePrompt.length > 200) {
+    return {
+      type: "raw_text",
+      value: sourcePrompt,
+      summary: "Imported from pasted recipe text",
+    };
+  }
+
+  return {
+    type: "instruction",
+    value: sourcePrompt,
+    summary: sourcePrompt,
+  };
+}
+
 const storedRecipeVersionSchema = z
   .object({
     id: z.union([z.string(), z.number()]).optional(),
@@ -205,9 +241,13 @@ const storedRecipeVersionSchema = z
     ingredients: storedIngredientsSchema.optional(),
     instructions: storedInstructionsSchema.optional(),
     source_prompt: z.string().optional(),
+    source: recipeSourceSchema.nullable().optional(),
     recipeDetails: recipeDetailsSchema.partial().nullable().optional(),
   })
   .transform((version): RecipeVersion => {
+    const legacySourcePrompt = version.source_prompt?.trim();
+    const source = version.source ?? (legacySourcePrompt ? inferLegacySource(legacySourcePrompt) : null);
+
     return {
       id: String(version.id ?? ""),
       recipeDetails: {
@@ -218,7 +258,7 @@ const storedRecipeVersionSchema = z
       description: version.description ?? "",
       ingredients: version.ingredients ?? [],
       instructions: version.instructions ?? [],
-      source_prompt: version.source_prompt ?? "",
+      source,
     };
   });
 
@@ -226,7 +266,6 @@ const storedRecipeSchema = z
   .object({
     id: z.union([z.string(), z.number()]).optional(),
     title: z.string().optional(),
-    source_url: z.string().nullable().optional(),
     created_at: z.string().nullable().optional(),
     tags: z.array(tagSchema).optional(),
     versions: z.array(storedRecipeVersionSchema).optional(),
@@ -235,7 +274,6 @@ const storedRecipeSchema = z
     (recipe): Recipe => ({
       id: String(recipe.id ?? ""),
       title: recipe.title ?? "",
-      source_url: recipe.source_url ?? null,
       created_at: recipe.created_at ?? null,
       tags: recipe.tags ?? [],
       versions: recipe.versions ?? [],

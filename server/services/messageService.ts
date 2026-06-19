@@ -13,7 +13,7 @@ type JsonRecord = Record<string, unknown>;
 type AskMessage = Omit<AskMessageRow, "recipe_id">;
 type StoredAiError = JsonRecord & {
   ai_model?: string;
-  source_prompt?: string;
+  source_input?: string;
   error?: string;
   errorMessage?: string;
   raw?: unknown;
@@ -24,7 +24,7 @@ type RecipeError = {
   status: string | null;
   created_at: string;
   ai_model?: string;
-  source_prompt?: string;
+  source_input?: string;
   error?: string;
   errorMessage: string;
   raw?: unknown;
@@ -93,7 +93,7 @@ export function getRecipeErrors(
       status: row.status,
       created_at: row.created_at,
       ai_model: parsed.ai_model,
-      source_prompt: parsed.source_prompt,
+      source_input: parsed.source_input,
       error: parsed.error,
       errorMessage: parsed.errorMessage || "Recipe could not be generated",
       raw: parsed.raw,

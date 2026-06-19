@@ -14,7 +14,7 @@ export type DraftIngredient = RecipeIngredient;
 
 export type DraftArrayField = "instructions" | "ingredients";
 
-export type DraftStringField = "title" | "description" | "source_prompt";
+export type DraftStringField = "title" | "description";
 
 export type DraftIngredientField =
   | "raw_text"
@@ -38,7 +38,7 @@ export type DraftRecipe = {
   recipeDetails: RecipeDetails;
   instructions: DraftTextItem[];
   ingredients: DraftIngredient[];
-  source_prompt: RecipeVersion["source_prompt"];
+  source: RecipeVersion["source"];
 };
 
 export type DraftArrayEditorProps = {

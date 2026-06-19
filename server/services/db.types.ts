@@ -17,7 +17,9 @@ export type RecipeVersionRow = {
   total_time: number | null;
   calories: number | null;
   description: string | null;
-  source_prompt: string | null;
+  source_type: "url" | "instruction" | "raw_text" | null;
+  source_value: string | null;
+  source_summary: string | null;
   ai_model: string | null;
   created_at: string;
 };

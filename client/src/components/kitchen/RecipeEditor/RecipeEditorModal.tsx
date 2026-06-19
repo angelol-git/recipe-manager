@@ -59,7 +59,7 @@ function RecipeEditorModal({
       tags: draft.tags,
       description: draft.description,
       recipeDetails: draft.recipeDetails,
-      source_prompt: draft.source_prompt,
+      source: draft.source,
       instructions: draft.instructions || [],
       ingredients: draft.ingredients || [],
     };

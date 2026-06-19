@@ -12,7 +12,7 @@ import {
   saveUserPrompt,
   saveAssistantErrorMessage,
 } from "../services/messageService.js";
-import { saveRecipeToDb } from "../services/recipeService.js";
+import { parseRecipeSource, saveRecipeToDb } from "../services/recipeService.js";
 import { getUrlContext } from "../services/urlContentService.js";
 import { isValidUrl } from "../utils/urlValidator.js";
 
@@ -72,7 +72,6 @@ router.post(
         const savedRecipe = saveRecipeToDb(parsedRecipe, {
           userId: user.id,
           recipeId: recipeId ?? null,
-          sourceUrl: url,
         });
         return res.json({
           recipe: savedRecipe,
@@ -110,7 +109,7 @@ router.post(
               completed: false,
               ...ingredient,
             })),
-            source_prompt: parsedRecipe.source_prompt,
+            source: parseRecipeSource(parsedRecipe.source_input),
           },
         ],
       };

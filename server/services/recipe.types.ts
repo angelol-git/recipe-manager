@@ -1,5 +1,13 @@
 import type { RecipeId } from "./db.types.js";
 
+export type RecipeSourceType = "url" | "instruction" | "raw_text";
+
+export type RecipeSource = {
+  type: RecipeSourceType;
+  value: string;
+  summary: string;
+};
+
 export type RecipeIngredient = {
   id: string;
   position: number;
@@ -33,7 +41,7 @@ export type RecipeVersion = {
   description: string;
   instructions: RecipeInstruction[];
   ingredients: RecipeIngredient[];
-  source_prompt: string;
+  source: RecipeSource | null;
   ai_model: string | null;
   created_at: string;
   version_number: number;

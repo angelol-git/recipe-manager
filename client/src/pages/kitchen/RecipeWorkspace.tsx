@@ -88,7 +88,6 @@ function RecipeWorkspace() {
               <RecipeContent
                 recipe={recipe}
                 recipeVersion={recipeVersion}
-                modalAnchorRef={replyPanelRef}
               />
             </div>
           </div>

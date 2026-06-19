@@ -114,7 +114,7 @@ export function updateLocalRecipe(recipe: UpdateRecipeInput): void {
       instructions: recipe.instructions,
       ingredients: recipe.ingredients,
       recipeDetails: recipe.recipeDetails,
-      source_prompt: recipe.source_prompt,
+      source: recipe.source,
     };
   }
 

@@ -1,11 +1,17 @@
 import type { Tag } from "./tag";
 
 export type RecipeDetailValue = string | number | null;
+export type RecipeSourceType = "url" | "instruction" | "raw_text";
+
+export type RecipeSource = {
+  type: RecipeSourceType;
+  value: string;
+  summary: string;
+};
 
 export type Recipe = {
   id: string;
   title: string;
-  source_url?: string | null;
   tags: Tag[];
   versions: RecipeVersion[];
   created_at?: string | null;
@@ -46,7 +52,7 @@ export type RecipeVersion = {
   ingredients: RecipeIngredient[];
   instructions: RecipeInstruction[];
   recipeDetails: RecipeDetails;
-  source_prompt: string;
+  source: RecipeSource | null;
   ai_model?: string | null;
   created_at?: string;
   version_number?: number;
@@ -61,5 +67,5 @@ export type UpdateRecipeInput = {
   instructions: RecipeInstruction[];
   ingredients: RecipeIngredient[];
   recipeDetails: RecipeDetails;
-  source_prompt: string;
+  source: RecipeSource | null;
 };

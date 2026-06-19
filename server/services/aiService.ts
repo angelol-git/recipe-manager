@@ -19,7 +19,7 @@ type AiRecipe = z.infer<typeof aiRecipeSchema>;
 
 export type ParsedAiRecipe = AiRecipe & {
   ai_model: string;
-  source_prompt: string;
+  source_input: string;
   relation?: "reply" | "fork";
   versionId?: string;
 };
@@ -38,7 +38,7 @@ type AiValidationIssue = {
 
 export type AiValidationMeta = {
   type: AiValidationErrorType;
-  source_prompt: string;
+  source_input: string;
   ai_model?: string;
   rawResponse?: string;
   issues?: AiValidationIssue[];
@@ -85,7 +85,7 @@ export function validateAiResponse(
   if (!rawResponse) {
     throw new AiValidationError("The AI returned an empty response.", {
       type: "empty_response",
-      source_prompt: prompt,
+      source_input: prompt,
     });
   }
 
@@ -103,7 +103,7 @@ export function validateAiResponse(
     throw new AiValidationError("Invalid JSON from AI", {
       type: "invalid_json",
       rawResponse,
-      source_prompt: prompt,
+      source_input: prompt,
       ai_model: model,
     });
   }
@@ -115,7 +115,7 @@ export function validateAiResponse(
     throw new AiValidationError("AI response did not match recipe schema.", {
       type: "schema_validation_failed",
       rawResponse,
-      source_prompt: prompt,
+      source_input: prompt,
       ai_model: model,
       issues:
         error instanceof z.ZodError
@@ -138,7 +138,7 @@ export function validateAiResponse(
       {
         type: "empty_recipe",
         rawResponse,
-        source_prompt: prompt,
+        source_input: prompt,
       },
     );
   }
@@ -147,7 +147,7 @@ export function validateAiResponse(
     throw new AiValidationError("Recipe title is too long.", {
       type: "invalid_json",
       rawResponse,
-      source_prompt: prompt,
+      source_input: prompt,
       ai_model: model,
     });
   }
@@ -155,7 +155,7 @@ export function validateAiResponse(
   return {
     ...validatedRecipe,
     ai_model: model,
-    source_prompt: prompt,
+    source_input: prompt,
   };
 }
 

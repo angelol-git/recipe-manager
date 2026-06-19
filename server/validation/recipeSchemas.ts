@@ -44,6 +44,14 @@ const recipeInstructionSchema = z.object({
   raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
 });
 
+const recipeSourceSchema = z
+  .object({
+    type: z.enum(["url", "instruction", "raw_text"]),
+    value: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+    summary: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+  })
+  .nullable();
+
 export const updateRecipeSchema = z.object({
   body: z.object({
     updatedRecipe: z.object({
@@ -62,11 +70,7 @@ export const updateRecipeSchema = z.object({
         .nullable(),
       instructions: z.array(recipeInstructionSchema).min(1),
       ingredients: z.array(recipeIngredientSchema).min(1),
-      source_prompt: z
-        .string()
-        .transform((s) => s.trim())
-        .optional()
-        .default(""),
+      source: recipeSourceSchema,
       tags: z.array(tagSchema).optional().default([]),
     }),
   }),
