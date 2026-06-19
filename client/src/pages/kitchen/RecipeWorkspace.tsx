@@ -78,67 +78,67 @@ function RecipeWorkspace() {
     <div className="relative flex h-full min-h-0 flex-col">
       <div className="ios-scroll min-h-0 flex-1 overflow-y-auto">
         {!isEditing ? (
-          <div
-            ref={replyPanelRef}
-            className="mx-auto w-full max-w-screen-md px-4 pt-2"
-            style={{ paddingBottom: `${composerHeight + 16}px` }}
-          >
-            <RecipeContentTags recipe={recipe} />
-            <RecipeContent
-              recipe={recipe}
-              recipeVersion={recipeVersion}
-              modalAnchorRef={replyPanelRef}
-            />
+          <div className="mx-auto w-full max-w-screen-md px-4">
+            <div
+              ref={replyPanelRef}
+              className="w-full pt-2"
+              style={{ paddingBottom: `${composerHeight + 16}px` }}
+            >
+              <RecipeContentTags recipe={recipe} />
+              <RecipeContent
+                recipe={recipe}
+                recipeVersion={recipeVersion}
+                modalAnchorRef={replyPanelRef}
+              />
+            </div>
           </div>
         ) : (
           //TO DO: Maybe RecipeEditForm modal for mobile and inline editing for desktop
           //TO DO: When the user switches to edit mode need to maintain the current scrolling position
-          <div
-            ref={replyPanelRef}
-            className="mx-auto w-full max-w-screen-md px-4 pt-2"
-          >
-            <RecipeEditForm
-              recipe={recipe}
-              recipeVersion={recipeVersion}
-              isEditing={isEditing}
-              openDeleteModal={openDeleteModal}
-            />
+          <div className="mx-auto w-full max-w-screen-md px-4">
+            <div ref={replyPanelRef} className="w-full pt-2">
+              <RecipeEditForm
+                recipe={recipe}
+                recipeVersion={recipeVersion}
+                isEditing={isEditing}
+                openDeleteModal={openDeleteModal}
+              />
+            </div>
           </div>
         )}
       </div>
 
       {!isEditing && (
         <div className="pointer-events-none absolute inset-x-0 bottom-0">
-          <div
-            ref={composerRef}
-            className="pb-safe mx-auto w-full max-w-screen-md px-2 pt-2"
-          >
-            <div className="flex items-center justify-between gap-3">
-              {hasRecipeNavigation && !isAssistantOpen && (
-                <div className="pointer-events-auto shrink-0">
-                  <RecipeVersionNavigation
+          <div className="mx-auto w-full max-w-screen-md px-4">
+            <div ref={composerRef} className="pb-safe w-full pt-2">
+              <div className="flex items-center justify-between gap-3">
+                {hasRecipeNavigation && !isAssistantOpen && (
+                  <div className="pointer-events-auto shrink-0">
+                    <RecipeVersionNavigation
+                      recipe={recipe}
+                      recipeVersion={recipeVersion}
+                      setRecipeVersion={setRecipeVersion}
+                    />
+                  </div>
+                )}
+                <div
+                  className={`pointer-events-auto flex justify-end ${
+                    isAssistantOpen ? "flex-1" : "ml-auto shrink-0"
+                  }`}
+                >
+                  <AssistantComposer
                     recipe={recipe}
                     recipeVersion={recipeVersion}
                     setRecipeVersion={setRecipeVersion}
+                    hasRecipeNavigation={hasRecipeNavigation}
+                    isAssistantOpen={isAssistantOpen}
+                    setIsAssistantOpen={setIsAssistantOpen}
+                    isQuestionsModalOpen={isQuestionsModalOpen}
+                    setIsQuestionsModalOpen={setIsQuestionsModalOpen}
+                    variant="existing"
                   />
                 </div>
-              )}
-              <div
-                className={`pointer-events-auto flex justify-end ${
-                  isAssistantOpen ? "flex-1" : "ml-auto shrink-0"
-                }`}
-              >
-                <AssistantComposer
-                  recipe={recipe}
-                  recipeVersion={recipeVersion}
-                  setRecipeVersion={setRecipeVersion}
-                  hasRecipeNavigation={hasRecipeNavigation}
-                  isAssistantOpen={isAssistantOpen}
-                  setIsAssistantOpen={setIsAssistantOpen}
-                  isQuestionsModalOpen={isQuestionsModalOpen}
-                  setIsQuestionsModalOpen={setIsQuestionsModalOpen}
-                  variant="existing"
-                />
               </div>
             </div>
           </div>

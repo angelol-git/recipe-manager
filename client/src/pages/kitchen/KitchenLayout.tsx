@@ -67,16 +67,18 @@ const KitchenLayout = () => {
 
   return (
     <div
-      className={`bg-base text-primary relative flex h-[100dvh] w-full overflow-hidden overscroll-contain`}
+      className={`bg-base text-primary relative flex h-[100dvh] w-full overscroll-contain`}
     >
-      <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-        <KitchenHeader
-          recipe={recipe}
-          isEditing={isEditing}
-          setIsEditing={setIsEditing}
-        />
-        <div className="min-h-0 flex-1 overflow-hidden">
-          <Outlet context={contextValue} />
+      <main className="relative flex min-w-0 flex-1 overflow-hidden">
+        <div className="flex w-full min-w-0 flex-1 flex-col">
+          <KitchenHeader
+            recipe={recipe}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+          />
+          <div className="min-h-0 flex-1">
+            <Outlet context={contextValue} />
+          </div>
         </div>
       </main>
       {deleteModal.isOpen && deleteModal.recipe && deleteModal.type && (

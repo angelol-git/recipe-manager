@@ -83,8 +83,8 @@ const RecipeContent = memo(
     }
 
     return (
-      <div role="log" aria-live="polite" className="flex flex-col gap-2">
-        <h1 className="font-lora line-clamp-2 max-w-screen-md text-3xl leading-snug font-semibold wrap-break-word md:text-4xl">
+      <div role="log" aria-live="polite" className="flex w-full flex-col gap-2">
+        <h1 className="font-lora line-clamp-2 text-3xl leading-snug font-semibold wrap-break-word md:text-4xl">
           {recipe?.title}
         </h1>
         <RecipeContentDetails recipeDetails={recipeDetails} />
