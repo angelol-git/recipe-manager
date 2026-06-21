@@ -1,10 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Navigate, Routes, Route, useParams } from "react-router";
+import { Routes, Route } from "react-router";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import KitchenLayout from "./pages/kitchen/KitchenLayout";
-import RecipeWorkspace from "./pages/kitchen/RecipeWorkspace";
-import NewRecipe from "./pages/kitchen/NewRecipe";
+import NewRecipePage from "./pages/kitchen/NewRecipePage";
+import RecipePage from "./pages/kitchen/RecipePage";
 import Toast from "./components/Toast";
 import { ToastProvider } from "./context/ToastContext";
 import { useToast } from "./hooks/useToast";
@@ -31,10 +30,8 @@ function App() {
       <ToastProvider>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/kitchen" element={<KitchenLayout />}>
-            <Route index element={<NewRecipe />} />
-            <Route path=":id" element={<RecipeWorkspace />} />
-          </Route>
+          <Route path="/kitchen" element={<NewRecipePage />} />
+          <Route path="/kitchen/:id" element={<RecipePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer />

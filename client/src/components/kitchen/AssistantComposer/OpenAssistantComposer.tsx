@@ -56,6 +56,7 @@ function OpenAssistantComposer({
           }
         }}
         aria-label="Enter recipe request or changes"
+        //TO DO: Change this based on RecipeNew or RecipePage
         placeholder="Describe a recipe or revision..."
         disabled={isPending}
       />
