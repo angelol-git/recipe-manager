@@ -52,37 +52,12 @@ const KitchenLayout = () => {
     }
   }, [recipe?.title]);
 
-  const stackCount = Math.min(
-    Math.max((recipe?.versions?.length ?? 1) - 1, 0),
-    3,
-  );
-  const stackOffsetX = 4;
-  const stackOffsetY = 6;
-
   return (
     <div className={`bg-base text-primary relative min-h-screen w-full`}>
       <main className="relative w-full">
-        <div
-          className="mx-auto flex w-full max-w-screen-md px-2 py-2 pb-4"
-          style={{ paddingBottom: `${stackCount * stackOffsetY + 16}px` }}
-        >
+        <div className="mx-auto flex w-full max-w-screen-md px-2 py-2 pb-4">
           <div className="relative flex w-full">
-            {Array.from({ length: stackCount }, (_, index) => {
-              const layer = stackCount - index;
-
-              return (
-                <div
-                  key={`kitchen-stack-${layer}`}
-                  className="border-primary/20 bg-base absolute inset-0 rounded-2xl border"
-                  style={{
-                    zIndex: index + 1,
-                    transform: `translate(${layer * stackOffsetX}px, ${layer * stackOffsetY}px)`,
-                  }}
-                />
-              );
-            })}
-
-            <div className="bg-mantle border-primary/10 relative z-20 flex w-full flex-col rounded-2xl border">
+            <div className="bg-mantle border-primary/10 relative flex w-full flex-col rounded-2xl border">
               <KitchenHeader
                 recipe={recipe}
                 isEditing={isEditing}

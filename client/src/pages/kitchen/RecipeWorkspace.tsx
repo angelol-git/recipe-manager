@@ -103,7 +103,7 @@ function RecipeWorkspace() {
 
       {!isEditing && (
         <div className="pointer-events-none sticky bottom-0 mt-4">
-          <div className="mx-auto w-full max-w-screen-md px-1">
+          <div className="mx-auto w-full max-w-screen-md px-2 md:px-4">
             <div ref={composerRef} className="pb-safe w-full pt-2">
               <div className="flex items-center justify-end gap-3">
                 <div
