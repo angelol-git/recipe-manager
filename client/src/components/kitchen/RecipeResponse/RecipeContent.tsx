@@ -81,12 +81,23 @@ const RecipeContent = memo(
     }
 
     return (
-      <div role="log" aria-live="polite" className="flex w-full flex-col gap-2">
-        <h1 className="font-lora line-clamp-2 text-3xl leading-snug font-semibold wrap-break-word md:text-4xl">
-          {recipe?.title}
-        </h1>
-        <RecipeContentDetails recipeDetails={recipeDetails} />
-        <p className="mb-4 wrap-break-word">{description}</p>
+      <div
+        role="log"
+        aria-live="polite"
+        className="flex w-full flex-col gap-6 pb-4"
+      >
+        <div className="border-primary/10 flex flex-col gap-3 border-b pb-5">
+          <p className="text-secondary font-ibm-plex-mono text-[11px] tracking-[0.12em] uppercase">
+            Recipe
+          </p>
+          <h1 className="font-lora line-clamp-2 text-3xl leading-snug font-semibold wrap-break-word md:text-4xl">
+            {recipe?.title}
+          </h1>
+          <RecipeContentDetails recipeDetails={recipeDetails} />
+          {description ? (
+            <p className="max-w-2xl wrap-break-word">{description}</p>
+          ) : null}
+        </div>
         <RecipeContentIngredients
           ingredients={ingredients}
           onToggleCompletion={toggleIngredientCompletion}
@@ -97,13 +108,13 @@ const RecipeContent = memo(
           onToggleCompletion={toggleInstructionCompletion}
           onResetCompletion={resetInstructionCompletion}
         />
-        <RecipeContentSource
-          source={source}
-        />
-        <RecipeContentVersionInfo
-          recipeVersion={recipeVersion}
-          versionCount={recipe.versions.length}
-        />
+        <div className="border-primary/10 flex flex-col gap-4 border-t pt-5">
+          <RecipeContentSource source={source} />
+          <RecipeContentVersionInfo
+            recipeVersion={recipeVersion}
+            versionCount={recipe.versions.length}
+          />
+        </div>
       </div>
     );
   },

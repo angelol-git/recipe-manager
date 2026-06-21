@@ -40,7 +40,7 @@ function RecipeContentSource({ source }: RecipeContentSourceProps) {
   }
 
   return (
-    <section className="text-primary mt-4 border-t border-black/8 pt-4 text-sm">
+    <section className="text-primary text-sm">
       <div className="mb-2 flex items-end gap-2">
         <h3 className="font-lora text-xl font-medium">Source</h3>
         <button
