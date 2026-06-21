@@ -74,8 +74,8 @@ function RecipeWorkspace() {
   }
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col">
-      <div className="ios-scroll min-h-0 flex-1 overflow-y-auto">
+    <div className="relative flex flex-col">
+      <div>
         {!isEditing ? (
           <div className="mx-auto w-full max-w-screen-md px-4">
             <div
@@ -102,8 +102,8 @@ function RecipeWorkspace() {
       </div>
 
       {!isEditing && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0">
-          <div className="mx-auto w-full max-w-screen-md">
+        <div className="pointer-events-none sticky bottom-0 mt-4">
+          <div className="mx-auto w-full max-w-screen-md px-1">
             <div ref={composerRef} className="pb-safe w-full pt-2">
               <div className="flex items-center justify-end gap-3">
                 <div

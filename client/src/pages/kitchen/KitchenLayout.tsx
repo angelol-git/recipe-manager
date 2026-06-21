@@ -52,19 +52,46 @@ const KitchenLayout = () => {
     }
   }, [recipe?.title]);
 
+  const stackCount = Math.min(
+    Math.max((recipe?.versions?.length ?? 1) - 1, 0),
+    3,
+  );
+  const stackOffsetX = 4;
+  const stackOffsetY = 6;
+
   return (
-    <div
-      className={`bg-mantle text-primary relative flex h-[100dvh] w-full overscroll-contain`}
-    >
-      <main className="relative flex min-w-0 flex-1 overflow-hidden">
-        <div className="flex w-full min-w-0 flex-1 flex-col">
-          <KitchenHeader
-            recipe={recipe}
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-          />
-          <div className="min-h-0 flex-1">
-            <Outlet context={contextValue} />
+    <div className={`bg-base text-primary relative min-h-screen w-full`}>
+      <main className="relative w-full">
+        <div
+          className="mx-auto flex w-full max-w-screen-md px-2 py-2 pb-4"
+          style={{ paddingBottom: `${stackCount * stackOffsetY + 16}px` }}
+        >
+          <div className="relative flex w-full">
+            {Array.from({ length: stackCount }, (_, index) => {
+              const layer = stackCount - index;
+
+              return (
+                <div
+                  key={`kitchen-stack-${layer}`}
+                  className="border-primary/20 bg-base absolute inset-0 rounded-2xl border"
+                  style={{
+                    zIndex: index + 1,
+                    transform: `translate(${layer * stackOffsetX}px, ${layer * stackOffsetY}px)`,
+                  }}
+                />
+              );
+            })}
+
+            <div className="bg-mantle border-primary/10 relative z-20 flex w-full flex-col rounded-2xl border">
+              <KitchenHeader
+                recipe={recipe}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+              />
+              <div>
+                <Outlet context={contextValue} />
+              </div>
+            </div>
           </div>
         </div>
       </main>
