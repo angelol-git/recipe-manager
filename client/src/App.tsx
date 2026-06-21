@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router";
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
+import HomePage from "./pages/HomePage";
+import NotFoundPage from "./pages/NotFoundPage";
 import NewRecipePage from "./pages/kitchen/NewRecipePage";
 import RecipePage from "./pages/kitchen/RecipePage";
 import Toast from "./components/Toast";
@@ -29,10 +29,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/kitchen" element={<NewRecipePage />} />
           <Route path="/kitchen/:id" element={<RecipePage />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <ToastContainer />
       </ToastProvider>

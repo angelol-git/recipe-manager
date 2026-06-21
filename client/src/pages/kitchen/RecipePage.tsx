@@ -11,7 +11,7 @@ import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.js";
 import { useRecipes } from "../../hooks/useRecipes";
 import { useToast } from "../../hooks/useToast";
 import type { Recipe } from "../../types/recipe.js";
-import NotFound from "../NotFound.jsx";
+import NotFoundPage from "../NotFoundPage";
 
 function RecipePage() {
   const { id } = useParams();
@@ -63,7 +63,7 @@ function RecipePage() {
   }, [isEditing]);
 
   if (!recipe && !isLoading) {
-    return <NotFound />;
+    return <NotFoundPage />;
   }
 
   return (

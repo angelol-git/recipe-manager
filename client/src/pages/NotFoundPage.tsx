@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router";
 
-function NotFound() {
+function NotFoundPage() {
   useEffect(() => {
     document.title = "Page Not Found";
   }, []);
@@ -24,4 +24,4 @@ function NotFound() {
   );
 }
 
-export default NotFound;
+export default NotFoundPage;

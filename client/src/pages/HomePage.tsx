@@ -6,7 +6,7 @@ import { useUser } from "../hooks/useUser";
 import { useRecipes } from "../hooks/useRecipes";
 import { useTags } from "../hooks/useTags";
 
-function Home() {
+function HomePage() {
   const [page, setPage] = useState(1);
   const { user, logout, isLoading: isUserLoading } = useUser();
   const {
@@ -83,4 +83,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default HomePage;
