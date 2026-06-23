@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { useParams } from "react-router";
 import DeleteRecipePortal from "../../components/delete/DeleteRecipePortal.js";
 import KitchenHeader from "../../components/kitchen/KitchenHeader/KitchenHeader.js";
@@ -9,14 +15,12 @@ import RecipeContent from "../../components/kitchen/RecipeResponse/RecipeContent
 import RecipeContentTags from "../../components/kitchen/RecipeResponse/RecipeContentTags.jsx";
 import { useDeleteRecipe } from "../../hooks/useDeleteRecipe.js";
 import { useRecipes } from "../../hooks/useRecipes";
-import { useToast } from "../../hooks/useToast";
 import type { Recipe } from "../../types/recipe.js";
 import NotFoundPage from "../NotFoundPage";
 
 function RecipePage() {
   const { id } = useParams();
   const { recipes, isLoading } = useRecipes({ page: 1, pageSize: 1000 });
-  const { showToast } = useToast();
   const recipe = useMemo(() => {
     if (!id) return null;
     return recipes.find((r) => r.id === id) || null;
@@ -31,8 +35,11 @@ function RecipePage() {
     useDeleteRecipe({
       onDeleteVersion: setRecipeVersion,
     });
-  const hasRecipeNavigation = recipe?.versions?.length > 1;
-  const stackCount = Math.min(Math.max((recipe?.versions?.length ?? 1) - 1, 0), 3);
+  const hasRecipeNavigation = (recipe?.versions?.length ?? 0) > 1;
+  const stackCount = Math.min(
+    Math.max((recipe?.versions?.length ?? 1) - 1, 0),
+    3,
+  );
   const stackOffsetX = 4;
   const stackOffsetY = 6;
 
@@ -44,15 +51,17 @@ function RecipePage() {
     }
   }, [recipe?.id, recipe?.versions?.length]);
 
+  // Changes the document/tab title to recipe title
   useEffect(() => {
     if (recipe?.title) {
       document.title = recipe.title;
     }
   }, [recipe?.title]);
 
+  // Hide the loading overlay once the recipe has loaded.
   useEffect(() => {
     if (recipe) {
-      window.hideShell?.();
+      window.hideLoadingOverlay?.();
     }
   }, [recipe]);
 
@@ -69,7 +78,7 @@ function RecipePage() {
   return (
     <div className="bg-base text-primary relative min-h-screen w-full">
       <main className="relative w-full">
-        <div className="mx-auto flex w-full max-w-screen-md px-2 py-2 pb-4">
+        <div className="mx-auto flex w-full max-w-4xl px-3 py-2 pb-4 md:px-5">
           <div className="relative flex w-full">
             {stackCount > 0 && (
               <div
@@ -94,17 +103,21 @@ function RecipePage() {
                 />
               );
             })}
-            <div className="bg-mantle border-primary/10 relative z-20 flex w-full flex-col rounded-2xl border">
+            <div className="bg-mantle border-primary/10 relative z-20 flex w-full flex-col rounded-2xl border md:min-h-[calc(100dvh-1rem)]">
               <KitchenHeader
                 recipe={recipe}
                 isEditing={isEditing}
                 setIsEditing={setIsEditing}
+                isSticky
               />
-              <div className="relative flex flex-col">
-                <div>
+              <div className="relative flex flex-col md:min-h-0 md:flex-1">
+                <div className="md:min-h-0 md:flex-1">
                   {!isEditing ? (
-                    <div className="mx-auto w-full max-w-screen-md px-4">
-                      <div className="w-full pt-2" style={{ paddingBottom: "16px" }}>
+                    <div className="mx-auto w-full max-w-4xl px-5 md:min-h-0 md:flex-1 md:overflow-y-auto md:px-8">
+                      <div
+                        className="w-full pt-2"
+                        style={{ paddingBottom: "16px" }}
+                      >
                         <RecipeContentTags recipe={recipe} />
                         <RecipeContent
                           recipe={recipe}
@@ -113,7 +126,7 @@ function RecipePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="mx-auto w-full max-w-screen-md px-4">
+                    <div className="mx-auto w-full max-w-4xl px-5 md:min-h-0 md:flex-1 md:overflow-y-auto md:px-8">
                       <div className="w-full pt-2">
                         <RecipeEditForm
                           recipe={recipe}
@@ -128,7 +141,7 @@ function RecipePage() {
 
                 {!isEditing && (
                   <div className="pointer-events-none sticky bottom-0 mt-4">
-                    <div className="mx-auto w-full max-w-screen-md px-2 md:px-4">
+                    <div className="mx-auto w-full max-w-4xl px-3 md:px-8">
                       <div className="pb-safe-tight w-full pt-2">
                         <div className="flex items-center justify-between">
                           {hasRecipeNavigation && !isAssistantOpen ? (

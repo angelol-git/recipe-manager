@@ -8,16 +8,22 @@ type KitchenHeaderProps = {
   recipe: Recipe | null;
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
+  isSticky?: boolean;
 };
 
 const KitchenHeader = ({
   recipe,
   isEditing,
   setIsEditing,
+  isSticky = false,
 }: KitchenHeaderProps) => {
   return (
-    <div className="px-5 pt-5 pb-4 sm:px-6">
-      <div className="mx-auto w-full max-w-screen-md">
+    <div
+      className={`px-5 pt-5 pb-4 sm:px-6 ${
+        isSticky ? "bg-mantle sticky top-0 z-30" : ""
+      }`}
+    >
+      <div className="mx-auto w-full max-w-4xl">
         <div
           className={`flex w-full items-center ${
             isEditing ? "justify-end" : "justify-between"
