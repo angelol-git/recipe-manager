@@ -34,7 +34,7 @@ function HomePage() {
 
   useEffect(() => {
     if (!isUserLoading && !isRecipesLoading) {
-      window.hideShell?.();
+      window.hideLoadingOverlay?.();
     }
   }, [isUserLoading, isRecipesLoading]);
 

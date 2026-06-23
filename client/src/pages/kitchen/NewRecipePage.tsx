@@ -5,9 +5,9 @@ import KitchenHeader from "../../components/kitchen/KitchenHeader/KitchenHeader.
 function NewRecipePage() {
   const [isEditing, setIsEditing] = useState(false);
 
-  // Hide shell once component is ready
+  // Hide the loading overlay once the page is ready.
   useEffect(() => {
-    window.hideShell?.();
+    window.hideLoadingOverlay?.();
   }, []);
 
   return (
