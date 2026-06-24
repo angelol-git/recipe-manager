@@ -5,6 +5,7 @@ import type { Recipe, RecipeDetails } from "../../../types/recipe";
 import RecipeEditTitle from "./RecipeEditTitle";
 import RecipeEditDetails from "./RecipeEditDetails";
 import RecipeEditDescription from "./RecipeEditDescription";
+import RecipeEditNotes from "./RecipeEditNotes";
 import RecipeEditIngredients from "./RecipeEditIngredients";
 import RecipeEditInstructions from "./RecipeEditInstructions";
 import RecipeEditControls from "./RecipeEditControls";
@@ -96,6 +97,7 @@ const RecipeEditForm = memo(
     const recipeTitle = draft?.title || "";
     const recipeDetails = draft?.recipeDetails || EMPTY_RECIPE_DETAILS;
     const recipeDescription = draft?.description || "";
+    const recipeNotes = draft?.notes || "";
     const recipeIngredients = draft?.ingredients || [];
     const recipeInstructions = draft?.instructions || [];
     return (
@@ -126,6 +128,10 @@ const RecipeEditForm = memo(
           handleDraftInstructionUpdate={handleDraftInstructionUpdate}
           handleDraftArrayDelete={handleDraftArrayDelete}
           handleDraftArrayPush={handleDraftArrayPush}
+        />
+        <RecipeEditNotes
+          recipeNotes={recipeNotes}
+          handleDraftString={handleDraftString}
         />
         <RecipeEditControls
           recipe={recipe}

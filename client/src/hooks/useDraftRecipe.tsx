@@ -49,6 +49,7 @@ export function useDraftRecipe({
       tags: recipe.tags || [],
       ...currentVersion,
       description: currentVersion.description || "",
+      notes: currentVersion.notes || "",
       recipeDetails: currentVersion.recipeDetails || {},
       instructions: currentVersion.instructions,
       ingredients: ingredientsWithIds,

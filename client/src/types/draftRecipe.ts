@@ -14,7 +14,7 @@ export type DraftIngredient = RecipeIngredient;
 
 export type DraftArrayField = "instructions" | "ingredients";
 
-export type DraftStringField = "title" | "description";
+export type DraftStringField = "title" | "description" | "notes";
 
 export type DraftIngredientField =
   | "raw_text"
@@ -35,6 +35,7 @@ export type DraftRecipe = {
   created_at: Recipe["created_at"];
   tags: EditableTag[];
   description: RecipeVersion["description"];
+  notes: RecipeVersion["notes"];
   recipeDetails: RecipeDetails;
   instructions: DraftTextItem[];
   ingredients: DraftIngredient[];
