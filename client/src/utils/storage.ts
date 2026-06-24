@@ -111,6 +111,7 @@ export function updateLocalRecipe(recipe: UpdateRecipeInput): void {
     recipes[existingIndex].versions[versionIndex] = {
       ...recipes[existingIndex].versions[versionIndex],
       description: recipe.description,
+      notes: recipe.notes,
       instructions: recipe.instructions,
       ingredients: recipe.ingredients,
       recipeDetails: recipe.recipeDetails,

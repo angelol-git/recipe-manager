@@ -238,6 +238,7 @@ const storedRecipeVersionSchema = z
   .object({
     id: z.union([z.string(), z.number()]).optional(),
     description: z.string().optional(),
+    notes: z.string().optional(),
     ingredients: storedIngredientsSchema.optional(),
     instructions: storedInstructionsSchema.optional(),
     source_prompt: z.string().optional(),
@@ -256,6 +257,7 @@ const storedRecipeVersionSchema = z
         total_time: version.recipeDetails?.total_time ?? null,
       },
       description: version.description ?? "",
+      notes: version.notes ?? "",
       ingredients: version.ingredients ?? [],
       instructions: version.instructions ?? [],
       source,

@@ -49,6 +49,7 @@ export type RecipeInstruction = {
 export type RecipeVersion = {
   id: string;
   description: string;
+  notes: string;
   ingredients: RecipeIngredient[];
   instructions: RecipeInstruction[];
   recipeDetails: RecipeDetails;
@@ -64,6 +65,7 @@ export type UpdateRecipeInput = {
   title: string;
   tags: Tag[];
   description: string;
+  notes: string;
   instructions: RecipeInstruction[];
   ingredients: RecipeIngredient[];
   recipeDetails: RecipeDetails;
