@@ -8,6 +8,7 @@ type KitchenHeaderProps = {
   recipe: Recipe | null;
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
+  editFormId?: string;
   isSticky?: boolean;
 };
 
@@ -15,6 +16,7 @@ const KitchenHeader = ({
   recipe,
   isEditing,
   setIsEditing,
+  editFormId,
   isSticky = false,
 }: KitchenHeaderProps) => {
   return (
@@ -45,6 +47,7 @@ const KitchenHeader = ({
             <KitchenOptions
               isEditing={isEditing}
               setIsEditing={setIsEditing}
+              editFormId={editFormId}
             />
           )}
         </div>

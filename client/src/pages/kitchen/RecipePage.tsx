@@ -18,6 +18,12 @@ import { useRecipes } from "../../hooks/useRecipes";
 import type { Recipe } from "../../types/recipe.js";
 import NotFoundPage from "../NotFoundPage";
 
+/*
+ * Save button and form data lives in a different component,
+ * to use native onSubmit handler need to wire id from form attribute
+ */
+const RECIPE_EDIT_FORM_ID = "recipe-edit-form";
+
 function RecipePageSkeleton() {
   return (
     <div className="bg-base text-primary relative min-h-screen w-full">
@@ -128,6 +134,7 @@ function RecipePage() {
                 recipe={recipe}
                 isEditing={isEditing}
                 setIsEditing={setIsEditing}
+                editFormId={RECIPE_EDIT_FORM_ID}
                 isSticky
               />
               <div className="relative flex flex-col md:min-h-0 md:flex-1">
@@ -152,6 +159,8 @@ function RecipePage() {
                           recipe={recipe}
                           recipeVersion={recipeVersion}
                           isEditing={isEditing}
+                          formId={RECIPE_EDIT_FORM_ID}
+                          setIsEditing={setIsEditing}
                           openDeleteModal={openDeleteModal}
                         />
                       </div>

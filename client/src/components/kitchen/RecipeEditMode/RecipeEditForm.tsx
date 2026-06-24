@@ -1,7 +1,17 @@
-import { memo } from "react";
+import {
+  memo,
+  type Dispatch,
+  type FormEvent,
+  type SetStateAction,
+} from "react";
 import type { OpenDeleteModal } from "../../../hooks/useDeleteRecipe";
 import { useDraftRecipe } from "../../../hooks/useDraftRecipe";
-import type { Recipe, RecipeDetails } from "../../../types/recipe";
+import { useRecipeMutations } from "../../../hooks/useRecipes";
+import type {
+  Recipe,
+  RecipeDetails,
+  UpdateRecipeInput,
+} from "../../../types/recipe";
 import RecipeEditTitle from "./RecipeEditTitle";
 import RecipeEditDetails from "./RecipeEditDetails";
 import RecipeEditDescription from "./RecipeEditDescription";
@@ -20,6 +30,8 @@ type RecipeEditFormProps = {
   recipe: Recipe;
   recipeVersion: number;
   isEditing: boolean;
+  formId: string;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
   openDeleteModal: OpenDeleteModal;
 };
 
@@ -70,13 +82,17 @@ type RecipeEditFormProps = {
 //   );
 // }
 
+// TODO: Maybe update recipe edit form place holder text to have rotating examples
 const RecipeEditForm = memo(
   ({
     recipe,
     recipeVersion,
     isEditing,
+    formId,
+    setIsEditing,
     openDeleteModal,
   }: RecipeEditFormProps) => {
+    const { updateRecipe } = useRecipeMutations();
     const {
       draft,
       handleDraftDetail,
@@ -94,6 +110,27 @@ const RecipeEditForm = memo(
 
     if (!current) return null;
 
+    function handleSave(event: FormEvent<HTMLFormElement>) {
+      event.preventDefault();
+      if (!draft) return;
+
+      const recipeToSave: UpdateRecipeInput = {
+        id: draft.id,
+        recipe_id: draft.recipe_id,
+        title: draft.title,
+        tags: draft.tags,
+        description: draft.description,
+        notes: draft.notes,
+        recipeDetails: draft.recipeDetails,
+        source: draft.source,
+        instructions: draft.instructions || [],
+        ingredients: draft.ingredients || [],
+      };
+
+      updateRecipe(recipeToSave);
+      setIsEditing(false);
+    }
+
     const recipeTitle = draft?.title || "";
     const recipeDetails = draft?.recipeDetails || EMPTY_RECIPE_DETAILS;
     const recipeDescription = draft?.description || "";
@@ -101,74 +138,50 @@ const RecipeEditForm = memo(
     const recipeIngredients = draft?.ingredients || [];
     const recipeInstructions = draft?.instructions || [];
     return (
-      <div role="log" aria-live="polite" className="flex flex-col gap-2 pb-12">
-        <RecipeEditTitle
-          recipeTitle={recipeTitle}
-          handleDraftString={handleDraftString}
-        />
-        <RecipeEditDetails
-          recipeDetails={recipeDetails}
-          handleDraftDetail={handleDraftDetail}
-        />
+      <form
+        id={formId}
+        onSubmit={handleSave}
+        className="flex flex-col gap-2 pb-12"
+      >
+        <div role="log" aria-live="polite" className="flex flex-col gap-2">
+          <RecipeEditTitle
+            recipeTitle={recipeTitle}
+            handleDraftString={handleDraftString}
+          />
+          <RecipeEditDetails
+            recipeDetails={recipeDetails}
+            handleDraftDetail={handleDraftDetail}
+          />
 
-        <RecipeEditDescription
-          recipeDescription={recipeDescription}
-          handleDraftString={handleDraftString}
-        />
+          <RecipeEditDescription
+            recipeDescription={recipeDescription}
+            handleDraftString={handleDraftString}
+          />
 
-        <RecipeEditIngredients
-          ingredients={recipeIngredients}
-          handleDraftIngredientUpdate={handleDraftIngredientUpdate}
-          handleDraftArrayDelete={handleDraftArrayDelete}
-          handleDraftArrayPush={handleDraftArrayPush}
-        />
+          <RecipeEditIngredients
+            ingredients={recipeIngredients}
+            handleDraftIngredientUpdate={handleDraftIngredientUpdate}
+            handleDraftArrayDelete={handleDraftArrayDelete}
+            handleDraftArrayPush={handleDraftArrayPush}
+          />
 
-        <RecipeEditInstructions
-          instructions={recipeInstructions}
-          handleDraftInstructionUpdate={handleDraftInstructionUpdate}
-          handleDraftArrayDelete={handleDraftArrayDelete}
-          handleDraftArrayPush={handleDraftArrayPush}
-        />
-        <RecipeEditNotes
-          recipeNotes={recipeNotes}
-          handleDraftString={handleDraftString}
-        />
-        <RecipeEditControls
-          recipe={recipe}
-          recipeVersion={recipeVersion}
-          openDeleteModal={openDeleteModal}
-        />
-
-        {/*
-        {source_prompt && (
-          <div className="text-secondary mt-4 flex max-w-full justify-between gap-4 text-sm">
-            <div className="flex w-full max-w-full min-w-0 flex-col items-start gap-2 py-2">
-              <button
-                onClick={() => setIsPromptModalOpen(true)}
-                className="hover:bg-base-hover cursor-pointer rounded-lg p-1 underline transition-colors duration-150"
-              >
-                View Prompt
-              </button>
-            </div>
-            {recipe.versions.length > 1 && (
-              <p
-                className="whitespace-nowrap"
-                aria-label={`Version ${recipeVersion + 1} of ${
-                  recipe.versions.length
-                }`}
-              >
-                {recipeVersion + 1} of {recipe.versions.length}
-              </p>
-            )}
-          </div>
-        )}
-        <RecipeContentPromptModal
-          isOpen={isPromptModalOpen}
-          onClose={() => setIsPromptModalOpen(false)}
-          sourcePrompt={source_prompt || ""}
-          anchorRef={modalAnchorRef}
-        /> */}
-      </div>
+          <RecipeEditInstructions
+            instructions={recipeInstructions}
+            handleDraftInstructionUpdate={handleDraftInstructionUpdate}
+            handleDraftArrayDelete={handleDraftArrayDelete}
+            handleDraftArrayPush={handleDraftArrayPush}
+          />
+          <RecipeEditNotes
+            recipeNotes={recipeNotes}
+            handleDraftString={handleDraftString}
+          />
+          <RecipeEditControls
+            recipe={recipe}
+            recipeVersion={recipeVersion}
+            openDeleteModal={openDeleteModal}
+          />
+        </div>
+      </form>
     );
   },
 );

@@ -2,6 +2,7 @@ import { useEffect, useState, memo } from "react";
 import RecipeContentDetails from "./RecipeContentDetails";
 import RecipeContentIngredients from "./RecipeContentIngredients";
 import RecipeContentInstructions from "./RecipeContentInstructions";
+import RecipeContentNotes from "./RecipeContentNotes";
 import RecipeContentSource from "./RecipeContentSource";
 import RecipeContentVersionInfo from "./RecipeContentVersionInfo";
 import type {
@@ -30,6 +31,7 @@ const RecipeContent = memo(({ recipe, recipeVersion }: RecipeContentProps) => {
   const {
     recipeDetails = EMPTY_RECIPE_DETAILS,
     description = "",
+    notes = "",
     source = null,
   } = current ?? {};
 
@@ -106,6 +108,10 @@ const RecipeContent = memo(({ recipe, recipeVersion }: RecipeContentProps) => {
         onResetCompletion={resetInstructionCompletion}
       />
       <div className="border-primary/10 flex flex-col gap-4 border-t pt-5">
+        <RecipeContentNotes notes={notes} />
+        {notes && source ? (
+          <div className="border-primary/10 border-t" aria-hidden="true" />
+        ) : null}
         <RecipeContentSource source={source} />
         <RecipeContentVersionInfo
           recipeVersion={recipeVersion}
