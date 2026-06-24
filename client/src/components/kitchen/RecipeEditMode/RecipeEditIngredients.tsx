@@ -65,7 +65,7 @@ function RecipeEditIngredients({
                       index,
                     )
                   }
-                  placeholder="1"
+                  placeholder="1 1/2"
                   className="text-primary placeholder:text-primary/35 border-secondary/20 focus:border-secondary/45 w-10 shrink-0 border-0 border-b bg-transparent px-0 pb-1 outline-none"
                 />
                 <input
@@ -79,7 +79,7 @@ function RecipeEditIngredients({
                       index,
                     )
                   }
-                  placeholder="cup"
+                  placeholder="cups"
                   className="text-primary placeholder:text-primary/35 border-secondary/20 focus:border-secondary/45 w-12 shrink-0 border-0 border-b bg-transparent px-0 pb-1 outline-none"
                 />
               </div>
@@ -88,7 +88,7 @@ function RecipeEditIngredients({
                 aria-label={`Ingredient ${index + 1} name`}
                 value={ingredient.ingredient_name || ""}
                 rows={1}
-                placeholder="Ingredient"
+                placeholder="all-purpose flour"
                 onChange={(event) => {
                   autoResize(event.target);
                   handleDraftIngredientUpdate(

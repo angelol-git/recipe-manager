@@ -20,7 +20,7 @@ function RecipeEditDescription({
         onChange={(event) =>
           handleDraftString("description", event.target.value)
         }
-        placeholder="Write a short description"
+        placeholder="Muffins packed with blueberries and topped with cinnamon streusel"
         rows={3}
         className="text-primary placeholder:text-primary/35 border-secondary/20 focus:border-secondary/45 w-full resize-none overflow-hidden border-b bg-transparent px-0 pb-1 leading-relaxed outline-none"
       />

@@ -56,7 +56,7 @@ function RecipeEditInstructions({
                 aria-label={`Instruction ${index + 1}`}
                 value={instruction.raw_text || ""}
                 rows={2}
-                placeholder="Step"
+                placeholder="Preheat oven to 350F"
                 onChange={(event) => {
                   autoResize(event.target);
                   handleDraftInstructionUpdate(event.target.value, index);
