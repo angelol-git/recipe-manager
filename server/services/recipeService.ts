@@ -75,7 +75,6 @@ export function saveRecipeToDb(
     const newVersionId = uuidv7();
     const versionNumber = getNextVersionNumber(recipeRecordId);
     const source = parseRecipeSource(parsedRecipe.source_input);
-    const notes = normalizeRecipeVersionNotes(parsedRecipe.notes);
     db.prepare(
       `INSERT INTO recipe_versions (
          id,
@@ -100,7 +99,7 @@ export function saveRecipeToDb(
       parsedRecipe.total_time,
       parsedRecipe.calories,
       parsedRecipe.description,
-      notes,
+      null,
       source?.type ?? null,
       source?.value ?? null,
       source?.summary ?? null,
