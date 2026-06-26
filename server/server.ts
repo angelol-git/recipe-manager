@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import pino from "pino";
 import authRoutes from "./routes/auth.js";
 import recipeRoutes from "./routes/recipes.js";
 import kitchenRoutes from "./routes/kitchen.js";
@@ -15,14 +16,10 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 const isProduction = process.env.NODE_ENV === "production";
-
-const log = (message:string) => {
-  if (isProduction) {
-    console.log(`[${new Date().toISOString()}] ${message}`);
-  } else {
-    console.log(message);
-  }
-};
+const logger = pino({
+  name: "rambutan-server",
+  level: process.env.LOG_LEVEL || (isProduction ? "info" : "debug"),
+});
 
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(cookieParser());
@@ -38,7 +35,14 @@ app.get("/health", (req, res) => {
 });
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  log(`Error: ${err instanceof Error ? err.message : String(err)}`);
+  logger.error(
+    {
+      err,
+      method: req.method,
+      path: req.originalUrl,
+    },
+    "Unhandled request error",
+  );
   res.status(500).json({ error: "Internal server error" });
 };
 
@@ -49,20 +53,16 @@ app.use((req, res) => {
 });
 
 const server = app.listen(PORT, () => {
-  log(`Server running on port ${PORT}`);
-  log(`CORS origin: ${CLIENT_URL}`);
-  log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  logger.info({ port: PORT }, "Server running");
 });
 
 const shutdown = (signal:ShutdownSignal) => {
-  log(`${signal} received. Starting graceful shutdown...`);
+  logger.warn({ signal }, "Starting graceful shutdown");
   server.close(() => {
-    log("Server closed. Exiting process.");
     process.exit(0);
   });
 
   setTimeout(() => {
-    log("Forced shutdown after timeout");
     process.exit(1);
   }, 30000);
 };
@@ -71,11 +71,11 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 process.on("SIGINT", () => shutdown("SIGINT"));
 
 process.on("uncaughtException", (err) => {
-  log(`Uncaught Exception: ${err.message}`);
+  logger.fatal({ err }, "Uncaught exception");
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  log(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
+  logger.fatal({ promise, reason }, "Unhandled rejection");
   process.exit(1);
 });
