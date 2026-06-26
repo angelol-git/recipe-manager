@@ -9,6 +9,7 @@ function NewRecipePage() {
     <div className="relative flex min-h-screen w-full flex-col">
       <KitchenHeader
         recipe={null}
+        recipeVersion={0}
         isEditing={isEditing}
         setIsEditing={setIsEditing}
       />

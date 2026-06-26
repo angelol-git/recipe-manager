@@ -100,9 +100,11 @@ function RecipePage() {
     return <RecipePageSkeleton />;
   }
 
-  if (!recipe && !isLoading) {
+  if (!recipe) {
     return <NotFoundPage />;
   }
+
+  const currentRecipe: Recipe = recipe;
 
   return (
     <div className="bg-base text-primary relative min-h-screen w-full">
@@ -134,7 +136,8 @@ function RecipePage() {
             })}
             <div className="bg-mantle border-primary/10 relative z-20 flex w-full flex-col rounded-2xl border md:min-h-[calc(100dvh-1rem)]">
               <KitchenHeader
-                recipe={recipe}
+                recipe={currentRecipe}
+                recipeVersion={recipeVersion}
                 isEditing={isEditing}
                 setIsEditing={setIsEditing}
                 editFormId={RECIPE_EDIT_FORM_ID}
@@ -148,9 +151,9 @@ function RecipePage() {
                         className="w-full pt-2"
                         style={{ paddingBottom: "16px" }}
                       >
-                        <RecipeContentTags recipe={recipe} />
+                        <RecipeContentTags recipe={currentRecipe} />
                         <RecipeContent
-                          recipe={recipe}
+                          recipe={currentRecipe}
                           recipeVersion={recipeVersion}
                         />
                       </div>
@@ -159,7 +162,7 @@ function RecipePage() {
                     <div className="mx-auto w-full max-w-4xl px-5 md:min-h-0 md:flex-1 md:overflow-y-auto md:px-8">
                       <div className="w-full pt-2">
                         <RecipeEditForm
-                          recipe={recipe}
+                          recipe={currentRecipe}
                           recipeVersion={recipeVersion}
                           isEditing={isEditing}
                           formId={RECIPE_EDIT_FORM_ID}
@@ -179,7 +182,7 @@ function RecipePage() {
                           {hasRecipeNavigation && !isAssistantOpen ? (
                             <div className="pointer-events-auto shrink-0">
                               <RecipeVersionNavigation
-                                recipe={recipe}
+                                recipe={currentRecipe}
                                 recipeVersion={recipeVersion}
                                 setRecipeVersion={
                                   setRecipeVersion as Dispatch<
@@ -197,7 +200,7 @@ function RecipePage() {
                             }`}
                           >
                             <AssistantComposer
-                              recipe={recipe as Recipe}
+                              recipe={currentRecipe}
                               recipeVersion={recipeVersion}
                               setRecipeVersion={setRecipeVersion}
                               hasRecipeNavigation={hasRecipeNavigation}
