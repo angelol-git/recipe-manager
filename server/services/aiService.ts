@@ -188,6 +188,10 @@ export function createPrompt(
 
     Core rules:
     - Do not invent a recipe just to satisfy the schema.
+    - Treat one-word inputs like "test", "hello", "hi", "hey", "ok", "okay" and similar placeholder text as unrelated.
+    - Treat unrelated requests like weather, code, math, politics, or generic chat as unrelated even if the user is editing an existing recipe.
+    - Only modify Current State when the user's request clearly describes a recipe change such as scaling, substitutions, ingredient changes, dietary changes, flavor changes, or cooking method changes.
+    - If the request is vague, off-topic, or not actionable for cooking, return the empty recipe object exactly as shown above.
     - Return JSON only. No markdown or extra text.
     - Keep title at 150 characters or fewer.
     - Preserve the recipe's core identity unless the user explicitly asks to change it.
