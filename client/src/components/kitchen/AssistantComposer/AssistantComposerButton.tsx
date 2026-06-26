@@ -1,4 +1,4 @@
-import { LoaderCircle, MessageCircleMore } from "lucide-react";
+import { LoaderCircle, Sparkles } from "lucide-react";
 
 type AssistantComposerButtonProps = {
   isPending: boolean;
@@ -11,22 +11,18 @@ function AssistantComposerButton({
 }: AssistantComposerButtonProps) {
   return (
     <button
-      className="bg-accent hover:bg-accent-hover inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-white transition-colors duration-200"
+      className="border-secondary/20 bg-base text-accent hover:bg-mantle inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border shadow-xs transition-colors duration-200"
       onClick={onOpen}
       aria-label="Open recipe assistant"
     >
       {isPending ? (
         <LoaderCircle
-          size={23}
+          size={20}
           strokeWidth={1.5}
           className="animate-spin stroke-current"
         />
       ) : (
-        <MessageCircleMore
-          size={23}
-          strokeWidth={1.5}
-          className="stroke-white"
-        />
+        <Sparkles size={20} strokeWidth={1.5} className="stroke-current" />
       )}
     </button>
   );
