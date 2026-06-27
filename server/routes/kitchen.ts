@@ -15,6 +15,7 @@ import {
 import { parseRecipeSource, saveRecipeToDb } from "../services/recipeService.js";
 import { getUrlContext } from "../services/urlContentService.js";
 import { isValidUrl } from "../utils/urlValidator.js";
+import logger from "../logger.js";
 
 const router = express.Router();
 
@@ -57,7 +58,7 @@ router.post(
         }
         contextData = await getUrlContext(url);
       } else if (url) {
-        console.warn(`Blocked potentially malicious URL: ${url}`);
+        logger.warn({ path: req.originalUrl, url }, "Blocked invalid or disallowed URL");
       }
 
       const aiPrompt = createPrompt(
@@ -123,9 +124,15 @@ router.post(
       const now = new Date();
 
       if (error instanceof AiValidationError) {
-        console.error(
-          `[${now.toISOString()}] AI validation failed`,
-          error.meta,
+        logger.error(
+          {
+            path: req.originalUrl,
+            userId: user?.id,
+            recipeId: recipeId ?? null,
+            timestamp: now.toISOString(),
+            meta: error.meta,
+          },
+          "AI validation failed",
         );
 
         if (user) {
@@ -138,7 +145,16 @@ router.post(
         return res.status(400).json({ error: error.message });
       }
 
-      console.error(`[${now.toISOString()}] Create recipe failed`, error);
+      logger.error(
+        {
+          err: error,
+          path: req.originalUrl,
+          userId: user?.id,
+          recipeId: recipeId ?? null,
+          timestamp: now.toISOString(),
+        },
+        "Create recipe failed",
+      );
       return res.status(500).json({ error: "Something went wrong" });
     }
   },

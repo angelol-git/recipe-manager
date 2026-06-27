@@ -25,6 +25,7 @@ import {
   type UpdateRecipeBody,
   type TagInput,
 } from "../validation/recipeSchemas.js";
+import logger from "../logger.js";
 
 const router = express.Router();
 
@@ -71,7 +72,7 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
     const recipes = getRecipesByUserId(user.id, { page, pageSize });
     return res.json(recipes);
   } catch (error) {
-    console.error("DB error:", error);
+    logger.error({ err: error, path: req.originalUrl, userId: user.id }, "Failed to list recipes");
     return res.status(500).json({ error: `DB error: ${String(error)}` });
   }
 });
@@ -92,7 +93,10 @@ router.get(
       }
       return res.json(recipe);
     } catch (error) {
-      console.error("DB error:", error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeId: req.params.id },
+        "Failed to fetch recipe",
+      );
       return res.status(500).json({ error: `DB error: ${String(error)}` });
     }
   },
@@ -114,7 +118,10 @@ router.get(
       }
       return res.json({ errors });
     } catch (error) {
-      console.error("DB error:", error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeId: req.params.id },
+        "Failed to fetch recipe errors",
+      );
       return res.status(500).json({ error: `DB error: ${String(error)}` });
     }
   },
@@ -136,7 +143,10 @@ router.delete(
       }
       return res.status(204).send();
     } catch (error) {
-      console.error("DB error:", error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, errorId: req.params.id },
+        "Failed to delete recipe error message",
+      );
       return res.status(500).json({ error: `DB error: ${String(error)}` });
     }
   },
@@ -158,7 +168,10 @@ router.delete(
       }
       return res.status(204).send();
     } catch (error) {
-      console.error("DB error:", error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeVersionId: req.params.id },
+        "Failed to delete recipe version",
+      );
       return res.status(500).json({ error: `DB error: ${String(error)}` });
     }
   },
@@ -180,7 +193,10 @@ router.delete(
       }
       return res.status(204).send();
     } catch (error) {
-      console.error("DB error:", error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeId: req.params.id },
+        "Failed to delete recipe",
+      );
       return res.status(500).json({ error: `DB error: ${String(error)}` });
     }
   },
@@ -202,7 +218,10 @@ router.get(
       }
       return res.json({ askMessages });
     } catch (error) {
-      console.error("DB error:", error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeId: req.params.id },
+        "Failed to fetch ask messages",
+      );
       return res.status(500).json({ error: `DB error: ${String(error)}` });
     }
   },
@@ -229,7 +248,10 @@ router.patch(
       }
       return res.status(200).json({ success: true, updatedId: req.params.id });
     } catch (error) {
-      console.error(error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeId: req.params.id },
+        "Failed to update recipe",
+      );
       return res
         .status(500)
         .json({ error: `Failed to update recipe: ${String(error)}` });
@@ -254,7 +276,10 @@ router.post(
       }
       return res.json({ success: true });
     } catch (error) {
-      console.error(error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, recipeId: req.params.id },
+        "Failed to add tag to recipe",
+      );
       return res.status(500).json({ error: "Failed to add tag" });
     }
   },
@@ -276,7 +301,10 @@ router.patch(
       }
       return res.json({ success: true });
     } catch (error) {
-      console.error(error);
+      logger.error(
+        { err: error, path: req.originalUrl, userId: user.id, tagId: req.params.id },
+        "Failed to update tag",
+      );
       return res.status(500).json({ error: "Failed to update tag" });
     }
   },
@@ -304,7 +332,16 @@ router.delete(
       }
       return res.status(204).send();
     } catch (error) {
-      console.error(error);
+      logger.error(
+        {
+          err: error,
+          path: req.originalUrl,
+          userId: user.id,
+          recipeId: req.params.id,
+          tagId: req.params.tagId,
+        },
+        "Failed to remove tag from recipe",
+      );
       return res.status(500).json({ error: "Failed to remove tag" });
     }
   },
