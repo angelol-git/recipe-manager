@@ -1,17 +1,16 @@
+import type { ComponentProps } from "react";
 import { createPortal } from "react-dom";
 import type { UseMutationResult } from "@tanstack/react-query";
 import GoogleLoginButton from "./GoogleLoginButton";
 import type { User } from "../types/user";
 
-type GoogleLoginSuccess = {
-  credential: string;
-};
+type OnLoginSuccess = ComponentProps<typeof GoogleLoginButton>["onSuccess"];
 
 type UserOptionsPortalProps = {
   user: User | null;
   logout: UseMutationResult<unknown, Error, void, unknown>;
   onClose: () => void;
-  onLoginSuccess: (response: GoogleLoginSuccess) => Promise<void>;
+  onLoginSuccess: OnLoginSuccess;
 };
 
 function UserOptionsPortal({
@@ -74,6 +73,14 @@ function UserOptionsPortal({
               </div>
               <div className="w-full rounded-2xl">
                 <GoogleLoginButton onSuccess={onLoginSuccess} />
+              </div>
+              <div className="border-primary/10 border-t pt-2">
+                <button
+                  onClick={onClose}
+                  className="interactive-mono text-secondary hover:text-primary focus-visible:ring-accent/25 flex w-full cursor-pointer items-center justify-end py-2 text-sm tracking-[0.08em] uppercase transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  Close
+                </button>
               </div>
             </>
           )}
