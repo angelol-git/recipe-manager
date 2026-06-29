@@ -158,7 +158,7 @@ function HomeTags({
           })
         ) : (
           <div className="text-secondary/70 text-sm italic">
-            No tags created yet.
+            Tags are not supported yet.
           </div>
         )}
       </div>
