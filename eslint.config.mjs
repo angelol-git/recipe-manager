@@ -15,7 +15,11 @@ const tsNoUnusedVarsRule = [
 ];
 
 export default defineConfig([
-  globalIgnores(["client/dist", "server/dist"]),
+  globalIgnores([
+    "client/dist",
+    "server/dist",
+    "client/src/components/kitchen/RecipeEditorLegacy/**",
+  ]),
   {
     files: ["client/**/*.{js,jsx,ts,tsx}"],
     extends: [
