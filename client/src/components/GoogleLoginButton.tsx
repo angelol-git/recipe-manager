@@ -1,15 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const GOOGLE_BUTTON_WIDTH = 260;
 const GOOGLE_BUTTON_HEIGHT = 48;
 
-type GoogleCredentialResponse = {
-  credential: string;
+type GoogleLoginButtonProps = {
+  onSuccess: (response: { credential: string }) => void | Promise<void>;
 };
 
-type GoogleLoginButtonProps = {
-  onSuccess: (response: GoogleCredentialResponse) => void | Promise<void>;
-};
 function GoogleLoginButton({ onSuccess }: GoogleLoginButtonProps) {
   const [isLoading, setIsLoading] = useState(true);
   const buttonRef = useRef<HTMLDivElement | null>(null);

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export {};
 
 declare global {
@@ -7,6 +6,7 @@ declare global {
     google?: {
       accounts: {
         id: {
+          cancel(): unknown;
           initialize: (options: {
             client_id: string;
             callback: (response: { credential: string }) => void;

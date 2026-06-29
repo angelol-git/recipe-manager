@@ -1,20 +1,6 @@
-import { createContext, useState, useCallback, useRef, useEffect } from "react";
-import type { ReactNode, Dispatch, SetStateAction } from "react";
-
-export type ToastType = "error" | "success";
-
-export type ToastValue = {
-  message: string;
-  type: ToastType;
-};
-
-export type ToastContextValue = {
-  toast: ToastValue | null;
-  setToast: Dispatch<SetStateAction<ToastValue | null>>;
-  showToast: (message: string, type?: ToastType, duration?: number) => void;
-};
-
-export const ToastContext = createContext<ToastContextValue | null>(null);
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { ToastContext, type ToastType, type ToastValue } from "./ToastContext";
 
 type ToastProviderProps = {
   children: ReactNode;

@@ -5,7 +5,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import NewRecipePage from "./pages/kitchen/NewRecipePage";
 import RecipePage from "./pages/kitchen/RecipePage";
 import Toast from "./components/Toast";
-import { ToastProvider } from "./context/ToastContext";
+import { ToastProvider } from "./context/ToastProvider";
 import { useToast } from "./hooks/useToast";
 
 const queryClient = new QueryClient();

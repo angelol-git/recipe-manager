@@ -5,11 +5,6 @@ function HomeRecipeCard({ recipe }: { recipe: Recipe }) {
   const stackCount = Math.min(Math.max(recipe.versions.length - 1, 0), 3);
   const stackOffsetX = 3;
   const stackOffsetY = 4;
-  const stackColors = [
-    "var(--color-overlay0)",
-    "var(--color-green)",
-    "var(--color-blue)",
-  ];
   const versionLabel = recipe.versions.length === 1 ? "VERSION" : "VERSIONS";
 
   return (

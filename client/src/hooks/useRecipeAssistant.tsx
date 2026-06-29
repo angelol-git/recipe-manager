@@ -52,6 +52,7 @@ export function useRecipeAssistant(showToast: ShowToast) {
     },
 
     onError: (err, _variables, context) => {
+      // TO DO: Inconsistent toast shape should just be a message and type
       showToast(err.message || err.error || "Something went wrong", "error");
 
       for (const [queryKey, previousData] of context?.previousRecipeQueries ??
