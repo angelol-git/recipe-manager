@@ -12,8 +12,25 @@ Recipe manager app for importing, organizing, editing, and generating recipes.
 
 ## Tech Stack
 
-- Frontend: React 19, Vite 7, Tailwind CSS 4, React Router 7, TanStack Query 5, `@dnd-kit`
-- Backend: Node.js, Express 5, SQLite, Google GenAI API, Cheerio, Google OAuth 2.0, Zod
+- Frontend: React 19, Vite 7, Tailwind CSS 4, React Router 7, TanStack Query 5, `@dnd-kit`, Vitest
+- Backend: Node.js, Express 5, TypeScript, SQLite, Google GenAI API, Cheerio, Google OAuth 2.0, Zod
+
+## Project Structure
+
+```text
+.
+├── client/                  # React + Vite frontend
+│   ├── src/pages/           # Home and kitchen routes
+│   ├── src/components/      # UI, editor, assistant, and tag components
+│   ├── src/hooks/           # Data-fetching and local state hooks
+│   └── src/api/             # Frontend API clients
+├── server/                  # Express API and SQLite app
+│   ├── routes/              # auth, recipes, kitchen, tags
+│   ├── services/            # AI, recipe, message, tag, and URL services
+│   ├── migrations/          # Database schema migrations
+│   └── scripts/             # Migration runner and benchmarks
+└── package.json             # Workspace-level scripts
+```
 
 ## Setup
 
@@ -24,60 +41,115 @@ git clone https://github.com/angelol-git/rambutan.git
 cd rambutan
 ```
 
-2. Install dependencies:
+2. Install workspace dependencies:
 
 ```bash
-cd server
-npm install
-cd ../client
-npm install
+pnpm install
 ```
 
-3. Create `server/.env`:
+3. Create `client/.env`:
 
 ```env
-NODE_ENV=development
-PORT=8080
-CLIENT_URL=http://localhost:5173
-DATABASE_URL=./recipes.db
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_API_KEY=your_google_genai_api_key
+VITE_API_URL=http://localhost:8080/api
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 ```
 
-Get OAuth credentials from [Google Cloud Console](https://console.cloud.google.com/) and the AI key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+4. Create `server/.env`:
+
+```env
+PORT=8080
+CLIENT_URL=http://localhost:5173
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_API_KEY=your-google-api-key
+SESSION_SECRET=replace-with-a-long-random-secret
+DATABASE_URL=./rambutan.db
+```
+
+Notes:
+
+- `DATABASE_URL` is optional; the server defaults to `server/rambutan.db`.
+- Google OAuth credentials come from [Google Cloud Console](https://console.cloud.google.com/).
+- The AI key comes from [Google AI Studio](https://aistudio.google.com/app/apikey).
+- The app is now managed as a `pnpm` workspace with separate `client` and `server` packages.
+
+5. Run database migrations:
+
+```bash
+pnpm migrate
+```
 
 ## Run Locally
 
 Start the server:
 
 ```bash
-cd server && npm run dev
+pnpm dev:server
 ```
 
 Runs on `http://localhost:8080`.
 
-Start the client:
+Start the client in another terminal:
 
 ```bash
-cd client && npm run dev
+pnpm dev:client
 ```
 
 Runs on `http://localhost:5173`.
 
-## Benchmarks
+Health check:
 
-Run benchmarks from `server/`:
+```text
+http://localhost:8080/health
+```
+
+## Workspace Scripts
+
+Run these from the repository root:
 
 ```bash
-npm run benchmark:create:text
-npm run benchmark:scrape
-npm run benchmark:url
-npm run benchmark:url-context
+pnpm dev:client
+pnpm dev:server
+pnpm migrate
+pnpm build
+pnpm lint
+pnpm test
+pnpm format
+pnpm format:check
+```
+
+## API Overview
+
+- `/api/auth`: Google login, logout, auth check, and current user
+- `/api/recipes`: recipe listing, detail, updates, deletion, version deletion, and related message history
+- `/api/tags`: bulk tag updates and deletes
+- `/api/kitchen`: AI recipe creation, refinement, and URL-based recipe import
+
+## Data Behavior
+
+- Guests can create and edit recipes in browser local storage
+- Signed-in users persist recipes, tags, sessions, prompts, and recipe versions in SQLite
+- Recipe completion state is stored locally for in-progress cooking checklists
+
+## Benchmarks
+
+Run benchmarks with the server package scripts:
+
+```bash
+pnpm --dir server benchmark:create:text
+pnpm --dir server benchmark:scrape
+pnpm --dir server benchmark:url
+pnpm --dir server benchmark:url-context
 ```
 
 Notes:
 
-- `benchmark:create:text` expects the server to already be running on `http://localhost:8080` unless you pass `--url`.
+- `benchmark:create:text` expects the API to already be running unless you provide a custom URL.
 - `benchmark:scrape` and `benchmark:url` fetch live pages and need outbound network access.
-- `benchmark:url-context` also requires `GOOGLE_API_KEY` in `server/.env`.
+- `benchmark:url-context` requires `GOOGLE_API_KEY` in `server/.env`.
+
+## Development Notes
+
+- Husky and `lint-staged` are configured at the workspace root
+- Frontend tests are present; the server test script is still a placeholder. Both are in process of a major rewrite.
+- Production server output is built into `server/dist/`

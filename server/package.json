@@ -10,6 +10,7 @@
     "dev": "tsx watch server.ts",
     "migrate": "tsx scripts/runMigrations.ts",
     "build": "tsc",
+    "lint": "../client/node_modules/.bin/eslint .",
     "start": "node dist/server.js",
     "prestart": "npm run build",
     "benchmark:create:text": "node scripts/benchmarkCreateTextOnly.js",
