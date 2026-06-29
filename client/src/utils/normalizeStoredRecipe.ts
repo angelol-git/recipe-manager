@@ -247,7 +247,9 @@ const storedRecipeVersionSchema = z
   })
   .transform((version): RecipeVersion => {
     const legacySourcePrompt = version.source_prompt?.trim();
-    const source = version.source ?? (legacySourcePrompt ? inferLegacySource(legacySourcePrompt) : null);
+    const source =
+      version.source ??
+      (legacySourcePrompt ? inferLegacySource(legacySourcePrompt) : null);
 
     return {
       id: String(version.id ?? ""),

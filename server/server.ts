@@ -51,7 +51,7 @@ const server = app.listen(PORT, () => {
   logger.info({ port: PORT }, "Server running");
 });
 
-const shutdown = (signal:ShutdownSignal) => {
+const shutdown = (signal: ShutdownSignal) => {
   logger.warn({ signal }, "Starting graceful shutdown");
   server.close(() => {
     process.exit(0);

@@ -133,15 +133,21 @@ async function run() {
 
   const average =
     durations.reduce((sum, value) => sum + value, 0) / durations.length;
-  const models = [...new Set(results.map((result) => result.model).filter(Boolean))];
+  const models = [
+    ...new Set(results.map((result) => result.model).filter(Boolean)),
+  ];
 
   console.log("");
-  console.log(`Completed ${durations.length} requests in ${formatSeconds(totalMs)}`);
+  console.log(
+    `Completed ${durations.length} requests in ${formatSeconds(totalMs)}`,
+  );
   console.log(`model ${models.length ? models.join(", ") : "unknown"}`);
   console.log(`avg ${formatSeconds(average)}`);
   console.log(`min ${formatSeconds(durations[0])}`);
   console.log(`max ${formatSeconds(durations[durations.length - 1])}`);
-  console.log(`throughput ${(durations.length / (totalMs / 1000)).toFixed(2)} req/s`);
+  console.log(
+    `throughput ${(durations.length / (totalMs / 1000)).toFixed(2)} req/s`,
+  );
 }
 
 run().catch((error) => {

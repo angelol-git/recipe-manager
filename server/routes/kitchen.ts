@@ -12,7 +12,10 @@ import {
   saveUserPrompt,
   saveAssistantErrorMessage,
 } from "../services/messageService.js";
-import { parseRecipeSource, saveRecipeToDb } from "../services/recipeService.js";
+import {
+  parseRecipeSource,
+  saveRecipeToDb,
+} from "../services/recipeService.js";
 import { getUrlContext } from "../services/urlContentService.js";
 import { isValidUrl } from "../utils/urlValidator.js";
 import logger from "../logger.js";
@@ -58,7 +61,10 @@ router.post(
         }
         contextData = await getUrlContext(url);
       } else if (url) {
-        logger.warn({ path: req.originalUrl, url }, "Blocked invalid or disallowed URL");
+        logger.warn(
+          { path: req.originalUrl, url },
+          "Blocked invalid or disallowed URL",
+        );
       }
 
       const aiPrompt = createPrompt(

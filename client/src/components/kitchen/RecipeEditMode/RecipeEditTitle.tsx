@@ -48,7 +48,7 @@ function RecipeEditTitle({
           handleDraftString("title", event.target.value);
         }}
         placeholder="Blueberry streusel muffins"
-        className="font-lora text-primary placeholder:text-primary/35 border-secondary/20 focus:border-secondary/45 w-full overflow-y-hidden resize-none border-0 border-b bg-transparent px-0 pb-1 text-3xl leading-snug font-semibold outline-none md:text-4xl"
+        className="font-lora text-primary placeholder:text-primary/35 border-secondary/20 focus:border-secondary/45 w-full resize-none overflow-y-hidden border-0 border-b bg-transparent px-0 pb-1 text-3xl leading-snug font-semibold outline-none md:text-4xl"
         required
       />
     </label>

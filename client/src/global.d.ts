@@ -1,7 +1,9 @@
-export {}
+/* eslint-disable no-unused-vars */
+export {};
 
 declare global {
   interface Window {
+    // The Google Identity Services script attaches its API to window.google.
     google?: {
       accounts: {
         id: {
@@ -11,7 +13,7 @@ declare global {
           }) => void;
           renderButton: (
             parent: HTMLElement,
-            options: Record<string, string | number>
+            options: Record<string, string | number>,
           ) => void;
         };
       };

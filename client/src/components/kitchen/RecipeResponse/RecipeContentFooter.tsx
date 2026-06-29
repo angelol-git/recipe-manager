@@ -26,7 +26,7 @@ function RecipeContentFooter({
       </div>
       {versionCount > 1 && (
         <p
-          className="font-ibm-plex-mono whitespace-nowrap text-[11px] tracking-[0.12em] uppercase"
+          className="font-ibm-plex-mono text-[11px] tracking-[0.12em] whitespace-nowrap uppercase"
           aria-label={`Version ${recipeVersion + 1} of ${versionCount}`}
         >
           Version {recipeVersion + 1} of {versionCount}

@@ -234,7 +234,8 @@ export function useDraftRecipe({
           } else if (field === "alternate_quantity_text") {
             const nextValue = typeof value === "string" ? value : String(value);
             nextItem.alternate_quantity_text = nextValue;
-            nextItem.alternate_quantity_value = parseIngredientNumber(nextValue);
+            nextItem.alternate_quantity_value =
+              parseIngredientNumber(nextValue);
           } else {
             nextItem[field] = typeof value === "string" ? value : String(value);
           }

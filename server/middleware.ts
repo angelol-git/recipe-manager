@@ -7,7 +7,7 @@ type SessionUserRow = {
   email: string;
 };
 
-export const authMiddleware: RequestHandler = (req, res, next)=> {
+export const authMiddleware: RequestHandler = (req, res, next) => {
   const sid = req.cookies.sid;
   if (!sid) {
     return res.status(401).json({ error: "Not authenticated" });
@@ -33,9 +33,9 @@ export const authMiddleware: RequestHandler = (req, res, next)=> {
     );
     return res.status(500).json({ error: "DB error" });
   }
-}
+};
 
-export const optionalAuth: RequestHandler = (req, res, next) =>{
+export const optionalAuth: RequestHandler = (req, res, next) => {
   const sid = req.cookies.sid as string | undefined;
 
   if (!sid) {
@@ -43,7 +43,7 @@ export const optionalAuth: RequestHandler = (req, res, next) =>{
     return next();
   }
 
-  try { 
+  try {
     req.user = getSessionUser(sid);
     next();
   } catch (error) {
@@ -57,7 +57,7 @@ export const optionalAuth: RequestHandler = (req, res, next) =>{
     req.user = null;
     next();
   }
-}
+};
 
 const getSessionUser = (sid: string): Express.UserPayload | null => {
   const user = db

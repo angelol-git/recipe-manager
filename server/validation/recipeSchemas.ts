@@ -23,7 +23,10 @@ const recipeDetailsSchema = z.object({
 const recipeIngredientSchema = z.object({
   id: z.string(),
   position: z.number().int().min(1),
-  raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+  raw_text: z
+    .string()
+    .transform((s) => s.trim())
+    .pipe(z.string().min(1)),
   ingredient_name: z
     .string()
     .transform((s) => s.trim())
@@ -41,14 +44,23 @@ const recipeIngredientSchema = z.object({
 const recipeInstructionSchema = z.object({
   id: z.string(),
   position: z.number().int().min(1),
-  raw_text: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+  raw_text: z
+    .string()
+    .transform((s) => s.trim())
+    .pipe(z.string().min(1)),
 });
 
 const recipeSourceSchema = z
   .object({
     type: z.enum(["url", "instruction", "raw_text"]),
-    value: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
-    summary: z.string().transform((s) => s.trim()).pipe(z.string().min(1)),
+    value: z
+      .string()
+      .transform((s) => s.trim())
+      .pipe(z.string().min(1)),
+    summary: z
+      .string()
+      .transform((s) => s.trim())
+      .pipe(z.string().min(1)),
   })
   .nullable();
 
@@ -94,14 +106,13 @@ export const addTagSchema = z.object({
   }),
 });
 
-
 export type TagInput = z.infer<typeof tagSchema>;
 export type RecipeDetailsInput = z.infer<typeof recipeDetailsSchema>;
 export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>["body"];
 export type AddTagBody = z.infer<typeof addTagSchema>["body"];
 
-export function validateRequest<T extends z.ZodTypeAny>(schema:T) {
-  return (req:Request, res:Response, next:NextFunction) => {
+export function validateRequest<T extends z.ZodTypeAny>(schema: T) {
+  return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse({
         body: req.body,

@@ -136,7 +136,11 @@ async function runJsonLdPath(ai, model, url) {
     throw new Error("JSON-LD path did not extract a valid recipe object.");
   }
 
-  const prompt = createPrompt(url, null, serializeContextData(extractedContext));
+  const prompt = createPrompt(
+    url,
+    null,
+    serializeContextData(extractedContext),
+  );
   const { response, elapsedMs } = await generateRecipe(ai, model, prompt);
   const parsedRecipe = validateAiResponse(response, url);
 
@@ -206,9 +210,14 @@ Read the recipe at this URL and report:
 URL: ${url}
 `;
 
-    const { response, elapsedMs } = await generateText(ai, model, fallbackPrompt, {
-      tools: [{ urlContext: {} }],
-    });
+    const { response, elapsedMs } = await generateText(
+      ai,
+      model,
+      fallbackPrompt,
+      {
+        tools: [{ urlContext: {} }],
+      },
+    );
     const urlContextMetadata = response.candidates?.[0]?.urlContextMetadata;
     const retrievedUrls = urlContextMetadata?.urlMetadata ?? [];
 
@@ -229,8 +238,12 @@ URL: ${url}
 }
 
 function printComparisonLine(label, result) {
-  console.log(`  ${label} input tokens: ${getInputTokens(result.usageMetadata)}`);
-  console.log(`  ${label} total tokens: ${result.usageMetadata.totalTokenCount ?? 0}`);
+  console.log(
+    `  ${label} input tokens: ${getInputTokens(result.usageMetadata)}`,
+  );
+  console.log(
+    `  ${label} total tokens: ${result.usageMetadata.totalTokenCount ?? 0}`,
+  );
 }
 
 function getCheapestLabel(entries, selector) {
@@ -316,7 +329,9 @@ async function run() {
   const results = [
     jsonLdStep.ok ? { label: "jsonld", result: jsonLdStep.result } : null,
     markdownStep.ok ? { label: "markdown", result: markdownStep.result } : null,
-    urlContextStep.ok ? { label: "urlContext", result: urlContextStep.result } : null,
+    urlContextStep.ok
+      ? { label: "urlContext", result: urlContextStep.result }
+      : null,
   ].filter(Boolean);
 
   if (!results.length) {
@@ -328,15 +343,15 @@ async function run() {
     printComparisonLine(entry.label, entry.result);
   }
   console.log(
-    `  cheapest input path: ${getCheapestLabel(
-      results,
-      (result) => getInputTokens(result.usageMetadata),
+    `  cheapest input path: ${getCheapestLabel(results, (result) =>
+      getInputTokens(result.usageMetadata),
     )}`,
   );
   console.log(
     `  cheapest total path: ${getCheapestLabel(
       results,
-      (result) => result.usageMetadata.totalTokenCount ?? Number.POSITIVE_INFINITY,
+      (result) =>
+        result.usageMetadata.totalTokenCount ?? Number.POSITIVE_INFINITY,
     )}`,
   );
 }

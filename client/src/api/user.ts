@@ -27,7 +27,6 @@ export async function logoutUser() {
     const errorText = await res.text();
     console.error(`Failed to log out: ${errorText}`);
     throw new Error(`Failed to log out: ${errorText}`);
-
   }
 
   return res.json();

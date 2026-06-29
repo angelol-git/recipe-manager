@@ -39,10 +39,7 @@ const KitchenHeader = ({
                 <MoveLeft strokeWidth={1.5} className="stroke-icon" size={20} />
               </Link>
             ) : (
-              <div
-                className="h-7 w-7"
-                aria-hidden="true"
-              />
+              <div className="h-7 w-7" aria-hidden="true" />
             )}
           </div>
           {recipe && (

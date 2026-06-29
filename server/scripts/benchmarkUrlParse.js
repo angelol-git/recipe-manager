@@ -8,8 +8,7 @@ import {
   getUrlContext,
 } from "../services/urlContentService.js";
 
-const DEFAULT_URL =
-  "https://sallysbakingaddiction.com/blueberry-muffins";
+const DEFAULT_URL = "https://sallysbakingaddiction.com/blueberry-muffins";
 
 function parseArgs(argv) {
   const options = {
@@ -50,7 +49,9 @@ function parseArgs(argv) {
     throw new Error("--warmup must be an integer greater than or equal to 0");
   }
 
-  if (!["fetch", "jsonld", "markdown", "recipe", "context"].includes(options.mode)) {
+  if (
+    !["fetch", "jsonld", "markdown", "recipe", "context"].includes(options.mode)
+  ) {
     throw new Error(
       '--mode must be one of "fetch", "jsonld", "markdown", "recipe", or "context"',
     );
@@ -76,7 +77,7 @@ function summarizeResult(result) {
   if (result && typeof result === "object") {
     const type = Array.isArray(result["@type"])
       ? result["@type"].join(", ")
-      : result["@type"] ?? "object";
+      : (result["@type"] ?? "object");
     const title = result.name ?? result.headline ?? result.title ?? null;
     return title ? `${type}: ${title}` : type;
   }
@@ -111,7 +112,6 @@ async function run() {
   console.log(`URL: ${url}`);
   console.log(`Iterations: ${iterations}`);
 
-
   for (let i = 0; i < warmup; i += 1) {
     await benchmark(url);
   }
@@ -123,12 +123,15 @@ async function run() {
     lastResult = await benchmark(url);
     const elapsedMs = performance.now() - iterationStartedAt;
     durations.push(elapsedMs);
-    console.log(`#${i + 1} ${formatMs(elapsedMs)} | ${summarizeResult(lastResult)}`);
+    console.log(
+      `#${i + 1} ${formatMs(elapsedMs)} | ${summarizeResult(lastResult)}`,
+    );
   }
 
   const totalMs = performance.now() - startedAt;
   const sorted = [...durations].sort((a, b) => a - b);
-  const average = durations.reduce((sum, value) => sum + value, 0) / durations.length;
+  const average =
+    durations.reduce((sum, value) => sum + value, 0) / durations.length;
 
   console.log("");
   console.log(`Completed in ${formatMs(totalMs)}`);

@@ -1,8 +1,4 @@
-import {
-  type Dispatch,
-  type FormEvent,
-  type SetStateAction,
-} from "react";
+import { type Dispatch, type FormEvent, type SetStateAction } from "react";
 import type { OpenDeleteModal } from "../../../hooks/useDeleteRecipe";
 import { useDraftRecipe } from "../../../hooks/useDraftRecipe";
 import { useRecipeMutations } from "../../../hooks/useRecipes";
@@ -137,7 +133,11 @@ function RecipeEditForm({
   const recipeIngredients = draft?.ingredients || [];
   const recipeInstructions = draft?.instructions || [];
   return (
-    <form id={formId} onSubmit={handleSave} className="flex flex-col gap-2 pb-12">
+    <form
+      id={formId}
+      onSubmit={handleSave}
+      className="flex flex-col gap-2 pb-12"
+    >
       <div role="log" aria-live="polite" className="flex flex-col gap-2">
         <RecipeEditTitle
           recipeTitle={recipeTitle}

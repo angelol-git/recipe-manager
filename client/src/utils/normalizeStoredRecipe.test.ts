@@ -24,7 +24,8 @@ describe("normalizeStoredRecipe", () => {
           description: "A simple and delicious blueberry cake.",
           ingredients: ["flour", "blueberries"],
           instructions: ["mix", "bake"],
-          source_prompt: "https://www.simplyrecipes.com/recipes/blueberry_cake/",
+          source_prompt:
+            "https://www.simplyrecipes.com/recipes/blueberry_cake/",
         },
       ],
     });
@@ -46,7 +47,8 @@ describe("normalizeStoredRecipe", () => {
           description: "A simple and delicious blueberry cake.",
           ingredients: ["flour", "blueberries"],
           instructions: ["mix", "bake"],
-          source_prompt: "https://www.simplyrecipes.com/recipes/blueberry_cake/",
+          source_prompt:
+            "https://www.simplyrecipes.com/recipes/blueberry_cake/",
         },
       ],
     });

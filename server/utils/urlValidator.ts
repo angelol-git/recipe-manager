@@ -45,7 +45,10 @@ export function normalizeUrl(input: string): string {
   url.hash = "";
 
   for (const key of [...url.searchParams.keys()]) {
-    if (key.startsWith("utm_") || trackingParams.includes(key as (typeof trackingParams)[number])) {
+    if (
+      key.startsWith("utm_") ||
+      trackingParams.includes(key as (typeof trackingParams)[number])
+    ) {
       url.searchParams.delete(key);
     }
   }

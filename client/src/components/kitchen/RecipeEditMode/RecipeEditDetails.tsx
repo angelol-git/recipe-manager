@@ -48,7 +48,7 @@ function RecipeEditDetails({
           <label
             key={field}
             htmlFor={field}
-            className="font-lora flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-medium text-green-900/80 italic"
+            className="font-lora flex shrink-0 items-center gap-1 text-sm font-medium whitespace-nowrap text-green-900/80 italic"
           >
             {prefix && <span>{prefix}</span>}
             <input

@@ -32,7 +32,7 @@ export const updateTagsSchema = z.object({
 });
 
 export function validateRequest<T extends z.ZodTypeAny>(schema: T) {
-  return (req:Request, res:Response, next:NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse({
         body: req.body,

@@ -21,12 +21,9 @@ function RecipeOptions({
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const portalRef = useRef<HTMLDivElement | null>(null);
 
-  useClickOutside(
-    [buttonRef, portalRef],
-    () => {
-      setIsOptionsOpen(false);
-    },
-  );
+  useClickOutside([buttonRef, portalRef], () => {
+    setIsOptionsOpen(false);
+  });
 
   return (
     <div className="relative">

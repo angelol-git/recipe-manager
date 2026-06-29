@@ -74,11 +74,18 @@ router.patch(
          WHERE id = ? AND user_id = ?`,
       );
 
-      const transaction = db.transaction((inputTags: UpdateTagsBody["tags"]) => {
-        inputTags.forEach((tag) => {
-          updateStatement.run(tag.name ?? null, tag.color ?? null, tag.id, user.id);
-        });
-      });
+      const transaction = db.transaction(
+        (inputTags: UpdateTagsBody["tags"]) => {
+          inputTags.forEach((tag) => {
+            updateStatement.run(
+              tag.name ?? null,
+              tag.color ?? null,
+              tag.id,
+              user.id,
+            );
+          });
+        },
+      );
 
       transaction(tags);
       return res.json({ success: true, updated: tags.length });

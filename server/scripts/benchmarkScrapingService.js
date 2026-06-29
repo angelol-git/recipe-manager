@@ -8,7 +8,7 @@ import {
 
 function parseArgs(argv) {
   const options = {
-    url:"https://sallysbakingaddiction.com/best-banana-bread-recipe/",
+    url: "https://sallysbakingaddiction.com/best-banana-bread-recipe/",
     // url:  "https://sallysbakingaddiction.com/blueberry-muffins/#tasty-recipes-67559",
     iterations: 1,
     warmup: 0,
@@ -70,7 +70,7 @@ function summarizeResult(result) {
   if (result && typeof result === "object") {
     const type = Array.isArray(result["@type"])
       ? result["@type"].join(", ")
-      : result["@type"] ?? "object";
+      : (result["@type"] ?? "object");
     const title = result.name ?? result.headline ?? result.title ?? null;
 
     return title ? `${type}: ${title}` : type;
