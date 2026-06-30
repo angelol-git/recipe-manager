@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import recipeRoutes from "./routes/recipes.js";
+import recipeVersionRoutes from "./routes/recipeVersions.js";
+import recipeTagRoutes from "./routes/recipeTags.js";
 import kitchenRoutes from "./routes/kitchen.js";
 import tagRoutes from "./routes/tags.js";
 import cookieParser from "cookie-parser";
@@ -22,6 +24,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
+app.use("/api/recipes", recipeVersionRoutes);
+app.use("/api/recipes", recipeTagRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/kitchen", kitchenRoutes);
 
@@ -29,7 +33,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (err, req, res) => {
   logger.error(
     {
       err,

@@ -44,12 +44,16 @@ export async function fetchRecipes({
 }
 
 export async function deleteRecipeVersion(
+  recipeId: string,
   recipeVersionId: string,
 ): Promise<true> {
-  const res = await fetch(`${backendUrl}/recipes/version/${recipeVersionId}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+  const res = await fetch(
+    `${backendUrl}/recipes/${recipeId}/versions/${recipeVersionId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    },
+  );
 
   if (!res.ok) {
     const errorText = await res.text();

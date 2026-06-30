@@ -45,7 +45,7 @@ export function useRecipeMutations() {
       recipeVersionId,
     }: DeleteRecipeMutationProps) => {
       if (user) {
-        return deleteRecipeVersion(recipeVersionId);
+        return deleteRecipeVersion(recipeId, recipeVersionId);
       }
 
       return deleteLocalRecipeVersion(recipeId, recipeVersionId);

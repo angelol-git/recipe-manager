@@ -15,7 +15,7 @@ import {
 import {
   parseRecipeSource,
   saveRecipeToDb,
-} from "../services/recipeService.js";
+} from "../services/recipeVersionService.js";
 import { getUrlContext } from "../services/urlContentService.js";
 import { isValidUrl } from "../utils/urlValidator.js";
 import logger from "../logger.js";
@@ -33,7 +33,10 @@ type CreateRecipeBody = {
 router.post(
   "/create",
   optionalAuth,
-  async (req: Request<{}, {}, CreateRecipeBody>, res: Response) => {
+  async (
+    req: Request<Record<string, never>, object, CreateRecipeBody>,
+    res: Response,
+  ) => {
     const user = req.user;
     const { prompt, message, recipeId, recipeVersion } = req.body;
     const recipePrompt = prompt ?? message;
