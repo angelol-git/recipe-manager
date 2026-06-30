@@ -1,5 +1,10 @@
 import API_BASE_URL from "../config/api";
-import type { Recipe, UpdateRecipeInput } from "../types/recipe";
+import type {
+  Recipe,
+  UpdateRecipeMetadataInput,
+  UpdateRecipeTagsInput,
+  UpdateRecipeVersionInput,
+} from "../types/recipe";
 import type { DraftTag } from "../types/tag";
 
 const backendUrl = API_BASE_URL;
@@ -77,15 +82,66 @@ export async function deleteRecipe(recipeId: string): Promise<true> {
   return true;
 }
 
-export async function updateRecipe(
-  updatedRecipe: UpdateRecipeInput,
+export async function updateRecipeMetadata(
+  updatedRecipe: UpdateRecipeMetadataInput,
 ): Promise<true> {
-  const res = await fetch(`${backendUrl}/recipes/${updatedRecipe.recipe_id}`, {
+  const res = await fetch(`${backendUrl}/recipes/${updatedRecipe.recipeId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ updatedRecipe }),
+    body: JSON.stringify({ updatedRecipe: { title: updatedRecipe.title } }),
   });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Server returned ${res.status}: ${errorText}`);
+  }
+
+  return true;
+}
+
+export async function updateRecipeVersion(
+  updatedRecipe: UpdateRecipeVersionInput,
+): Promise<true> {
+  const res = await fetch(
+    `${backendUrl}/recipes/${updatedRecipe.recipeId}/versions/${updatedRecipe.versionId}`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        updatedRecipe: {
+          recipeDetails: updatedRecipe.recipeDetails,
+          description: updatedRecipe.description,
+          notes: updatedRecipe.notes,
+          instructions: updatedRecipe.instructions,
+          ingredients: updatedRecipe.ingredients,
+          source: updatedRecipe.source,
+        },
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Server returned ${res.status}: ${errorText}`);
+  }
+
+  return true;
+}
+
+export async function updateRecipeTags(
+  updatedRecipe: UpdateRecipeTagsInput,
+): Promise<true> {
+  const res = await fetch(
+    `${backendUrl}/recipes/${updatedRecipe.recipeId}/tags`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ updatedRecipe: { tags: updatedRecipe.tags } }),
+    },
+  );
 
   if (!res.ok) {
     const errorText = await res.text();

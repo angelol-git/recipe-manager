@@ -59,11 +59,19 @@ export type RecipeVersion = {
   version_number?: number;
 };
 
-export type UpdateRecipeInput = {
-  id: string;
-  recipe_id: string;
+export type UpdateRecipeMetadataInput = {
+  recipeId: string;
   title: string;
+};
+
+export type UpdateRecipeTagsInput = {
+  recipeId: string;
   tags: Tag[];
+};
+
+export type UpdateRecipeVersionInput = {
+  recipeId: string;
+  versionId: string;
   description: string;
   notes: string;
   instructions: RecipeInstruction[];
@@ -71,3 +79,10 @@ export type UpdateRecipeInput = {
   recipeDetails: RecipeDetails;
   source: RecipeSource | null;
 };
+
+export type UpdateRecipeInput = UpdateRecipeMetadataInput &
+  UpdateRecipeTagsInput &
+  Omit<UpdateRecipeVersionInput, "recipeId" | "versionId"> & {
+    id: string;
+    recipe_id: string;
+  };

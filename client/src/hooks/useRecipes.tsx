@@ -4,10 +4,17 @@ import {
   deleteRecipe,
   deleteRecipeVersion,
   fetchRecipes,
-  updateRecipe,
+  updateRecipeMetadata,
+  updateRecipeTags,
+  updateRecipeVersion,
   type PaginatedRecipesResponse,
 } from "../api/recipes";
-import type { Recipe, UpdateRecipeInput } from "../types/recipe";
+import type {
+  Recipe,
+  UpdateRecipeMetadataInput,
+  UpdateRecipeTagsInput,
+  UpdateRecipeVersionInput,
+} from "../types/recipe";
 import type { DraftTag } from "../types/tag";
 import {
   addLocalRecipe,
@@ -15,7 +22,9 @@ import {
   deleteLocalRecipeAll,
   deleteLocalRecipeVersion,
   getLocalRecipes,
-  updateLocalRecipe,
+  updateLocalRecipeMetadata,
+  updateLocalRecipeTags,
+  updateLocalRecipeVersion,
 } from "../utils/storage";
 import { useUser } from "./useUser.js";
 
@@ -69,13 +78,39 @@ export function useRecipeMutations() {
     },
   });
 
-  const updateRecipeMutation = useMutation({
-    mutationFn: async (updatedRecipe: UpdateRecipeInput) => {
+  const updateRecipeMetadataMutation = useMutation({
+    mutationFn: async (updatedRecipe: UpdateRecipeMetadataInput) => {
       if (user) {
-        return updateRecipe(updatedRecipe);
+        return updateRecipeMetadata(updatedRecipe);
       }
 
-      return updateLocalRecipe(updatedRecipe);
+      return updateLocalRecipeMetadata(updatedRecipe);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+    },
+  });
+
+  const updateRecipeVersionMutation = useMutation({
+    mutationFn: async (updatedRecipe: UpdateRecipeVersionInput) => {
+      if (user) {
+        return updateRecipeVersion(updatedRecipe);
+      }
+
+      return updateLocalRecipeVersion(updatedRecipe);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["recipes"] });
+    },
+  });
+
+  const updateRecipeTagsMutation = useMutation({
+    mutationFn: async (updatedRecipe: UpdateRecipeTagsInput) => {
+      if (user) {
+        return updateRecipeTags(updatedRecipe);
+      }
+
+      return updateLocalRecipeTags(updatedRecipe);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["recipes"] });
@@ -109,7 +144,12 @@ export function useRecipeMutations() {
     addRecipeTag: addRecipeTagMutation.mutate,
     deleteRecipe: deleteRecipeMutation.mutate,
     deleteRecipeVersion: deleteRecipeVersionMutation.mutate,
-    updateRecipe: updateRecipeMutation.mutate,
+    updateRecipeMetadata: updateRecipeMetadataMutation.mutate,
+    updateRecipeMetadataAsync: updateRecipeMetadataMutation.mutateAsync,
+    updateRecipeTags: updateRecipeTagsMutation.mutate,
+    updateRecipeTagsAsync: updateRecipeTagsMutation.mutateAsync,
+    updateRecipeVersion: updateRecipeVersionMutation.mutate,
+    updateRecipeVersionAsync: updateRecipeVersionMutation.mutateAsync,
   };
 }
 

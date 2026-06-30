@@ -5,7 +5,7 @@ import { useRecipeMutations } from "../../../hooks/useRecipes";
 import type {
   Recipe,
   RecipeDetails,
-  UpdateRecipeInput,
+  UpdateRecipeVersionInput,
 } from "../../../types/recipe";
 import RecipeEditTitle from "./RecipeEditTitle";
 import RecipeEditDetails from "./RecipeEditDetails";
@@ -22,6 +22,27 @@ const EMPTY_RECIPE_DETAILS: RecipeDetails = {
   total_time: null,
 };
 
+function normalizeDetailValue(value: string | number | null | undefined) {
+  if (value == null) return null;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return null;
+
+  const numericValue = Number(trimmedValue);
+  return Number.isFinite(numericValue) ? numericValue : null;
+}
+
+function normalizeRecipeDetails(recipeDetails: RecipeDetails): RecipeDetails {
+  return {
+    calories: normalizeDetailValue(recipeDetails.calories),
+    servings: normalizeDetailValue(recipeDetails.servings),
+    total_time: normalizeDetailValue(recipeDetails.total_time),
+  };
+}
+
 type RecipeEditFormProps = {
   recipe: Recipe;
   recipeVersion: number;
@@ -31,54 +52,6 @@ type RecipeEditFormProps = {
   openDeleteModal: OpenDeleteModal;
 };
 
-// function renderIngredient(ingredient: RecipeIngredient) {
-//   const hasPrimaryMeasurement =
-//     ingredient.quantity_text != null || ingredient.quantity_value != null;
-
-//   const hasAlternateMeasurement =
-//     ingredient.alternate_quantity_text != null ||
-//     ingredient.alternate_quantity_value != null;
-
-//   return (
-//     <div className="grid grid-cols-[90px_1fr] items-start gap-1">
-//       <div className="flex flex-col">
-//         {hasPrimaryMeasurement && (
-//           <span>
-//             <span>
-//               {ingredient.quantity_text ??
-//                 ingredient.quantity_value?.toString()}
-//             </span>
-//             {ingredient.unit && <span className="ml-1">{ingredient.unit}</span>}
-//           </span>
-//         )}
-//         {hasAlternateMeasurement && (
-//           <div className="text-secondary text-xs">
-//             <span>(</span>
-//             <span>
-//               {ingredient.alternate_quantity_text ??
-//                 ingredient.alternate_quantity_value?.toString()}
-//             </span>
-//             {ingredient.alternate_unit && (
-//               <span className="ml-1">{ingredient.alternate_unit}</span>
-//             )}
-//             <span>)</span>
-//           </div>
-//         )}
-//       </div>
-//       <div className="flex flex-col items-start">
-//         {ingredient.ingredient_name && (
-//           <span>{ingredient.ingredient_name}</span>
-//         )}
-//         {ingredient.note && (
-//           <span className="text-secondary text-xs">({ingredient.note})</span>
-//         )}
-//         {ingredient.is_optional && <span>optional</span>}
-//       </div>
-//     </div>
-//   );
-// }
-
-// TODO: Maybe update recipe edit form place holder text to have rotating examples
 function RecipeEditForm({
   recipe,
   recipeVersion,
@@ -87,7 +60,8 @@ function RecipeEditForm({
   setIsEditing,
   openDeleteModal,
 }: RecipeEditFormProps) {
-  const { updateRecipe } = useRecipeMutations();
+  const { updateRecipeMetadataAsync, updateRecipeVersionAsync } =
+    useRecipeMutations();
   const {
     draft,
     handleDraftDetail,
@@ -105,25 +79,65 @@ function RecipeEditForm({
 
   if (!current) return null;
 
-  function handleSave(event: FormEvent<HTMLFormElement>) {
+  async function handleSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!draft) return;
 
-    const recipeToSave: UpdateRecipeInput = {
-      id: draft.id,
-      recipe_id: draft.recipe_id,
-      title: draft.title,
-      tags: draft.tags,
+    const requests: Array<Promise<unknown>> = [];
+
+    //Checks recipe metadata differences
+    const trimmedDraftTitle = draft.title.trim();
+    const trimmedCurrentTitle = recipe.title.trim();
+
+    if (trimmedDraftTitle !== trimmedCurrentTitle) {
+      requests.push(
+        updateRecipeMetadataAsync({
+          recipeId: recipe.id,
+          title: trimmedDraftTitle,
+        }),
+      );
+    }
+
+    //Checks recipe version differences
+    const nextVersionUpdate: UpdateRecipeVersionInput = {
+      recipeId: recipe.id,
+      versionId: draft.id,
       description: draft.description,
       notes: draft.notes,
-      recipeDetails: draft.recipeDetails,
-      source: draft.source,
       instructions: draft.instructions || [],
       ingredients: draft.ingredients || [],
+      recipeDetails: normalizeRecipeDetails(
+        draft.recipeDetails || EMPTY_RECIPE_DETAILS,
+      ),
+      source: draft.source,
+    };
+    const currentVersionUpdate: UpdateRecipeVersionInput = {
+      recipeId: recipe.id,
+      versionId: current.id,
+      description: current.description ?? "",
+      notes: current.notes ?? "",
+      instructions: current.instructions ?? [],
+      ingredients: current.ingredients ?? [],
+      recipeDetails: normalizeRecipeDetails(
+        current.recipeDetails || EMPTY_RECIPE_DETAILS,
+      ),
+      source: current.source,
     };
 
-    updateRecipe(recipeToSave);
-    setIsEditing(false);
+    if (
+      JSON.stringify(nextVersionUpdate) !== JSON.stringify(currentVersionUpdate)
+    ) {
+      requests.push(updateRecipeVersionAsync(nextVersionUpdate));
+    }
+
+    //TO DO: Checks recipe tags differences
+
+    try {
+      await Promise.all(requests);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to save recipe edits", error);
+    }
   }
 
   const recipeTitle = draft?.title || "";

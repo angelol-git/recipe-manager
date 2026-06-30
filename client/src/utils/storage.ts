@@ -2,7 +2,13 @@ import {
   normalizeStoredRecipe,
   normalizeStoredRecipes,
 } from "./normalizeStoredRecipe";
-import type { Recipe, UpdateRecipeInput } from "../types/recipe";
+import type {
+  Recipe,
+  UpdateRecipeInput,
+  UpdateRecipeMetadataInput,
+  UpdateRecipeTagsInput,
+  UpdateRecipeVersionInput,
+} from "../types/recipe";
 import type { DraftTag, EditableTagUpdate, Tag } from "../types/tag";
 
 const GUEST_RECIPES_STORAGE_KEY = "rambutan-guest-recipes";
@@ -166,35 +172,90 @@ export function deleteLocalRecipeVersion(
   }
 }
 
-export function updateLocalRecipe(recipe: UpdateRecipeInput): void {
+export function updateLocalRecipeMetadata(
+  recipeUpdate: UpdateRecipeMetadataInput,
+): void {
   const recipes = getLocalRecipes();
-  const existingIndex = recipes.findIndex((r) => r.id === recipe.recipe_id);
+  const existingIndex = recipes.findIndex(
+    (r) => r.id === recipeUpdate.recipeId,
+  );
+
+  if (existingIndex === -1) return;
+
+  recipes[existingIndex] = normalizeStoredRecipe({
+    ...recipes[existingIndex],
+    title: recipeUpdate.title,
+  });
+
+  localStorage.setItem(GUEST_RECIPES_STORAGE_KEY, JSON.stringify(recipes));
+}
+
+export function updateLocalRecipeVersion(
+  recipeUpdate: UpdateRecipeVersionInput,
+): void {
+  const recipes = getLocalRecipes();
+  const existingIndex = recipes.findIndex(
+    (r) => r.id === recipeUpdate.recipeId,
+  );
 
   if (existingIndex === -1) return;
 
   const versionIndex = recipes[existingIndex].versions.findIndex(
-    (v) => v.id === recipe.id,
+    (v) => v.id === recipeUpdate.versionId,
   );
 
-  if (versionIndex !== -1) {
-    recipes[existingIndex].versions[versionIndex] = {
-      ...recipes[existingIndex].versions[versionIndex],
-      description: recipe.description,
-      notes: recipe.notes,
-      instructions: recipe.instructions,
-      ingredients: recipe.ingredients,
-      recipeDetails: recipe.recipeDetails,
-      source: recipe.source,
-    };
-  }
+  if (versionIndex === -1) return;
+
+  recipes[existingIndex].versions[versionIndex] = {
+    ...recipes[existingIndex].versions[versionIndex],
+    description: recipeUpdate.description,
+    notes: recipeUpdate.notes,
+    instructions: recipeUpdate.instructions,
+    ingredients: recipeUpdate.ingredients,
+    recipeDetails: recipeUpdate.recipeDetails,
+    source: recipeUpdate.source,
+  };
+
+  localStorage.setItem(GUEST_RECIPES_STORAGE_KEY, JSON.stringify(recipes));
+}
+
+export function updateLocalRecipeTags(
+  recipeUpdate: UpdateRecipeTagsInput,
+): void {
+  const recipes = getLocalRecipes();
+  const existingIndex = recipes.findIndex(
+    (r) => r.id === recipeUpdate.recipeId,
+  );
+
+  if (existingIndex === -1) return;
 
   recipes[existingIndex] = normalizeStoredRecipe({
     ...recipes[existingIndex],
-    title: recipe.title,
-    tags: recipe.tags || [],
+    tags: recipeUpdate.tags || [],
   });
 
   localStorage.setItem(GUEST_RECIPES_STORAGE_KEY, JSON.stringify(recipes));
+}
+
+export function updateLocalRecipe(recipeUpdate: UpdateRecipeInput): void {
+  updateLocalRecipeMetadata({
+    recipeId: recipeUpdate.recipe_id,
+    title: recipeUpdate.title,
+  });
+  updateLocalRecipeVersion({
+    recipeId: recipeUpdate.recipe_id,
+    versionId: recipeUpdate.id,
+    description: recipeUpdate.description,
+    notes: recipeUpdate.notes,
+    instructions: recipeUpdate.instructions,
+    ingredients: recipeUpdate.ingredients,
+    recipeDetails: recipeUpdate.recipeDetails,
+    source: recipeUpdate.source,
+  });
+  updateLocalRecipeTags({
+    recipeId: recipeUpdate.recipe_id,
+    tags: recipeUpdate.tags,
+  });
 }
 
 export function addLocalRecipeTag(
