@@ -57,7 +57,12 @@ router.patch(
     }
 
     try {
-      const result = updateTag(req.params.tagId, user.id, req.body.tag ?? {});
+      const tagId = Number.parseInt(req.params.tagId, 10);
+      if (!Number.isInteger(tagId)) {
+        return res.status(400).json({ error: "Invalid tag id" });
+      }
+
+      const result = updateTag(tagId, user.id, req.body.tag ?? {});
       if (!result.success) {
         return res.status(400).json({ error: result.error });
       }

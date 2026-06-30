@@ -43,7 +43,7 @@ type AddRecipeTagMutationInput = {
 type UseRecipesParams = {
   page: number;
   pageSize: number;
-  selectedTagIds?: Array<string | number>;
+  selectedTagIds?: number[];
 };
 
 export function useRecipeMutations() {

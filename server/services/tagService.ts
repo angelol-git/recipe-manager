@@ -5,24 +5,24 @@ import type { TagInput } from "../validation/recipeSchemas.js";
 type UpdateTagInput = Partial<Pick<TagInput, "name" | "color">>;
 type UpdateRecipeResult = { success: true } | { success: false; error: string };
 type BulkUpdateTagInput = Array<{
-  id: string | number;
+  id: number;
   name?: string;
   color?: string;
 }>;
 type DeleteTagsResult =
-  | { success: true; deletedTagIds: Array<string | number> }
+  | { success: true; deletedTagIds: number[] }
   | { success: false; error: string };
 type UpdateTagsResult =
   | { success: true; updated: number }
   | { success: false; error: string };
 
 export function updateTag(
-  tagId: string | number,
+  tagId: number,
   userId: UserId,
   updates: UpdateTagInput,
 ): UpdateRecipeResult {
   const fields: string[] = [];
-  const values: Array<string | number> = [];
+  const values: string[] = [];
 
   if (updates.color !== undefined) {
     fields.push("color = ?");
@@ -46,10 +46,7 @@ export function updateTag(
   return { success: true };
 }
 
-export function deleteTags(
-  tagIds: Array<string | number>,
-  userId: UserId,
-): DeleteTagsResult {
+export function deleteTags(tagIds: number[], userId: UserId): DeleteTagsResult {
   try {
     const deleteTransaction = db.transaction(() => {
       db.prepare(

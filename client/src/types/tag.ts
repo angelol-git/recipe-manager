@@ -1,11 +1,11 @@
 export type Tag = {
-  id: string | number;
+  id: number;
   name: string;
   color: string;
 };
 
 export type EditableTagUpdate = {
-  id: string | number;
+  id: number;
   name?: string;
   color?: string;
 };
@@ -16,7 +16,7 @@ export type DraftTag = {
 };
 
 export type EditableTag = {
-  id: string | number;
+  id: number;
   name: string;
   color: string;
 };

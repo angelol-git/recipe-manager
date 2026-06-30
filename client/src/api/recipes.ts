@@ -12,7 +12,7 @@ const backendUrl = API_BASE_URL;
 type FetchRecipesParams = {
   page: number;
   pageSize: number;
-  selectedTagIds?: Array<string | number>;
+  selectedTagIds?: number[];
 };
 export type PaginatedRecipesResponse = {
   items: Recipe[];

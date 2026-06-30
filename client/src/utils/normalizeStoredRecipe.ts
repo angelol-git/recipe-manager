@@ -194,7 +194,7 @@ const recipeDetailsSchema = z.object({
 });
 
 const tagSchema = z.object({
-  id: z.union([z.string(), z.number()]),
+  id: z.number().int(),
   name: z.string(),
   color: z.string(),
 }) satisfies z.ZodType<Tag>;

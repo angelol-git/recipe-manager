@@ -6,7 +6,7 @@ const hexColorSchema = z
   .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid hex color format");
 
 const tagSchema = z.object({
-  id: z.union([z.string(), z.number()]),
+  id: z.number().int(),
   name: z
     .string()
     .transform((s) => s.trim())

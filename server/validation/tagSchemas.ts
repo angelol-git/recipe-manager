@@ -7,7 +7,7 @@ const hexColorSchema = z
   .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid hex color format");
 
 const tagSchema = z.object({
-  id: z.union([z.string(), z.number()]),
+  id: z.number().int(),
   name: z
     .string()
     .min(1)
@@ -19,9 +19,7 @@ const tagSchema = z.object({
 
 export const deleteTagsSchema = z.object({
   body: z.object({
-    tagIds: z
-      .array(z.union([z.string(), z.number()]))
-      .min(1, "At least one tag ID is required"),
+    tagIds: z.array(z.number().int()).min(1, "At least one tag ID is required"),
   }),
 });
 

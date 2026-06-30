@@ -64,7 +64,7 @@ export function createRecipeTag(
 
 export function deleteRecipeTag(
   recipeId: RecipeId,
-  tagId: string | number,
+  tagId: number,
   userId: UserId,
 ): UpdateRecipeResult {
   const recipe = db
@@ -77,7 +77,7 @@ export function deleteRecipeTag(
 
   db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ? AND tag_id = ?`).run(
     recipeId,
-    toNumericTagId(tagId),
+    tagId,
   );
 
   return { success: true };
@@ -155,8 +155,4 @@ function toRecipeTag(tag: RecipeTagRow): RecipeTag {
     name: tag.name,
     color: tag.color,
   };
-}
-
-function toNumericTagId(tagId: string | number): number {
-  return typeof tagId === "number" ? tagId : Number.parseInt(tagId, 10);
 }

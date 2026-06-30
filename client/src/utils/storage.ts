@@ -22,8 +22,18 @@ type RecipeCompletionState = {
 type StoredRecipeCompletionState = Partial<RecipeCompletionState>;
 type StoredRecipeCompletionMap = Record<string, StoredRecipeCompletionState>;
 
-function generateId(): string {
-  return crypto.randomUUID();
+function generateTagId(recipes: Recipe[]): number {
+  let nextId = 1;
+
+  for (const recipe of recipes) {
+    for (const tag of recipe.tags) {
+      if (tag.id >= nextId) {
+        nextId = tag.id + 1;
+      }
+    }
+  }
+
+  return nextId;
 }
 
 function getStoredRecipeCompletionMap(): StoredRecipeCompletionMap {
@@ -321,7 +331,7 @@ export function addLocalRecipeTag(
 
   if (!tagToUse) {
     tagToUse = {
-      id: generateId(),
+      id: generateTagId(recipes),
       name: newTag.name,
       color: newTag.color || "#FFB86C",
     };

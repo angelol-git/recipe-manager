@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { DraftTag } from "../types/tag";
+import type { DraftTag } from "../types/tag";
 import type { EditableTag } from "../types/tag";
 import type { Recipe, RecipeDetails } from "../types/recipe";
 import type {
@@ -156,7 +156,7 @@ export function useDraftRecipe({
         tags: [
           ...(prev.tags || []),
           {
-            id: `draft-tag-${Date.now()}`,
+            id: -Date.now(),
             name: trimmedName,
             color: tag.color || "#FFB86C",
           },

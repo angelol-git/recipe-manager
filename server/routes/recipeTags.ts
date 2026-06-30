@@ -115,11 +115,12 @@ router.delete(
     }
 
     try {
-      const result = deleteRecipeTag(
-        req.params.recipeId,
-        req.params.tagId,
-        user.id,
-      );
+      const tagId = Number.parseInt(req.params.tagId, 10);
+      if (!Number.isInteger(tagId)) {
+        return res.status(400).json({ error: "Invalid tag id" });
+      }
+
+      const result = deleteRecipeTag(req.params.recipeId, tagId, user.id);
       if (!result.success) {
         return res
           .status(404)

@@ -16,7 +16,7 @@ type EditTagProps = {
   draft: DraftWithTags;
   handleDraftTagName: (newName: string, tagId: number) => void;
   handleDraftTagColor: (color: ColorChange, tag: Tag) => void;
-  handleDraftTagDelete: (tagId: number) => void;
+  handleDraftTagDelete: (tag: Tag) => void;
   handleDraftTagAdd: (tag: DraftTag) => void;
 };
 
