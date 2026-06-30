@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useRecipeMutations } from "./useRecipes";
+import { useToast } from "./useToast";
 import type { Recipe } from "../types/recipe";
 
 export type DeleteType = "version" | "all";
@@ -25,7 +26,8 @@ export function useDeleteRecipe({
   onDeleteVersion,
 }: UseDeleteRecipeOptions = {}) {
   const navigate = useNavigate();
-  const { deleteRecipe, deleteRecipeVersion } = useRecipeMutations();
+  const { deleteRecipeAsync, deleteRecipeVersionAsync } = useRecipeMutations();
+  const { showToast } = useToast();
 
   const [deleteModal, setDeleteModal] = useState<DeleteModalState>({
     isOpen: false,
@@ -45,7 +47,7 @@ export function useDeleteRecipe({
     setDeleteModal((prev) => ({ ...prev, isOpen: false }));
   }, []);
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = useCallback(async () => {
     const { type, recipe, recipeVersion } = deleteModal;
 
     if (!type || !recipe) {
@@ -53,25 +55,31 @@ export function useDeleteRecipe({
       return;
     }
 
-    if (type === "version" && recipeVersion !== null) {
-      deleteRecipeVersion({
-        recipeId: recipe.id,
-        recipeVersionId: recipe.versions[recipeVersion].id,
-      });
-      onDeleteVersion?.(Math.max(recipeVersion - 1, 0));
-    } else {
-      deleteRecipe(recipe.id);
-      navigate("/");
-    }
+    try {
+      if (type === "version" && recipeVersion !== null) {
+        await deleteRecipeVersionAsync({
+          recipeId: recipe.id,
+          recipeVersionId: recipe.versions[recipeVersion].id,
+        });
+        onDeleteVersion?.(Math.max(recipeVersion - 1, 0));
+      } else {
+        await deleteRecipeAsync(recipe.id);
+        navigate("/");
+      }
 
-    closeDeleteModal();
+      closeDeleteModal();
+    } catch (error) {
+      console.error("Failed to delete recipe:", error);
+      showToast("Unable to delete recipe right now.", "error");
+    }
   }, [
     deleteModal,
-    deleteRecipe,
-    deleteRecipeVersion,
+    deleteRecipeAsync,
+    deleteRecipeVersionAsync,
     onDeleteVersion,
     navigate,
     closeDeleteModal,
+    showToast,
   ]);
 
   return { deleteModal, openDeleteModal, closeDeleteModal, handleDelete };
