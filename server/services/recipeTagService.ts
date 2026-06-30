@@ -6,15 +6,18 @@ import type {
   UserId,
 } from "./db.types.js";
 import type { RecipeTag } from "./recipe.types.js";
-import type { AddTagBody } from "../validation/recipeSchemas.js";
+import type { AddTagBody, TagInput } from "../validation/recipeSchemas.js";
 
 type NewTagInput = AddTagBody["newTag"];
 type UpdateRecipeResult = { success: true } | { success: false; error: string };
 type TagMutationResult =
   | { success: true; tag?: RecipeTag }
   | { success: false; error: string };
+type UpdateRecipeTagsInput = {
+  tags?: TagInput[];
+};
 
-export function addTagToRecipe(
+export function createRecipeTag(
   recipeId: RecipeId,
   userId: UserId,
   newTag: NewTagInput,
@@ -59,7 +62,7 @@ export function addTagToRecipe(
   return { success: true, tag: toRecipeTag(tagRow) };
 }
 
-export function removeTagFromRecipe(
+export function deleteRecipeTag(
   recipeId: RecipeId,
   tagId: string | number,
   userId: UserId,
@@ -76,6 +79,72 @@ export function removeTagFromRecipe(
     recipeId,
     toNumericTagId(tagId),
   );
+
+  return { success: true };
+}
+
+export function updateRecipeTags(
+  recipeId: RecipeId,
+  userId: UserId,
+  updatedRecipe: UpdateRecipeTagsInput,
+): UpdateRecipeResult {
+  const resolvedTagIds: number[] = [];
+
+  for (const tag of updatedRecipe.tags ?? []) {
+    const existingTagById = db
+      .prepare(`SELECT id FROM tags WHERE id = ? AND user_id = ?`)
+      .get(tag.id, userId) as { id: number } | undefined;
+
+    if (existingTagById) {
+      db.prepare(
+        `UPDATE tags
+           SET name = ?, color = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ? AND user_id = ?`,
+      ).run(tag.name, tag.color, existingTagById.id, userId);
+
+      resolvedTagIds.push(existingTagById.id);
+      continue;
+    }
+
+    const existingTagByName = db
+      .prepare(`SELECT id FROM tags WHERE user_id = ? AND name = ?`)
+      .get(userId, tag.name) as { id: number } | undefined;
+
+    if (existingTagByName) {
+      db.prepare(
+        `UPDATE tags
+           SET color = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE id = ? AND user_id = ?`,
+      ).run(tag.color, existingTagByName.id, userId);
+      resolvedTagIds.push(existingTagByName.id);
+      continue;
+    }
+
+    const insertResult = db
+      .prepare(`INSERT INTO tags (user_id, name, color) VALUES (?, ?, ?)`)
+      .run(userId, tag.name, tag.color);
+
+    resolvedTagIds.push(Number(insertResult.lastInsertRowid));
+  }
+
+  if (resolvedTagIds.length > 0) {
+    db.prepare(
+      `DELETE FROM recipe_tags
+         WHERE recipe_id = ? AND tag_id NOT IN (${resolvedTagIds.map(() => "?").join(", ")})`,
+    ).run(recipeId, ...resolvedTagIds);
+  } else {
+    db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ?`).run(recipeId);
+  }
+
+  for (const tagId of resolvedTagIds) {
+    db.prepare(
+      `INSERT OR IGNORE INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)`,
+    ).run(recipeId, tagId);
+  }
+
+  db.prepare(
+    `DELETE FROM tags WHERE id NOT IN (SELECT tag_id FROM recipe_tags)`,
+  ).run();
 
   return { success: true };
 }

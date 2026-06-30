@@ -12,9 +12,9 @@ import {
   getAskMessages,
 } from "../services/messageService.js";
 import {
-  updateRecipeSchema,
+  updateRecipeMetadataSchema,
   validateRequest,
-  type UpdateRecipeBody,
+  type UpdateRecipeMetadataBody,
 } from "../validation/recipeSchemas.js";
 import logger from "../logger.js";
 import { requireUser } from "./routeUtils.js";
@@ -99,9 +99,9 @@ router.get(
 router.patch(
   "/:recipeId",
   authMiddleware,
-  validateRequest(updateRecipeSchema),
+  validateRequest(updateRecipeMetadataSchema),
   async (
-    req: Request<RecipeParams, object, UpdateRecipeBody>,
+    req: Request<RecipeParams, object, UpdateRecipeMetadataBody>,
     res: Response,
   ) => {
     const user = requireUser(req, res);

@@ -5,9 +5,9 @@ import {
   updateRecipeVersion,
 } from "../services/recipeVersionService.js";
 import {
-  updateRecipeSchema,
+  updateRecipeVersionSchema,
   validateRequest,
-  type UpdateRecipeBody,
+  type UpdateRecipeVersionBody,
 } from "../validation/recipeSchemas.js";
 import logger from "../logger.js";
 import { requireUser } from "./routeUtils.js";
@@ -22,9 +22,9 @@ type RecipeVersionParams = {
 router.patch(
   "/:recipeId/versions/:versionId",
   authMiddleware,
-  validateRequest(updateRecipeSchema),
+  validateRequest(updateRecipeVersionSchema),
   async (
-    req: Request<RecipeVersionParams, object, UpdateRecipeBody>,
+    req: Request<RecipeVersionParams, object, UpdateRecipeVersionBody>,
     res: Response,
   ) => {
     const user = requireUser(req, res);
@@ -35,6 +35,7 @@ router.patch(
     try {
       const result = updateRecipeVersion(
         req.params.recipeId,
+        req.params.versionId,
         user.id,
         req.body.updatedRecipe,
       );

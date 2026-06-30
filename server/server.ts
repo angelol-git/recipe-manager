@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import recipeRoutes from "./routes/recipes.js";
-import recipeVersionRoutes from "./routes/recipeVersions.js";
+import recipeVersionRoutes from "./routes/recipeVersion.js";
 import recipeTagRoutes from "./routes/recipeTags.js";
 import kitchenRoutes from "./routes/kitchen.js";
 import tagRoutes from "./routes/tags.js";

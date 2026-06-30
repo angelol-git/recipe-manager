@@ -1,7 +1,6 @@
 import express, { type Request, type Response } from "express";
-import db from "../db.js";
 import authMiddleware from "../middleware.js";
-import { updateTag } from "../services/tagService.js";
+import { deleteTags, updateTag, updateTags } from "../services/tagService.js";
 import {
   deleteTagsSchema,
   updateTagsSchema,
@@ -14,7 +13,6 @@ import { requireUser } from "./routeUtils.js";
  * Routes for managing global recipe tags ex. bulk updates and deletes from the home page.
  */
 const router = express.Router();
-
 type DeleteTagsBody = z.infer<typeof deleteTagsSchema>["body"];
 type UpdateTagsBody = z.infer<typeof updateTagsSchema>["body"];
 type TagParams = {
@@ -40,25 +38,12 @@ router.delete(
       return;
     }
 
-    const { tagIds } = req.body;
-
-    try {
-      const deleteTransaction = db.transaction(() => {
-        db.prepare(
-          `DELETE FROM recipe_tags WHERE tag_id IN (${tagIds.map(() => "?").join(", ")})`,
-        ).run(...tagIds);
-
-        db.prepare(
-          `DELETE FROM tags WHERE id IN (${tagIds.map(() => "?").join(", ")}) AND user_id = ?`,
-        ).run(...tagIds, user.id);
-      });
-
-      deleteTransaction();
-      return res.json({ success: true, deletedTagIds: tagIds });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Failed to delete tags" });
+    const result = deleteTags(req.body.tagIds, user.id);
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
     }
+
+    return res.json(result);
   },
 );
 
@@ -97,35 +82,12 @@ router.patch(
       return;
     }
 
-    const { tags } = req.body;
-
-    try {
-      const updateStatement = db.prepare(
-        `UPDATE tags
-         SET name = COALESCE(?, name),
-             color = COALESCE(?, color)
-         WHERE id = ? AND user_id = ?`,
-      );
-
-      const transaction = db.transaction(
-        (inputTags: UpdateTagsBody["tags"]) => {
-          inputTags.forEach((tag) => {
-            updateStatement.run(
-              tag.name ?? null,
-              tag.color ?? null,
-              tag.id,
-              user.id,
-            );
-          });
-        },
-      );
-
-      transaction(tags);
-      return res.json({ success: true, updated: tags.length });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Failed to update tag" });
+    const result = updateTags(req.body.tags, user.id);
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
     }
+
+    return res.json(result);
   },
 );
 

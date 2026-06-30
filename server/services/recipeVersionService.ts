@@ -15,11 +15,11 @@ import type {
   RecipeInstruction,
   RecipeSource,
 } from "./recipe.types.js";
-import type { UpdateRecipeBody } from "../validation/recipeSchemas.js";
+import type { UpdateRecipeVersionBody } from "../validation/recipeSchemas.js";
 import { normalizeIngredientUnit } from "../utils/ingredientParser.js";
 import { getRecipeById } from "./recipeService.js";
 
-type UpdateRecipeInput = UpdateRecipeBody["updatedRecipe"];
+type UpdateRecipeInput = UpdateRecipeVersionBody["updatedRecipe"];
 type UpdateRecipeResult = { success: true } | { success: false; error: string };
 
 export function saveRecipeToDb(
@@ -117,7 +117,8 @@ export function deleteRecipeVersion(id: VersionId, userId: UserId): boolean {
 }
 
 export function updateRecipeVersion(
-  id: RecipeId,
+  recipeId: RecipeId,
+  versionId: VersionId,
   userId: UserId,
   updatedRecipe: UpdateRecipeInput,
 ): UpdateRecipeResult {
@@ -128,7 +129,7 @@ export function updateRecipeVersion(
        JOIN recipes r ON rv.recipe_id = r.id
        WHERE rv.id = ? AND rv.recipe_id = ? AND r.user_id = ?`,
     )
-    .get(String(updatedRecipe.id), id, userId) as ExistingTextIdRow | undefined;
+    .get(versionId, recipeId, userId) as ExistingTextIdRow | undefined;
 
   if (!version) {
     return { success: false, error: "Recipe version not found" };
@@ -156,12 +157,12 @@ export function updateRecipeVersion(
     updatedRecipe.source?.type ?? null,
     updatedRecipe.source?.value ?? null,
     updatedRecipe.source?.summary ?? null,
-    String(updatedRecipe.id),
-    id,
+    versionId,
+    recipeId,
   );
 
   replaceRecipeVersionIngredientsAndSteps(
-    String(updatedRecipe.id),
+    versionId,
     updatedRecipe.ingredients,
     updatedRecipe.instructions,
   );

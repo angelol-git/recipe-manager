@@ -64,33 +64,52 @@ const recipeSourceSchema = z
   })
   .nullable();
 
-export const updateRecipeSchema = z.object({
+const updateRecipeMetadataPayloadSchema = z.object({
+  title: z
+    .string()
+    .min(1)
+    .max(150)
+    .transform((s) => s.trim()),
+});
+
+const updateRecipeVersionPayloadSchema = z.object({
+  recipeDetails: recipeDetailsSchema,
+  description: z
+    .string()
+    .max(2000)
+    .transform((s) => s.trim())
+    .optional()
+    .nullable(),
+  notes: z
+    .string()
+    .max(4000)
+    .transform((s) => s.trim())
+    .optional()
+    .nullable(),
+  instructions: z.array(recipeInstructionSchema).min(1),
+  ingredients: z.array(recipeIngredientSchema).min(1),
+  source: recipeSourceSchema,
+});
+
+const updateRecipeTagsPayloadSchema = z.object({
+  tags: z.array(tagSchema).optional().default([]),
+});
+
+export const updateRecipeMetadataSchema = z.object({
   body: z.object({
-    updatedRecipe: z.object({
-      id: z.string(),
-      title: z
-        .string()
-        .min(1)
-        .max(150)
-        .transform((s) => s.trim()),
-      recipeDetails: recipeDetailsSchema,
-      description: z
-        .string()
-        .max(2000)
-        .transform((s) => s.trim())
-        .optional()
-        .nullable(),
-      notes: z
-        .string()
-        .max(4000)
-        .transform((s) => s.trim())
-        .optional()
-        .nullable(),
-      instructions: z.array(recipeInstructionSchema).min(1),
-      ingredients: z.array(recipeIngredientSchema).min(1),
-      source: recipeSourceSchema,
-      tags: z.array(tagSchema).optional().default([]),
-    }),
+    updatedRecipe: updateRecipeMetadataPayloadSchema,
+  }),
+});
+
+export const updateRecipeVersionSchema = z.object({
+  body: z.object({
+    updatedRecipe: updateRecipeVersionPayloadSchema,
+  }),
+});
+
+export const updateRecipeTagsSchema = z.object({
+  body: z.object({
+    updatedRecipe: updateRecipeTagsPayloadSchema,
   }),
 });
 
@@ -108,7 +127,15 @@ export const addTagSchema = z.object({
 
 export type TagInput = z.infer<typeof tagSchema>;
 export type RecipeDetailsInput = z.infer<typeof recipeDetailsSchema>;
-export type UpdateRecipeBody = z.infer<typeof updateRecipeSchema>["body"];
+export type UpdateRecipeMetadataBody = z.infer<
+  typeof updateRecipeMetadataSchema
+>["body"];
+export type UpdateRecipeVersionBody = z.infer<
+  typeof updateRecipeVersionSchema
+>["body"];
+export type UpdateRecipeTagsBody = z.infer<
+  typeof updateRecipeTagsSchema
+>["body"];
 export type AddTagBody = z.infer<typeof addTagSchema>["body"];
 
 export function validateRequest<T extends z.ZodTypeAny>(schema: T) {

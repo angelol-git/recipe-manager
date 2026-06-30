@@ -20,9 +20,9 @@ import type {
   RecipeTag,
   RecipeVersion,
 } from "./recipe.types.js";
-import type { UpdateRecipeBody } from "../validation/recipeSchemas.js";
+import type { UpdateRecipeMetadataBody } from "../validation/recipeSchemas.js";
 
-type UpdateRecipeInput = UpdateRecipeBody["updatedRecipe"];
+type UpdateRecipeInput = UpdateRecipeMetadataBody["updatedRecipe"];
 
 type GetRecipesByUserIdOptions = {
   page: number;
@@ -169,72 +169,6 @@ export function updateRecipe(
 
     return { success: true };
   })();
-}
-
-export function updateRecipeTags(
-  id: RecipeId,
-  userId: UserId,
-  updatedRecipe: UpdateRecipeInput,
-) {
-  const resolvedTagIds: number[] = [];
-
-  for (const tag of updatedRecipe.tags ?? []) {
-    const existingTagById = db
-      .prepare(`SELECT id FROM tags WHERE id = ? AND user_id = ?`)
-      .get(tag.id, userId) as { id: number } | undefined;
-
-    if (existingTagById) {
-      db.prepare(
-        `UPDATE tags
-           SET name = ?, color = ?, updated_at = CURRENT_TIMESTAMP
-           WHERE id = ? AND user_id = ?`,
-      ).run(tag.name, tag.color, existingTagById.id, userId);
-
-      resolvedTagIds.push(existingTagById.id);
-      continue;
-    }
-
-    const existingTagByName = db
-      .prepare(`SELECT id FROM tags WHERE user_id = ? AND name = ?`)
-      .get(userId, tag.name) as { id: number } | undefined;
-
-    if (existingTagByName) {
-      db.prepare(
-        `UPDATE tags
-           SET color = ?, updated_at = CURRENT_TIMESTAMP
-           WHERE id = ? AND user_id = ?`,
-      ).run(tag.color, existingTagByName.id, userId);
-      resolvedTagIds.push(existingTagByName.id);
-      continue;
-    }
-
-    const insertResult = db
-      .prepare(`INSERT INTO tags (user_id, name, color) VALUES (?, ?, ?)`)
-      .run(userId, tag.name, tag.color);
-
-    resolvedTagIds.push(Number(insertResult.lastInsertRowid));
-  }
-
-  if (resolvedTagIds.length > 0) {
-    db.prepare(
-      `DELETE FROM recipe_tags
-         WHERE recipe_id = ? AND tag_id NOT IN (${resolvedTagIds.map(() => "?").join(", ")})`,
-    ).run(id, ...resolvedTagIds);
-  } else {
-    db.prepare(`DELETE FROM recipe_tags WHERE recipe_id = ?`).run(id);
-  }
-
-  for (const tagId of resolvedTagIds) {
-    db.prepare(
-      `INSERT OR IGNORE INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)`,
-    ).run(id, tagId);
-  }
-
-  db.prepare(
-    `DELETE FROM tags WHERE id NOT IN (SELECT tag_id FROM recipe_tags)`,
-  ).run();
-
-  return { success: true };
 }
 
 function toRecipeTag(tag: RecipeTagRow): RecipeTag {

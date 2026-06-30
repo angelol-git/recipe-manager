@@ -1,13 +1,16 @@
 import express, { type Request, type Response } from "express";
 import authMiddleware from "../middleware.js";
 import {
-  addTagToRecipe,
-  removeTagFromRecipe,
+  createRecipeTag,
+  deleteRecipeTag,
+  updateRecipeTags,
 } from "../services/recipeTagService.js";
 import {
   addTagSchema,
+  updateRecipeTagsSchema,
   validateRequest,
   type AddTagBody,
+  type UpdateRecipeTagsBody,
 } from "../validation/recipeSchemas.js";
 import logger from "../logger.js";
 import { requireUser } from "./routeUtils.js";
@@ -37,7 +40,7 @@ router.post(
     }
 
     try {
-      const result = addTagToRecipe(
+      const result = createRecipeTag(
         req.params.recipeId,
         user.id,
         req.body.newTag,
@@ -61,6 +64,47 @@ router.post(
   },
 );
 
+router.patch(
+  "/:recipeId/tags",
+  authMiddleware,
+  validateRequest(updateRecipeTagsSchema),
+  async (
+    req: Request<RecipeParams, object, UpdateRecipeTagsBody>,
+    res: Response,
+  ) => {
+    const user = requireUser(req, res);
+    if (!user) {
+      return;
+    }
+
+    try {
+      const result = updateRecipeTags(
+        req.params.recipeId,
+        user.id,
+        req.body.updatedRecipe,
+      );
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      return res.status(200).json({
+        success: true,
+        updatedId: req.params.recipeId,
+      });
+    } catch (error) {
+      logger.error(
+        {
+          err: error,
+          path: req.originalUrl,
+          userId: user.id,
+          recipeId: req.params.recipeId,
+        },
+        "Failed to update recipe tags",
+      );
+      return res.status(500).json({ error: "Failed to update recipe tags" });
+    }
+  },
+);
+
 router.delete(
   "/:recipeId/tag/:tagId",
   authMiddleware,
@@ -71,7 +115,7 @@ router.delete(
     }
 
     try {
-      const result = removeTagFromRecipe(
+      const result = deleteRecipeTag(
         req.params.recipeId,
         req.params.tagId,
         user.id,
